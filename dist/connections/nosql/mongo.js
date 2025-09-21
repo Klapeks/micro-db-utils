@@ -35,13 +35,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoGeoPoint = exports.MongoDBConnection = exports.cursorOffsetAggregation = exports.flattenForUpdate = void 0;
 var utils_1 = require("@klapeks/utils");
-var mongoose_1 = __importDefault(require("mongoose"));
+var quiet_require_1 = require("../quiet.require");
+var mongooseModule = (0, quiet_require_1.quietRequire)('mongoose');
 function flattenForUpdate(object, prefix) {
     if (prefix === void 0) { prefix = ''; }
     var _o = object;
@@ -88,13 +86,13 @@ var MongoDBConnection = /** @class */ (function () {
         var _this = this;
         if (name === void 0) { name = 'Counter'; }
         // @ts-ignore
-        var _CounterSchema = new mongoose_1.default.Schema({
+        var _CounterSchema = new mongoose.Schema({
             model: { type: String, required: true, unique: true },
             counter: { type: Number, default: 0 }
         }, {
             versionKey: false
         });
-        var CounterModel = mongoose_1.default.model(name, _CounterSchema);
+        var CounterModel = mongooseModule === null || mongooseModule === void 0 ? void 0 : mongooseModule.model(name, _CounterSchema);
         return {
             model: CounterModel,
             increment: function (model, increment) {
@@ -151,7 +149,9 @@ var MongoDBConnection = /** @class */ (function () {
                         _a = this.getOptions(), host = _a.host, port = _a.port, password = _a.password, username = _a.username;
                         mongoURI = 'mongodb://' + host + ':' + port + '/' + databaseName;
                         // logger.log(mongoURI);
-                        return [4 /*yield*/, mongoose_1.default.connect(mongoURI, {
+                        if (!mongooseModule)
+                            throw new Error("No mongoose module");
+                        return [4 /*yield*/, mongooseModule.connect(mongoURI, {
                                 auth: username ? {
                                     username: username,
                                     password: password,
@@ -159,7 +159,6 @@ var MongoDBConnection = /** @class */ (function () {
                                 authSource: "admin"
                             })];
                     case 1:
-                        // logger.log(mongoURI);
                         _b.sent();
                         _databaseName = databaseName;
                         utils_1.logger.log("Mongo connected to database:", databaseName);
@@ -172,10 +171,10 @@ var MongoDBConnection = /** @class */ (function () {
 }());
 exports.MongoDBConnection = MongoDBConnection;
 function _createDefaultMongoSchemas() {
-    if (!mongoose_1.default)
+    if (!mongooseModule)
         return {};
     return {
-        MongoGeoPoint: new mongoose_1.default.Schema({
+        MongoGeoPoint: new mongooseModule.Schema({
             type: {
                 type: String,
                 enum: ['Point'],

@@ -45,7 +45,7 @@ var RedisConnection = /** @class */ (function () {
     function RedisConnection(options) {
         this.options = options;
         if (!redisModule)
-            throw "Redis module is not installed";
+            throw new Error("Redis module is not installed");
         if (!options.keyPrefix.endsWith(':')) {
             options.keyPrefix = options.keyPrefix + ':';
         }

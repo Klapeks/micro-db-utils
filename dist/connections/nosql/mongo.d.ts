@@ -1,5 +1,30 @@
+/// <reference types="mongoose/types/aggregate" />
+/// <reference types="mongoose/types/callback" />
+/// <reference types="mongoose/types/collection" />
+/// <reference types="mongoose/types/connection" />
+/// <reference types="mongoose/types/cursor" />
+/// <reference types="mongoose/types/document" />
+/// <reference types="mongoose/types/error" />
+/// <reference types="mongoose/types/expressions" />
+/// <reference types="mongoose/types/helpers" />
+/// <reference types="mongoose/types/middlewares" />
+/// <reference types="mongoose/types/indexes" />
+/// <reference types="mongoose/types/models" />
+/// <reference types="mongoose/types/mongooseoptions" />
+/// <reference types="mongoose/types/pipelinestage" />
+/// <reference types="mongoose/types/populate" />
+/// <reference types="mongoose/types/query" />
+/// <reference types="mongoose/types/schemaoptions" />
+/// <reference types="mongoose/types/session" />
+/// <reference types="mongoose/types/types" />
+/// <reference types="mongoose/types/utility" />
+/// <reference types="mongoose/types/validation" />
+/// <reference types="mongoose/types/virtuals" />
+/// <reference types="mongoose/types/schematypes" />
+/// <reference types="mongoose/types/inferschematype" />
+/// <reference types="mongoose/types/inferrawdoctype" />
 import { DatabaseOptions, Flatten } from "@klapeks/utils";
-import mongoose, { PipelineStage, QuerySelector } from "mongoose";
+import type { Schema as MongooseSchema, PipelineStage, QuerySelector } from "mongoose";
 import { Point } from "typeorm";
 export type MongoDBConnectOptions = Omit<DatabaseOptions & {
     type: "mysql";
@@ -13,61 +38,19 @@ export declare function flattenForUpdate<T extends object>(object: T, prefix?: s
 export declare function cursorOffsetAggregation<T extends object>(sortField: keyof Flatten<T>, lastValue: number | string, fieldSort: 'asc' | 'desc', idField: keyof Flatten<T>, lastId: number | string): PipelineStage;
 export declare class MongoDBConnection {
     static createCounter<T extends string>(name?: string): {
-        readonly model: mongoose.Model<{
-            model: string;
-            counter: number;
-        }, {}, {}, {}, mongoose.Document<unknown, {}, {
-            model: string;
-            counter: number;
-        }, {}, mongoose.DefaultSchemaOptions> & {
-            model: string;
-            counter: number;
-        } & {
-            _id: mongoose.Types.ObjectId;
-        } & {
-            __v: number;
-        }, mongoose.Schema<{
-            model: string;
-            counter: number;
-        }, mongoose.Model<{
-            model: string;
-            counter: number;
-        }, any, any, any, mongoose.Document<unknown, any, {
-            model: string;
-            counter: number;
-        }, any, {}> & {
-            model: string;
-            counter: number;
-        } & {
-            _id: mongoose.Types.ObjectId;
-        } & {
-            __v: number;
-        }, any>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, {
-            model: string;
-            counter: number;
-        }, mongoose.Document<unknown, {}, mongoose.FlatRecord<{
-            model: string;
-            counter: number;
-        }>, {}, mongoose.ResolveSchemaOptions<mongoose.DefaultSchemaOptions>> & mongoose.FlatRecord<{
-            model: string;
-            counter: number;
-        }> & {
-            _id: mongoose.Types.ObjectId;
-        } & {
-            __v: number;
-        }>>;
-        readonly increment: (model: T, increment?: number) => Promise<number>;
-        readonly set: (model: T, value: number) => Promise<number>;
+        readonly model: import("mongoose").Model<any, unknown, unknown, unknown, any, any> | undefined;
+        readonly increment: (model: T, increment?: number) => Promise<any>;
+        readonly set: (model: T, value: number) => Promise<any>;
     };
     static getOptions(): MongoDBConnectOptions;
     static init(databaseName: string): Promise<void>;
 }
-export declare const MongoGeoPoint: mongoose.Schema<Point, mongoose.Model<Point, any, any, any, mongoose.Document<unknown, any, Point, any, {}> & Point & {
-    _id: mongoose.Types.ObjectId;
+export declare const MongoGeoPoint: MongooseSchema<Point, import("mongoose").Model<Point, any, any, any, import("mongoose").Document<unknown, any, Point, any, {}> & Point & {
+    _id: import("mongoose").Types.ObjectId;
 } & {
     __v: number;
-}, any>, {}, {}, {}, {}, mongoose.DefaultSchemaOptions, Point, mongoose.Document<unknown, {}, mongoose.FlatRecord<Point>, {}, mongoose.ResolveSchemaOptions<mongoose.DefaultSchemaOptions>> & mongoose.FlatRecord<Point> & {
-    _id: mongoose.Types.ObjectId;
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Point, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Point>, {}, import("mongoose").ResolveSchemaOptions<import("mongoose").DefaultSchemaOptions>> & import("mongoose").FlatRecord<Point> & {
+    _id: import("mongoose").Types.ObjectId;
 } & {
     __v: number;
 }>;

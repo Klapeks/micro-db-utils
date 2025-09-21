@@ -1,6 +1,9 @@
 import { DatabaseOptions, Flatten, logger } from "@klapeks/utils";
-import mongoose, { PipelineStage, QuerySelector } from "mongoose";
+import type { Schema as MongooseSchema, PipelineStage, QuerySelector } from "mongoose";
 import { Point } from "typeorm";
+import { quietRequire } from "../quiet.require";
+
+const mongooseModule = quietRequire<typeof import('mongoose')>('mongoose');
 
 export type MongoDBConnectOptions = Omit<DatabaseOptions & { type: "mysql" }, "type"> & { type: "mongo" };
 
@@ -60,7 +63,7 @@ export class MongoDBConnection {
         }, {
             versionKey: false
         });
-        const CounterModel = mongoose.model(name, _CounterSchema);
+        const CounterModel = mongooseModule?.model(name, _CounterSchema);
         return {
             model: CounterModel,
             increment: async (model: T, increment = 1) => {
@@ -103,8 +106,8 @@ export class MongoDBConnection {
         const mongoURI = 'mongodb://' + host + ':' + port + '/' + databaseName;
 
         // logger.log(mongoURI);
-
-        await mongoose.connect(mongoURI, {
+        if (!mongooseModule) throw new Error("No mongoose module");
+        await mongooseModule.connect(mongoURI, {
             auth: username ? {
                 username: username,
                 password: password,
@@ -117,11 +120,11 @@ export class MongoDBConnection {
 }
 
 function _createDefaultMongoSchemas(): {
-    MongoGeoPoint: mongoose.Schema<Point>
+    MongoGeoPoint: MongooseSchema<Point>
 } {
-    if (!mongoose) return {} as any;
+    if (!mongooseModule) return {} as any;
     return {
-        MongoGeoPoint: new mongoose.Schema<Point>({
+        MongoGeoPoint: new mongooseModule.Schema<Point>({
             type: {
                 type: String,
                 enum: ['Point'],
