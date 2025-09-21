@@ -1,5 +1,5 @@
 import { Logger } from "@klapeks/utils";
-import { Consumer, ConsumerConfig, EachMessagePayload } from "kafkajs";
+import type { Consumer, ConsumerConfig, EachMessagePayload } from "kafkajs";
 import { KafkaConnection } from "./kafka";
 
 

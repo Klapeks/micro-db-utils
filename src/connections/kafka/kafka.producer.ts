@@ -1,4 +1,4 @@
-import { Message as KafkaMessage, Producer, ProducerConfig } from "kafkajs";
+import type { Message as KafkaMessage, Producer, ProducerConfig } from "kafkajs";
 import { KafkaConnection } from "./kafka";
 import { Logger } from "@klapeks/utils";
 

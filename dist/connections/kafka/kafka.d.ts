@@ -1,4 +1,4 @@
-import { ConsumerConfig, Kafka, ProducerConfig } from "kafkajs";
+import type { ConsumerConfig, Kafka, ProducerConfig } from "kafkajs";
 import { KafkaProducer } from "./kafka.producer";
 import { KafkaConsumer } from "./kafka.consumer";
 export declare const instances: {

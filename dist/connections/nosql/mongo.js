@@ -174,6 +174,7 @@ function _createDefaultMongoSchemas() {
     if (!mongooseModule)
         return {};
     return {
+        // @ts-ignore
         MongoGeoPoint: new mongooseModule.Schema({
             type: {
                 type: String,

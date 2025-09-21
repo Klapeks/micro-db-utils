@@ -63,7 +63,7 @@ export class MongoDBConnection {
         }, {
             versionKey: false
         });
-        const CounterModel = mongooseModule?.model(name, _CounterSchema);
+        const CounterModel = mongooseModule?.model(name, _CounterSchema) as any;
         return {
             model: CounterModel,
             increment: async (model: T, increment = 1) => {
@@ -124,6 +124,7 @@ function _createDefaultMongoSchemas(): {
 } {
     if (!mongooseModule) return {} as any;
     return {
+        // @ts-ignore
         MongoGeoPoint: new mongooseModule.Schema<Point>({
             type: {
                 type: String,

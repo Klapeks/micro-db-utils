@@ -1,4 +1,4 @@
-import { Message as KafkaMessage, Producer, ProducerConfig } from "kafkajs";
+import type { Message as KafkaMessage, Producer, ProducerConfig } from "kafkajs";
 import { KafkaConnection } from "./kafka";
 export declare class KafkaProducer {
     readonly connection: KafkaConnection;

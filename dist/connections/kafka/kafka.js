@@ -38,9 +38,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KafkaConnection = exports.instances = void 0;
 var utils_1 = require("@klapeks/utils");
-var kafkajs_1 = require("kafkajs");
 var kafka_producer_1 = require("./kafka.producer");
 var kafka_consumer_1 = require("./kafka.consumer");
+var quiet_require_1 = require("../quiet.require");
+var kafkajsModule = (0, quiet_require_1.quietRequire)('kafkajs');
 var logger = new utils_1.Logger("Kafka");
 exports.instances = {
     producers: [],
@@ -49,7 +50,9 @@ exports.instances = {
 var KafkaConnection = /** @class */ (function () {
     function KafkaConnection(clientId) {
         this.clientId = clientId;
-        this.kafka = new kafkajs_1.Kafka({
+        if (!kafkajsModule)
+            throw "No kafkajs module installed";
+        this.kafka = new kafkajsModule.Kafka({
             clientId: clientId,
             brokers: ['localhost:9092'],
             logCreator: function () { return function () { }; }
@@ -99,7 +102,7 @@ var KafkaConnection = /** @class */ (function () {
                     case 6: return [4 /*yield*/, admin.alterConfigs({
                             validateOnly: false,
                             resources: [{
-                                    type: kafkajs_1.ConfigResourceTypes.TOPIC,
+                                    type: kafkajsModule.ConfigResourceTypes.TOPIC,
                                     name: topic,
                                     configEntries: [{
                                             name: 'retention.ms',

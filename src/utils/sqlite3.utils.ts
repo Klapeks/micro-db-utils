@@ -1,5 +1,4 @@
-import { Database } from "sqlite3";
-
+import type { Database } from "sqlite3";
 
 export const sqlite3_utils = (db: Database) => {
 

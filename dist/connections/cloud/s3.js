@@ -37,9 +37,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.S3Connection = void 0;
-var client_s3_1 = require("@aws-sdk/client-s3");
-var s3_request_presigner_1 = require("@aws-sdk/s3-request-presigner");
 var utils_1 = require("@klapeks/utils");
+var quiet_require_1 = require("../quiet.require");
+var s3ClientModule = (0, quiet_require_1.quietRequire)('@aws-sdk/client-s3');
+var s3PresignerModule = (0, quiet_require_1.quietRequire)('@aws-sdk/s3-request-presigner');
 var logger = new utils_1.Logger("S3/R2");
 var fixPath = function (path) {
     while (path[0] == '/')
@@ -50,8 +51,10 @@ var fixPath = function (path) {
 };
 var S3Connection = /** @class */ (function () {
     function S3Connection(config) {
+        if (!s3ClientModule)
+            throw "No @aws-sdk/client-s3 module installed";
         this._config = config;
-        this.client = new client_s3_1.S3Client({
+        this.client = new s3ClientModule.S3Client({
             region: "auto",
             endpoint: config.url,
             credentials: {
@@ -73,11 +76,14 @@ var S3Connection = /** @class */ (function () {
             var url;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, (0, s3_request_presigner_1.getSignedUrl)(this.client, new client_s3_1.PutObjectCommand({
-                            Bucket: this.bucketName,
-                            Key: fixPath(path),
-                            ContentType: mimeType,
-                        }), { expiresIn: 3600 })];
+                    case 0:
+                        if (!s3PresignerModule)
+                            throw "No @aws-sdk/s3-request-presigner module";
+                        return [4 /*yield*/, s3PresignerModule.getSignedUrl(this.client, new s3ClientModule.PutObjectCommand({
+                                Bucket: this.bucketName,
+                                Key: fixPath(path),
+                                ContentType: mimeType,
+                            }), { expiresIn: 3600 })];
                     case 1:
                         url = _a.sent();
                         return [2 /*return*/, { url: url, mimeType: mimeType }];
@@ -89,7 +95,7 @@ var S3Connection = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.client.send(new client_s3_1.PutObjectCommand({
+                    case 0: return [4 /*yield*/, this.client.send(new s3ClientModule.PutObjectCommand({
                             Bucket: this.bucketName,
                             Key: fixPath(path),
                             Body: buffer,
@@ -107,7 +113,7 @@ var S3Connection = /** @class */ (function () {
                     case 0:
                         while (prefix[0] == '/')
                             prefix = prefix.substring(1);
-                        return [4 /*yield*/, this.client.send(new client_s3_1.ListObjectsCommand({
+                        return [4 /*yield*/, this.client.send(new s3ClientModule.ListObjectsCommand({
                                 Bucket: this.bucketName, Prefix: prefix
                             }))];
                     case 1: return [2 /*return*/, _a.sent()];
@@ -122,7 +128,7 @@ var S3Connection = /** @class */ (function () {
                     case 0:
                         if (!keys.length)
                             return [2 /*return*/];
-                        return [4 /*yield*/, this.client.send(new client_s3_1.DeleteObjectsCommand({
+                        return [4 /*yield*/, this.client.send(new s3ClientModule.DeleteObjectsCommand({
                                 Bucket: this.bucketName,
                                 Delete: {
                                     Objects: keys.map(function (k) { return ({ Key: fixPath(k) }); })

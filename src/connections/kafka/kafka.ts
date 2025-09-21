@@ -1,7 +1,10 @@
 import { Logger } from "@klapeks/utils";
-import { ConfigResourceTypes, ConsumerConfig, Kafka, ProducerConfig } from "kafkajs";
+import type { ConfigResourceTypes, ConsumerConfig, Kafka, ProducerConfig } from "kafkajs";
 import { KafkaProducer } from "./kafka.producer";
 import { KafkaConsumer } from "./kafka.consumer";
+import { quietRequire } from "../quiet.require";
+
+const kafkajsModule = quietRequire<typeof import('kafkajs')>('kafkajs')
 
 const logger = new Logger("Kafka");
 
@@ -14,7 +17,8 @@ export class KafkaConnection {
 
     readonly kafka: Kafka;
     constructor(readonly clientId: string) {
-        this.kafka = new Kafka({
+        if (!kafkajsModule) throw "No kafkajs module installed";
+        this.kafka = new kafkajsModule.Kafka({
             clientId: clientId,
             brokers: ['localhost:9092'],
             logCreator: () => () => { }
@@ -51,7 +55,7 @@ export class KafkaConnection {
         const result = await admin.alterConfigs({
             validateOnly: false,
             resources: [{
-                type: ConfigResourceTypes.TOPIC,
+                type: kafkajsModule!.ConfigResourceTypes.TOPIC,
                 name: topic,
                 configEntries: [{
                     name: 'retention.ms', 

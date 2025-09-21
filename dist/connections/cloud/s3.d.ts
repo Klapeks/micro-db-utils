@@ -1,6 +1,6 @@
 /// <reference types="node" />
 /// <reference types="node" />
-import { S3Client } from "@aws-sdk/client-s3";
+import type { S3Client } from "@aws-sdk/client-s3";
 export interface S3ConnectionConfig {
     bucket: string;
     url: string;

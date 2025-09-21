@@ -38,7 +38,7 @@ export declare function flattenForUpdate<T extends object>(object: T, prefix?: s
 export declare function cursorOffsetAggregation<T extends object>(sortField: keyof Flatten<T>, lastValue: number | string, fieldSort: 'asc' | 'desc', idField: keyof Flatten<T>, lastId: number | string): PipelineStage;
 export declare class MongoDBConnection {
     static createCounter<T extends string>(name?: string): {
-        readonly model: import("mongoose").Model<any, unknown, unknown, unknown, any, any> | undefined;
+        readonly model: any;
         readonly increment: (model: T, increment?: number) => Promise<any>;
         readonly set: (model: T, value: number) => Promise<any>;
     };
