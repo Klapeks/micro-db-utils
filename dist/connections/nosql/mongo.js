@@ -88,7 +88,7 @@ var MongoDBConnection = /** @class */ (function () {
         var _this = this;
         if (name === void 0) { name = 'Counter'; }
         var _CounterSchema = new mongoose_1.default.Schema({
-            // @ts-ignore
+            // @ts-ignore // idk why, but compiler is angry
             model: { type: String, required: true, unique: true },
             counter: { type: Number, default: 0 }
         }, {
