@@ -7,8 +7,7 @@
     "license": "ISC",
     "scripts": {
         "patch": "npm version patch -f --no-git-tag-version",
-        "build": "rm -rf dist && tsc --skipLibCheck",
-        "b---uild": "npm run patch && tsc --skipLibCheck",
+        "build": "npm run patch && tsc --skipLibCheck",
         "prepublishOnly": "tsc --skipLibCheck"
     },
     "keywords": [
@@ -20,19 +19,19 @@
         "url": "https://github.com/Klapeks/micro-db-utils.git"
     },
     "devDependencies": {
-        "@klapeks/api-creation-tools": "^0.0.7",
-        "@types/node": "^18.11.18",
-        "axios": "^1.7.7",
-        "typescript": "^4.7.4",
-        "@klapeks/utils": "^0.1.1",
         "@aws-sdk/client-s3": "^3.842.0",
         "@aws-sdk/s3-request-presigner": "^3.844.0",
+        "@klapeks/api-creation-tools": "^0.0.7",
+        "@klapeks/utils": "^0.1.1",
+        "@types/node": "^18.11.18",
+        "axios": "^1.7.7",
+        "ioredis": "^5.6.1",
         "kafkajs": "^2.2.4",
         "mongoose": "^8.16.1",
-        "ioredis": "^5.6.1",
-        "redis": "^4.7.0",
         "mysql2": "^3.11.3",
+        "redis": "^4.7.0",
         "sqlite3": "^5.1.7",
-        "typeorm": "^0.3.21"
+        "typeorm": "^0.3.21",
+        "typescript": "^4.7.4"
     }
 }
