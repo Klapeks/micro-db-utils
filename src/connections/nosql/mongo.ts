@@ -50,7 +50,11 @@ let _databaseName = '';
 export class MongoDBConnection {
 
     static createCounter<T extends string>(name = 'Counter') {
-        const _CounterSchema = new mongoose.Schema({
+        const _CounterSchema = new mongoose.Schema<{
+            model: string,
+            counter: number
+        }>({
+            // @ts-ignore // idk why, but compiler is angry
             model: { type: String, required: true, unique: true },
             counter: { type: Number, default: 0 }
         }, {
