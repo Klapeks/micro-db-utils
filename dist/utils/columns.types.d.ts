@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { EntitySchemaColumnOptions, EntitySchemaOptions } from "typeorm";
-export declare type RequiredColumns<T> = Required<EntitySchemaOptions<T>['columns']>;
-export declare type RequiredMongoColumns<T> = Required<mongoose.Schema<T>>;
+export type RequiredColumns<T> = Required<EntitySchemaOptions<T>['columns']>;
+export type RequiredMongoColumns<T> = Required<mongoose.Schema<T>>;
 export declare function createRelation(target: string, type: "one-to-many" | "one-to-one", inverseSide: string, cascade?: boolean): {
     target: string;
     type: "one-to-many" | "one-to-one";
@@ -29,7 +29,7 @@ export declare const NullableFloatingColumn: {
     update?: boolean | undefined;
     select?: boolean | undefined;
     insert?: boolean | undefined;
-    generated?: true | "increment" | "uuid" | "rowid" | undefined;
+    generated?: true | "uuid" | "increment" | "rowid" | undefined;
     unique?: boolean | undefined;
     columnDefinition?: string | undefined;
     comment?: string | undefined;
@@ -74,7 +74,7 @@ export declare const NullableFloat64Column: {
     update?: boolean | undefined;
     select?: boolean | undefined;
     insert?: boolean | undefined;
-    generated?: true | "increment" | "uuid" | "rowid" | undefined;
+    generated?: true | "uuid" | "increment" | "rowid" | undefined;
     unique?: boolean | undefined;
     columnDefinition?: string | undefined;
     comment?: string | undefined;

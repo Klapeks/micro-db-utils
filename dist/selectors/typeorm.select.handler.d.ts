@@ -1,7 +1,7 @@
 import { DataSource, EntitySchema, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from './abstract.select.handler';
 import { SelectOptions } from '@klapeks/api-creation-tools';
-export declare type TypeormSelectEntityHandlerOptions<T extends ObjectLiteral, K extends string> = SelectEntityHandlerOptions<T, K> & {
+export type TypeormSelectEntityHandlerOptions<T extends ObjectLiteral, K extends string> = SelectEntityHandlerOptions<T, K> & {
     schema: EntitySchema<T>;
     dataSource: DataSource;
     beforeGetMany?: (builder: SelectQueryBuilder<T>, options: SelectOptions<T>) => Promise<void> | void;

@@ -1,12 +1,12 @@
 import { DatabaseOptions, Flatten } from "@klapeks/utils";
 import mongoose, { PipelineStage, QuerySelector } from "mongoose";
 import { Point } from "typeorm";
-export declare type MongoDBConnectOptions = Omit<DatabaseOptions & {
+export type MongoDBConnectOptions = Omit<DatabaseOptions & {
     type: "mysql";
 }, "type"> & {
     type: "mongo";
 };
-export declare type MongoSearchQuery<T extends object> = {
+export type MongoSearchQuery<T extends object> = {
     [K in keyof Flatten<T>]?: Flatten<T>[K] | QuerySelector<Flatten<T>[K]>;
 };
 export declare function flattenForUpdate<T extends object>(object: T, prefix?: string): Partial<Flatten<T>>;

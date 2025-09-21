@@ -1,6 +1,6 @@
 import { Consumer, ConsumerConfig, EachMessagePayload } from "kafkajs";
 import { KafkaConnection } from "./kafka";
-export declare type KafkaConnectionHandler = (message: any, payload: EachMessagePayload) => any;
+export type KafkaConnectionHandler = (message: any, payload: EachMessagePayload) => any;
 export declare class KafkaConsumer {
     readonly connection: KafkaConnection;
     private readonly config;
