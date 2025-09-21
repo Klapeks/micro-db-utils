@@ -45,11 +45,11 @@ export declare class MongoDBConnection {
     static getOptions(): MongoDBConnectOptions;
     static init(databaseName: string): Promise<void>;
 }
-export declare const MongoGeoPoint: MongooseSchema<Point, import("mongoose").Model<Point, any, any, any, import("mongoose").Document<unknown, any, Point, any, {}> & Point & {
+export declare const MongoGeoPoint: MongooseSchema<Point, import("mongoose").Model<Point, any, any, any, import("mongoose").Document<unknown, any, Point, any> & Point & {
     _id: import("mongoose").Types.ObjectId;
 } & {
     __v: number;
-}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Point, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Point>, {}, import("mongoose").ResolveSchemaOptions<import("mongoose").DefaultSchemaOptions>> & import("mongoose").FlatRecord<Point> & {
+}, any>, {}, {}, {}, {}, import("mongoose").DefaultSchemaOptions, Point, import("mongoose").Document<unknown, {}, import("mongoose").FlatRecord<Point>, {}> & import("mongoose").FlatRecord<Point> & {
     _id: import("mongoose").Types.ObjectId;
 } & {
     __v: number;

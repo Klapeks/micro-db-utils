@@ -61,7 +61,12 @@ var RedisConnection = /** @class */ (function () {
     RedisConnection.prototype.initialize = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.redisClient.connect()];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.redisClient.connect()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
             });
         });
     };

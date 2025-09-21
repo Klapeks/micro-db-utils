@@ -25,7 +25,8 @@ export class RedisConnection {
         return this.options.keyPrefix;
     }
     async initialize() {
-        return this.redisClient.connect();
+        await this.redisClient.connect();
+        return;
     }
 
     async remove(key: string) {
