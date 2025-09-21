@@ -1,13 +1,14 @@
 {
     "name": "@klapeks/micro-db-utils",
     "description": "klapeks utils for db and other storages",
-    "version": "0.0.2",
+    "version": "0.0.1",
     "type": "commonjs",
     "author": "Klapeks",
     "license": "ISC",
     "scripts": {
         "patch": "npm version patch -f --no-git-tag-version",
-        "build": "npm run patch && tsc --skipLibCheck",
+        "build": "rm -rf dist && tsc --skipLibCheck",
+        "b---uild": "npm run patch && tsc --skipLibCheck",
         "prepublishOnly": "tsc --skipLibCheck"
     },
     "keywords": [

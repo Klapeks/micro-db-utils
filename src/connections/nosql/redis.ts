@@ -1,7 +1,8 @@
 
 import { Logger } from '@klapeks/utils';
 import type { createClient as REDIS_createClient } from 'redis';
-const redisMODULE = require('redis') as typeof import('redis');
+import { quietRequire } from '../quiet.require';
+const redisModule = quietRequire<typeof import('redis')>('redis');
 
 const logger = new Logger("Redis");
 
@@ -13,10 +14,11 @@ export class RedisConnection {
         clientName: string,
         keyPrefix: string
     }) {
+        if (!redisModule) throw "Redis module is not installed";
         if (!options.keyPrefix.endsWith(':')) {
             options.keyPrefix = options.keyPrefix + ':'
         }
-        this.redisClient = redisMODULE.createClient({ name: options.clientName });
+        this.redisClient = redisModule.createClient({ name: options.clientName });
     }
 
     get keyPrefix() {

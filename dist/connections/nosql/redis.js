@@ -38,15 +38,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedisConnection = void 0;
 var utils_1 = require("@klapeks/utils");
-var redisMODULE = require('redis');
+var quiet_require_1 = require("../quiet.require");
+var redisModule = (0, quiet_require_1.quietRequire)('redis');
 var logger = new utils_1.Logger("Redis");
 var RedisConnection = /** @class */ (function () {
     function RedisConnection(options) {
         this.options = options;
+        if (!redisModule)
+            throw "Redis module is not installed";
         if (!options.keyPrefix.endsWith(':')) {
             options.keyPrefix = options.keyPrefix + ':';
         }
-        this.redisClient = redisMODULE.createClient({ name: options.clientName });
+        this.redisClient = redisModule.createClient({ name: options.clientName });
     }
     Object.defineProperty(RedisConnection.prototype, "keyPrefix", {
         get: function () {
