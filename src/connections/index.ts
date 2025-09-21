@@ -3,8 +3,8 @@
 export * from './mysql.connection';
 
 // NoSQL
-export * from './nosql/mongo';
 export * from './nosql/redis';
+export * from './nosql/mongo';
 
 // Brokers
 export * from './kafka';
