@@ -1,10 +1,10 @@
-import { createClient } from 'redis';
+import type { createClient as REDIS_createClient } from 'redis';
 export declare class RedisConnection {
     readonly options: {
         clientName: string;
         keyPrefix: string;
     };
-    readonly redisClient: ReturnType<typeof createClient>;
+    readonly redisClient: ReturnType<typeof REDIS_createClient>;
     constructor(options: {
         clientName: string;
         keyPrefix: string;
@@ -20,7 +20,7 @@ export declare class RedisConnection {
             delete: typeof import("@redis/graph/dist/commands/DELETE");
             EXPLAIN: typeof import("@redis/graph/dist/commands/EXPLAIN");
             explain: typeof import("@redis/graph/dist/commands/EXPLAIN");
-            LIST: typeof import("@redis/graph/dist/commands/LIST"); /** in seconds */
+            LIST: typeof import("@redis/graph/dist/commands/LIST");
             list: typeof import("@redis/graph/dist/commands/LIST");
             PROFILE: typeof import("@redis/graph/dist/commands/PROFILE");
             profile: typeof import("@redis/graph/dist/commands/PROFILE");

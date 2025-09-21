@@ -1,12 +1,13 @@
 
 import { Logger } from '@klapeks/utils';
-import { createClient } from 'redis';
+import type { createClient as REDIS_createClient } from 'redis';
+const redisMODULE = require('redis') as typeof import('redis');
 
 const logger = new Logger("Redis");
 
 export class RedisConnection {
 
-    readonly redisClient: ReturnType<typeof createClient>;
+    readonly redisClient: ReturnType<typeof REDIS_createClient>;
 
     constructor(readonly options: {
         clientName: string,
@@ -15,7 +16,7 @@ export class RedisConnection {
         if (!options.keyPrefix.endsWith(':')) {
             options.keyPrefix = options.keyPrefix + ':'
         }
-        this.redisClient = createClient({ name: options.clientName });
+        this.redisClient = redisMODULE.createClient({ name: options.clientName });
     }
 
     get keyPrefix() {

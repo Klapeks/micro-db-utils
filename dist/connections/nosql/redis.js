@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedisConnection = void 0;
 var utils_1 = require("@klapeks/utils");
-var redis_1 = require("redis");
+var redisMODULE = require('redis');
 var logger = new utils_1.Logger("Redis");
 var RedisConnection = /** @class */ (function () {
     function RedisConnection(options) {
@@ -46,7 +46,7 @@ var RedisConnection = /** @class */ (function () {
         if (!options.keyPrefix.endsWith(':')) {
             options.keyPrefix = options.keyPrefix + ':';
         }
-        this.redisClient = (0, redis_1.createClient)({ name: options.clientName });
+        this.redisClient = redisMODULE.createClient({ name: options.clientName });
     }
     Object.defineProperty(RedisConnection.prototype, "keyPrefix", {
         get: function () {
