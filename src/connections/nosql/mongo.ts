@@ -116,15 +116,24 @@ export class MongoDBConnection {
     }
 }
 
-export const MongoGeoPoint = new mongoose.Schema<Point>({
-    type: {
-        type: String,
-        enum: ['Point'],
-        required: true,
-        default: 'Point'
-    },
-    coordinates: {
-        type: [Number],  // [долгота, широта]
-        required: true
+function _createDefaultMongoSchemas(): {
+    MongoGeoPoint: mongoose.Schema<Point>
+} {
+    if (!mongoose) return {} as any;
+    return {
+        MongoGeoPoint: new mongoose.Schema<Point>({
+            type: {
+                type: String,
+                enum: ['Point'],
+                required: true,
+                default: 'Point'
+            },
+            coordinates: {
+                type: [Number],  // [долгота, широта]
+                required: true
+            }
+        }, { _id: false })
     }
-}, { _id: false })
+}
+
+export const { MongoGeoPoint } = _createDefaultMongoSchemas();
