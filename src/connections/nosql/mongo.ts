@@ -53,8 +53,8 @@ let _databaseName = '';
 export class MongoDBConnection {
 
     static createCounter<T extends string>(name = 'Counter') {
-        // @ts-ignore
-        const _CounterSchema = new mongoose.Schema<{
+        if (!mongooseModule) throw "No mongoose module";
+        const _CounterSchema = new mongooseModule.Schema<{
             model: string,
             counter: number
         }>({
@@ -124,7 +124,6 @@ function _createDefaultMongoSchemas(): {
 } {
     if (!mongooseModule) return {} as any;
     return {
-        // @ts-ignore
         MongoGeoPoint: new mongooseModule.Schema<Point>({
             type: {
                 type: String,

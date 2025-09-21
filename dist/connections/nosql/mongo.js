@@ -85,8 +85,9 @@ var MongoDBConnection = /** @class */ (function () {
     MongoDBConnection.createCounter = function (name) {
         var _this = this;
         if (name === void 0) { name = 'Counter'; }
-        // @ts-ignore
-        var _CounterSchema = new mongoose.Schema({
+        if (!mongooseModule)
+            throw "No mongoose module";
+        var _CounterSchema = new mongooseModule.Schema({
             model: { type: String, required: true, unique: true },
             counter: { type: Number, default: 0 }
         }, {
@@ -174,7 +175,6 @@ function _createDefaultMongoSchemas() {
     if (!mongooseModule)
         return {};
     return {
-        // @ts-ignore
         MongoGeoPoint: new mongooseModule.Schema({
             type: {
                 type: String,

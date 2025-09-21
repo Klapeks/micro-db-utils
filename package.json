@@ -1,7 +1,7 @@
 {
     "name": "@klapeks/micro-db-utils",
     "description": "klapeks utils for db and other storages",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "type": "commonjs",
     "author": "Klapeks",
     "license": "ISC",
