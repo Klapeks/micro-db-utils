@@ -83,11 +83,14 @@ export abstract class AbstractSelectHandler<
             count: await this.getTotal()
         }
 
-        response.total = (await this.runSQL_One(`
-            SELECT SUM(${sumField as string}) as sum
-            FROM ${this.getTableName()}
-            ${strWhere ? ("WHERE " + strWhere) : ''}
-        `))?.sum;
+        response.total = {
+            from: new Date(0), // TODO get first?
+            sum: (await this.runSQL_One(`
+                SELECT SUM(${sumField as string}) as sum
+                FROM ${this.getTableName()}
+                ${strWhere ? ("WHERE " + strWhere) : ''}
+            `))?.sum as number
+        };
 
         response.thisDay = await stat(new Date());
         response.thisWeek = await stat(d => d.setDate(d.getDate() - (d.getDay() || 7) + 1));
