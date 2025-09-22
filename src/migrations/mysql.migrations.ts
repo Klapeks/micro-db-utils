@@ -73,6 +73,17 @@ export class MySQLMigrations {
                     return;
                 }
                 const lastRealMigration = migrationRecords?.find(r => r.table == table)?.lastMigrationTime as string;
+                const _local_runSQL = async (sql: string) => {
+                    if (sql.toLowerCase().startsWith("alter table")) {
+                        // log error if error
+                        await mysqlInstance.runSQL(sql).catch(err => {
+                            logger.error("Error while alter table:", err);
+                        });
+                    } else {
+                        // throw error if error
+                        await mysqlInstance.runSQL(sql); 
+                    }
+                }
                 for (let migration of todoMigrations) {
                     if (migration.table != table) continue;
                     if (lastRealMigration && new Date(lastRealMigration).getTime() >= migration.date.getTime()) {
@@ -86,12 +97,12 @@ export class MySQLMigrations {
                         });
                         logger.log(runnedMigrationsAmount, "| Migrations will be runned:",
                                 migrationName, '|\n' + terminalColors.cyan, sqls);
-                        for (let sql of sqls) await mysqlInstance.runSQL(sql);
+                        for (let sql of sqls) await _local_runSQL(sql);
                     } else {
                         const sql = utils.replaceAll(migration.sql, "%{table_name}", table);
                         logger.log(runnedMigrationsAmount, "| Migration will be runned:", 
                                 migrationName, '|\n' + terminalColors.cyan, sql.trim());
-                        await mysqlInstance.runSQL(sql);
+                        await _local_runSQL(sql);
                     }
                     await mysqlInstance.runSQL(`
                         INSERT INTO \`${this.migrationTableName}\` (\`table\`, \`lastMigrationTime\`)

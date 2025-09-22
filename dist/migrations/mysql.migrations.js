@@ -104,7 +104,8 @@ var MySQLMigrations = /** @class */ (function () {
                         migrationRecords_1 = _b.sent();
                         runnedMigrationsAmount_1 = 0;
                         runTableMigration = function (table) { return __awaiter(_this, void 0, void 0, function () {
-                            var todoMigrations, tableInfo, lastMigrationDate, lastRealMigration, _i, todoMigrations_1, migration, migrationName, sqls, _a, sqls_1, sql, sql;
+                            var todoMigrations, tableInfo, lastMigrationDate, lastRealMigration, _local_runSQL, _i, todoMigrations_1, migration, migrationName, sqls, _a, sqls_1, sql, sql;
+                            var _this = this;
                             var _b, _c;
                             return __generator(this, function (_d) {
                                 switch (_d.label) {
@@ -125,6 +126,30 @@ var MySQLMigrations = /** @class */ (function () {
                                     case 3: return [2 /*return*/];
                                     case 4:
                                         lastRealMigration = (_c = migrationRecords_1 === null || migrationRecords_1 === void 0 ? void 0 : migrationRecords_1.find(function (r) { return r.table == table; })) === null || _c === void 0 ? void 0 : _c.lastMigrationTime;
+                                        _local_runSQL = function (sql) { return __awaiter(_this, void 0, void 0, function () {
+                                            return __generator(this, function (_a) {
+                                                switch (_a.label) {
+                                                    case 0:
+                                                        if (!sql.toLowerCase().startsWith("alter table")) return [3 /*break*/, 2];
+                                                        // log error if error
+                                                        return [4 /*yield*/, mysqlInstance_1.runSQL(sql).catch(function (err) {
+                                                                logger.error("Error while alter table:", err);
+                                                            })];
+                                                    case 1:
+                                                        // log error if error
+                                                        _a.sent();
+                                                        return [3 /*break*/, 4];
+                                                    case 2: 
+                                                    // throw error if error
+                                                    return [4 /*yield*/, mysqlInstance_1.runSQL(sql)];
+                                                    case 3:
+                                                        // throw error if error
+                                                        _a.sent();
+                                                        _a.label = 4;
+                                                    case 4: return [2 /*return*/];
+                                                }
+                                            });
+                                        }); };
                                         _i = 0, todoMigrations_1 = todoMigrations;
                                         _d.label = 5;
                                     case 5:
@@ -147,7 +172,7 @@ var MySQLMigrations = /** @class */ (function () {
                                     case 6:
                                         if (!(_a < sqls_1.length)) return [3 /*break*/, 9];
                                         sql = sqls_1[_a];
-                                        return [4 /*yield*/, mysqlInstance_1.runSQL(sql)];
+                                        return [4 /*yield*/, _local_runSQL(sql)];
                                     case 7:
                                         _d.sent();
                                         _d.label = 8;
@@ -158,7 +183,7 @@ var MySQLMigrations = /** @class */ (function () {
                                     case 10:
                                         sql = utils_1.utils.replaceAll(migration.sql, "%{table_name}", table);
                                         logger.log(runnedMigrationsAmount_1, "| Migration will be runned:", migrationName, '|\n' + utils_1.terminalColors.cyan, sql.trim());
-                                        return [4 /*yield*/, mysqlInstance_1.runSQL(sql)];
+                                        return [4 /*yield*/, _local_runSQL(sql)];
                                     case 11:
                                         _d.sent();
                                         _d.label = 12;
