@@ -28,6 +28,7 @@ export class MySQLMigrations {
     }
 
     private static checkIsCreatesTable(migrations: string | string[]): boolean {
+        if (!migrations) return false;
         if (Array.isArray(migrations)) return this.checkIsCreatesTable(migrations[0]);
         return migrations.toLowerCase().startsWith('create table');
     }
@@ -66,7 +67,7 @@ export class MySQLMigrations {
         
                 const isTableExistsInfo = await getTable(table);
                 
-                if (!isTableExistsInfo && !this.checkIsCreatesTable(todoMigrations[0].sql)) {
+                if (!isTableExistsInfo && !this.checkIsCreatesTable(todoMigrations?.[0]?.sql)) {
                     logger.log(`Table ${table} not found. Migrations ${todoMigrations?.length} will be skipped`);
                     const lastMigrationDate = todoMigrations.length ? todoMigrations?.[todoMigrations.length - 1]?.date : undefined;
                     if (todoMigrations?.length && lastMigrationDate) {
