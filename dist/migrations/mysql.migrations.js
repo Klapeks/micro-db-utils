@@ -71,6 +71,11 @@ var MySQLMigrations = /** @class */ (function () {
             sql: sql
         });
     };
+    MySQLMigrations.checkIsCreatesTable = function (migrations) {
+        if (Array.isArray(migrations))
+            return this.checkIsCreatesTable(migrations[0]);
+        return migrations.toLowerCase().startsWith('create table');
+    };
     MySQLMigrations.runMigrations = function (dataSource) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
@@ -104,7 +109,7 @@ var MySQLMigrations = /** @class */ (function () {
                         migrationRecords_1 = _b.sent();
                         runnedMigrationsAmount_1 = 0;
                         runTableMigration = function (table) { return __awaiter(_this, void 0, void 0, function () {
-                            var todoMigrations, tableInfo, lastMigrationDate, lastRealMigration, _local_runSQL, _i, todoMigrations_1, migration, migrationName, sqls, _a, sqls_1, sql, sql;
+                            var todoMigrations, isTableExistsInfo, lastMigrationDate, lastRealMigration, _local_runSQL, _i, todoMigrations_1, migration, migrationName, sqls, _a, sqls_1, sql, sql;
                             var _this = this;
                             var _b, _c;
                             return __generator(this, function (_d) {
@@ -114,8 +119,8 @@ var MySQLMigrations = /** @class */ (function () {
                                         todoMigrations = __spreadArray([], todoMigrations, true).filter(function (m) { return m.table == table; });
                                         return [4 /*yield*/, getTable_1(table)];
                                     case 1:
-                                        tableInfo = _d.sent();
-                                        if (!!tableInfo) return [3 /*break*/, 4];
+                                        isTableExistsInfo = _d.sent();
+                                        if (!(!isTableExistsInfo && !this.checkIsCreatesTable(todoMigrations[0].sql))) return [3 /*break*/, 4];
                                         logger.log("Table ".concat(table, " not found. Migrations ").concat(todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length, " will be skipped"));
                                         lastMigrationDate = todoMigrations.length ? (_b = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[todoMigrations.length - 1]) === null || _b === void 0 ? void 0 : _b.date : undefined;
                                         if (!((todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length) && lastMigrationDate)) return [3 /*break*/, 3];
