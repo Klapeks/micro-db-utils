@@ -27,6 +27,11 @@ export class MySQLMigrations {
         });
     }
 
+    private static checkIsCreatesTable(migrations: string | string[]): boolean {
+        if (Array.isArray(migrations)) return this.checkIsCreatesTable(migrations[0]);
+        return migrations.toLowerCase().startsWith('create table');
+    }
+
     static async runMigrations(dataSource: DataSource) {
         try {
             const options = dataSourceOptions();
@@ -59,8 +64,9 @@ export class MySQLMigrations {
                 let todoMigrations = _migrations.sort((c1, c2) => c1.date.getTime() - c2.date.getTime());
                 todoMigrations = [...todoMigrations].filter(m => m.table == table);
         
-                const tableInfo = await getTable(table);
-                if (!tableInfo) {
+                const isTableExistsInfo = await getTable(table);
+                
+                if (!isTableExistsInfo && !this.checkIsCreatesTable(todoMigrations[0].sql)) {
                     logger.log(`Table ${table} not found. Migrations ${todoMigrations?.length} will be skipped`);
                     const lastMigrationDate = todoMigrations.length ? todoMigrations?.[todoMigrations.length - 1]?.date : undefined;
                     if (todoMigrations?.length && lastMigrationDate) {
