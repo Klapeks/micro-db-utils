@@ -113,26 +113,27 @@ var MySQLMigrations = /** @class */ (function () {
                         runTableMigration = function (table) { return __awaiter(_this, void 0, void 0, function () {
                             var todoMigrations, isTableExistsInfo, lastMigrationDate, lastRealMigration, _local_runSQL, _i, todoMigrations_1, migration, migrationName, sqls, _a, sqls_1, sql, sql;
                             var _this = this;
-                            var _b, _c, _d;
-                            return __generator(this, function (_e) {
-                                switch (_e.label) {
+                            var _b, _c, _d, _e, _f;
+                            return __generator(this, function (_g) {
+                                switch (_g.label) {
                                     case 0:
                                         todoMigrations = _migrations.sort(function (c1, c2) { return c1.date.getTime() - c2.date.getTime(); });
                                         todoMigrations = __spreadArray([], todoMigrations, true).filter(function (m) { return m.table == table; });
                                         return [4 /*yield*/, getTable_1(table)];
                                     case 1:
-                                        isTableExistsInfo = _e.sent();
-                                        if (!(!isTableExistsInfo && !this.checkIsCreatesTable((_b = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[0]) === null || _b === void 0 ? void 0 : _b.sql))) return [3 /*break*/, 4];
+                                        isTableExistsInfo = _g.sent();
+                                        console.log("FCK", table, '|||', (_b = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[0]) === null || _b === void 0 ? void 0 : _b.sql, this.checkIsCreatesTable((_c = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[0]) === null || _c === void 0 ? void 0 : _c.sql));
+                                        if (!(!isTableExistsInfo && !this.checkIsCreatesTable((_d = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[0]) === null || _d === void 0 ? void 0 : _d.sql))) return [3 /*break*/, 4];
                                         logger.log("Table ".concat(table, " not found. Migrations ").concat(todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length, " will be skipped"));
-                                        lastMigrationDate = todoMigrations.length ? (_c = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[todoMigrations.length - 1]) === null || _c === void 0 ? void 0 : _c.date : undefined;
+                                        lastMigrationDate = todoMigrations.length ? (_e = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[todoMigrations.length - 1]) === null || _e === void 0 ? void 0 : _e.date : undefined;
                                         if (!((todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length) && lastMigrationDate)) return [3 /*break*/, 3];
                                         return [4 /*yield*/, mysqlInstance_1.runSQL("\n                            INSERT INTO `".concat(this.migrationTableName, "` (`table`, `lastMigrationTime`)\n                            VALUES ('").concat(table, "', '").concat((0, iso_date_time_1.toISODate)(lastMigrationDate), "')\n                            ON DUPLICATE KEY UPDATE `lastMigrationTime` = '").concat((0, iso_date_time_1.toISODate)(lastMigrationDate), "'\n                        "))];
                                     case 2:
-                                        _e.sent();
-                                        _e.label = 3;
+                                        _g.sent();
+                                        _g.label = 3;
                                     case 3: return [2 /*return*/];
                                     case 4:
-                                        lastRealMigration = (_d = migrationRecords_1 === null || migrationRecords_1 === void 0 ? void 0 : migrationRecords_1.find(function (r) { return r.table == table; })) === null || _d === void 0 ? void 0 : _d.lastMigrationTime;
+                                        lastRealMigration = (_f = migrationRecords_1 === null || migrationRecords_1 === void 0 ? void 0 : migrationRecords_1.find(function (r) { return r.table == table; })) === null || _f === void 0 ? void 0 : _f.lastMigrationTime;
                                         _local_runSQL = function (sql) { return __awaiter(_this, void 0, void 0, function () {
                                             return __generator(this, function (_a) {
                                                 switch (_a.label) {
@@ -158,7 +159,7 @@ var MySQLMigrations = /** @class */ (function () {
                                             });
                                         }); };
                                         _i = 0, todoMigrations_1 = todoMigrations;
-                                        _e.label = 5;
+                                        _g.label = 5;
                                     case 5:
                                         if (!(_i < todoMigrations_1.length)) return [3 /*break*/, 16];
                                         migration = todoMigrations_1[_i];
@@ -175,14 +176,14 @@ var MySQLMigrations = /** @class */ (function () {
                                         });
                                         logger.log(runnedMigrationsAmount_1, "| Migrations will be runned:", migrationName, '|\n' + utils_1.terminalColors.cyan, sqls);
                                         _a = 0, sqls_1 = sqls;
-                                        _e.label = 6;
+                                        _g.label = 6;
                                     case 6:
                                         if (!(_a < sqls_1.length)) return [3 /*break*/, 9];
                                         sql = sqls_1[_a];
                                         return [4 /*yield*/, _local_runSQL(sql)];
                                     case 7:
-                                        _e.sent();
-                                        _e.label = 8;
+                                        _g.sent();
+                                        _g.label = 8;
                                     case 8:
                                         _a++;
                                         return [3 /*break*/, 6];
@@ -192,16 +193,16 @@ var MySQLMigrations = /** @class */ (function () {
                                         logger.log(runnedMigrationsAmount_1, "| Migration will be runned:", migrationName, '|\n' + utils_1.terminalColors.cyan, sql.trim());
                                         return [4 /*yield*/, _local_runSQL(sql)];
                                     case 11:
-                                        _e.sent();
-                                        _e.label = 12;
+                                        _g.sent();
+                                        _g.label = 12;
                                     case 12: return [4 /*yield*/, mysqlInstance_1.runSQL("\n                        INSERT INTO `".concat(this.migrationTableName, "` (`table`, `lastMigrationTime`)\n                        VALUES ('").concat(table, "', '").concat((0, iso_date_time_1.toISODate)(migration.date), "')\n                        ON DUPLICATE KEY UPDATE `lastMigrationTime` = '").concat((0, iso_date_time_1.toISODate)(migration.date), "'\n                    "))];
                                     case 13:
-                                        _e.sent();
+                                        _g.sent();
                                         logger.log(runnedMigrationsAmount_1, "| Migration", migrationName, "successfully done");
                                         return [4 /*yield*/, utils_1.utils.sleep(100)];
                                     case 14:
-                                        _e.sent();
-                                        _e.label = 15;
+                                        _g.sent();
+                                        _g.label = 15;
                                     case 15:
                                         _i++;
                                         return [3 /*break*/, 5];

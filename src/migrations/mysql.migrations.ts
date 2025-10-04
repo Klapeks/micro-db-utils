@@ -66,6 +66,9 @@ export class MySQLMigrations {
                 todoMigrations = [...todoMigrations].filter(m => m.table == table);
         
                 const isTableExistsInfo = await getTable(table);
+
+                console.log("FCK", table, '|||', todoMigrations?.[0]?.sql, 
+                    this.checkIsCreatesTable(todoMigrations?.[0]?.sql))
                 
                 if (!isTableExistsInfo && !this.checkIsCreatesTable(todoMigrations?.[0]?.sql)) {
                     logger.log(`Table ${table} not found. Migrations ${todoMigrations?.length} will be skipped`);
