@@ -30,7 +30,7 @@ export class MySQLMigrations {
     private static checkIsCreatesTable(migrations: string | string[]): boolean {
         if (!migrations) return false;
         if (Array.isArray(migrations)) return this.checkIsCreatesTable(migrations[0]);
-        return migrations.toLowerCase().startsWith('create table');
+        return migrations.trim().toLowerCase().startsWith('create table');
     }
 
     static async runMigrations(dataSource: DataSource) {
@@ -67,8 +67,8 @@ export class MySQLMigrations {
         
                 const isTableExistsInfo = await getTable(table);
 
-                console.log("FCK", table, '|||', todoMigrations?.[0]?.sql, 
-                    this.checkIsCreatesTable(todoMigrations?.[0]?.sql))
+                // console.log("FCK", table, '|||', todoMigrations?.[0]?.sql, 
+                //     this.checkIsCreatesTable(todoMigrations?.[0]?.sql))
                 
                 if (!isTableExistsInfo && !this.checkIsCreatesTable(todoMigrations?.[0]?.sql)) {
                     logger.log(`Table ${table} not found. Migrations ${todoMigrations?.length} will be skipped`);
