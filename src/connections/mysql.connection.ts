@@ -6,10 +6,10 @@ const logger = new Logger('MySQL');
 export class RawMySQLConnection {
 
     private _pool: mysql2.Pool | undefined;
-    private _poolOptions: mysql2.PoolOptions;
 
+    readonly poolOptions: mysql2.PoolOptions;
     constructor(options: DatabaseOptions & { type: "mysql" }) {
-        this._poolOptions = {
+        this.poolOptions = {
             user: options.username,
             password: options.password,
             host: options.host,
@@ -26,7 +26,7 @@ export class RawMySQLConnection {
     async takePool(): Promise<mysql2.Pool> {
         if (this._pool) return this._pool;
         // if (this.options.type != 'mysql') throw "Not a mysql";
-        this._pool = mysql2.createPool(this._poolOptions);
+        this._pool = mysql2.createPool(this.poolOptions);
 
         this._pool.on('connection', () => {
             logger.log('Database connected');
