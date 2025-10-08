@@ -2,7 +2,7 @@ import mysql2 from 'mysql2';
 import { DatabaseOptions } from '@klapeks/utils';
 export declare class RawMySQLConnection {
     private _pool;
-    private _poolOptions;
+    readonly poolOptions: mysql2.PoolOptions;
     constructor(options: DatabaseOptions & {
         type: "mysql";
     });

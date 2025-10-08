@@ -45,7 +45,7 @@ var utils_1 = require("@klapeks/utils");
 var logger = new utils_1.Logger('MySQL');
 var RawMySQLConnection = /** @class */ (function () {
     function RawMySQLConnection(options) {
-        this._poolOptions = {
+        this.poolOptions = {
             user: options.username,
             password: options.password,
             host: options.host,
@@ -68,7 +68,7 @@ var RawMySQLConnection = /** @class */ (function () {
                 if (this._pool)
                     return [2 /*return*/, this._pool];
                 // if (this.options.type != 'mysql') throw "Not a mysql";
-                this._pool = mysql2_1.default.createPool(this._poolOptions);
+                this._pool = mysql2_1.default.createPool(this.poolOptions);
                 this._pool.on('connection', function () {
                     logger.log('Database connected');
                 });
