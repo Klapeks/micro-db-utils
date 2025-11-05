@@ -100,7 +100,9 @@ export class MongoDBConnection {
 
     static async init(databaseName: string, replicaSet?: string) {
         if (_databaseName) return;
-        if (!replicaSet && process.env.MONGO_DATABASE_REPLICA_SET) replicaSet = process.env.MONGO_DATABASE_REPLICA_SET;
+        if (!replicaSet && process.env.MONGO_DATABASE_REPLICA_SET) {
+            replicaSet = process.env.MONGO_DATABASE_REPLICA_SET;
+        }
 
         const { host, port, password, username } = this.getOptions();
 
