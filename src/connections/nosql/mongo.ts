@@ -98,12 +98,14 @@ export class MongoDBConnection {
         }
     }
 
-    static async init(databaseName: string) {
+    static async init(databaseName: string, replicaSet?: string) {
         if (_databaseName) return;
+        if (!replicaSet && process.env.MONGO_DATABASE_REPLICA_SET) replicaSet = process.env.MONGO_DATABASE_REPLICA_SET;
 
         const { host, port, password, username } = this.getOptions();
 
-        const mongoURI = 'mongodb://' + host + ':' + port + '/' + databaseName;
+        const mongoURI = 'mongodb://' + host + ':' + port + '/' + databaseName
+            + (replicaSet ? '?replicaSet=' + replicaSet : undefined);
 
         // logger.log(mongoURI);
         if (!mongooseModule) throw new Error("No mongoose module");
