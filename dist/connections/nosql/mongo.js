@@ -139,7 +139,7 @@ var MongoDBConnection = /** @class */ (function () {
             database: ""
         };
     };
-    MongoDBConnection.init = function (databaseName) {
+    MongoDBConnection.init = function (databaseName, replicaSet) {
         return __awaiter(this, void 0, void 0, function () {
             var _a, host, port, password, username, mongoURI;
             return __generator(this, function (_b) {
@@ -147,8 +147,12 @@ var MongoDBConnection = /** @class */ (function () {
                     case 0:
                         if (_databaseName)
                             return [2 /*return*/];
+                        if (!replicaSet && process.env.MONGO_DATABASE_REPLICA_SET) {
+                            replicaSet = process.env.MONGO_DATABASE_REPLICA_SET;
+                        }
                         _a = this.getOptions(), host = _a.host, port = _a.port, password = _a.password, username = _a.username;
-                        mongoURI = 'mongodb://' + host + ':' + port + '/' + databaseName;
+                        mongoURI = 'mongodb://' + host + ':' + port + '/' + databaseName
+                            + (replicaSet ? '?replicaSet=' + replicaSet : undefined);
                         // logger.log(mongoURI);
                         if (!mongooseModule)
                             throw new Error("No mongoose module");

@@ -43,7 +43,7 @@ export declare class MongoDBConnection {
         readonly set: (model: T, value: number) => Promise<any>;
     };
     static getOptions(): MongoDBConnectOptions;
-    static init(databaseName: string): Promise<void>;
+    static init(databaseName: string, replicaSet?: string): Promise<void>;
 }
 export declare const MongoGeoPoint: MongooseSchema<Point, import("mongoose").Model<Point, any, any, any, import("mongoose").Document<unknown, any, Point, any> & Point & {
     _id: import("mongoose").Types.ObjectId;
