@@ -129,6 +129,38 @@ var RedisConnection = /** @class */ (function () {
             });
         });
     };
+    RedisConnection.prototype.setLock = function (key, options) {
+        return __awaiter(this, void 0, void 0, function () {
+            var result, err_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, this.redisClient.set(this.keyPrefix + key, "1", {
+                                NX: true,
+                                EX: (options === null || options === void 0 ? void 0 : options.expiredInSeconds) || 60
+                            })];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/, {
+                                isAlreadyLocked: !result
+                            }];
+                    case 2:
+                        err_2 = _a.sent();
+                        logger.error("Error locking redis:", (0, utils_1.shortErrorParser)(err_2));
+                        throw err_2;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    RedisConnection.prototype.unlock = function (key) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.remove(key)];
+            });
+        });
+    };
     return RedisConnection;
 }());
 exports.RedisConnection = RedisConnection;

@@ -1,4 +1,4 @@
-import type { Consumer, ConsumerConfig, EachMessagePayload } from "kafkajs";
+import type { Consumer, ConsumerConfig, ConsumerRunConfig, EachMessagePayload } from "kafkajs";
 import { KafkaConnection } from "./kafka";
 export type KafkaConnectionHandler = (message: any, payload: EachMessagePayload) => any;
 export declare class KafkaConsumer {
@@ -8,6 +8,6 @@ export declare class KafkaConsumer {
     constructor(connection: KafkaConnection, config: ConsumerConfig);
     private _needConnection;
     connect(): Promise<void>;
-    subscribe(topic: string, handler: KafkaConnectionHandler): Promise<void>;
+    subscribe(topic: string, handler: KafkaConnectionHandler, consumerOptions?: Omit<ConsumerRunConfig, "eachMessage">): Promise<void>;
     disconnect(): Promise<void>;
 }

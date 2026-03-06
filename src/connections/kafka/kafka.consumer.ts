@@ -1,5 +1,5 @@
 import { Logger } from "@klapeks/utils";
-import type { Consumer, ConsumerConfig, EachMessagePayload } from "kafkajs";
+import type { Consumer, ConsumerConfig, ConsumerRunConfig, EachMessagePayload } from "kafkajs";
 import { KafkaConnection } from "./kafka";
 
 
@@ -23,7 +23,11 @@ export class KafkaConsumer {
         this._needConnection = false;
     }
     
-    async subscribe(topic: string, handler: KafkaConnectionHandler) {
+    async subscribe(
+        topic: string, 
+        handler: KafkaConnectionHandler, 
+        consumerOptions?: Omit<ConsumerRunConfig, "eachMessage">
+    ) {
         if (this._needConnection) {
             await this.connect();
         }
@@ -31,8 +35,15 @@ export class KafkaConsumer {
             topic: topic,
             fromBeginning: true,
         });
+
+        if (!consumerOptions) consumerOptions = {};
+        if (!consumerOptions.partitionsConsumedConcurrently) {
+            consumerOptions.partitionsConsumedConcurrently = 10
+        }
+
         logger.log("Pre run:", topic);
         await this.consumer.run({
+            ...consumerOptions,
             eachMessage: async (payload) => {
                 let msg: any = payload.message.value?.toString();
                 if (!msg) return;

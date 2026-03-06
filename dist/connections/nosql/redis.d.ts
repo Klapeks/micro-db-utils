@@ -18,4 +18,10 @@ export declare class RedisConnection {
         /** in seconds */
         expiredInSeconds?: number;
     }): Promise<void>;
+    setLock(key: string, options?: {
+        expiredInSeconds?: number;
+    }): Promise<{
+        isAlreadyLocked: boolean;
+    }>;
+    unlock(key: string): Promise<boolean>;
 }

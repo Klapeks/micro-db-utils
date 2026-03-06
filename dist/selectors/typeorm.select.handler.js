@@ -136,7 +136,7 @@ var SelectEntityHandler = /** @class */ (function (_super) {
                                         for (var _i = 0, _c = Object.keys(where); _i < _c.length; _i++) {
                                             var key = _c[_i];
                                             var placeholderKey = key + "_" + i;
-                                            if (typeof where[key] == undefined)
+                                            if (typeof where[key] === 'undefined')
                                                 continue;
                                             if (where[key] == null) {
                                                 qb2 = qb2.andWhere('key is NULL');

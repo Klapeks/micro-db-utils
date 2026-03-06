@@ -64,7 +64,7 @@ export class SelectEntityHandler<T extends ObjectLiteral, K extends string>
                     qb1 = qb1.orWhere(new Brackets(qb2 => {
                         for (let key of Object.keys(where)) {
                             const placeholderKey = key + "_" + i;
-                            if (typeof where[key] == undefined) continue;
+                            if (typeof where[key] === 'undefined') continue;
                             if (where[key] == null) {
                                 qb2 = qb2.andWhere('key is NULL');
                                 continue;

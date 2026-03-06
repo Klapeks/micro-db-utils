@@ -1,5 +1,5 @@
 
-import { Logger } from '@klapeks/utils';
+import { Logger, shortErrorParser } from '@klapeks/utils';
 import type { createClient as REDIS_createClient } from 'redis';
 import { quietRequire } from '../quiet.require';
 const redisModule = quietRequire<typeof import('redis')>('redis');
@@ -62,5 +62,28 @@ export class RedisConnection {
                 value, "with expire of", expire);
             throw err;
         }
+    }
+
+    async setLock(key: string, options?: {
+        expiredInSeconds?: number
+    }): Promise<{ isAlreadyLocked: boolean }> {
+        // saving value in cache
+        try {
+            const result = await this.redisClient.set(
+                this.keyPrefix + key, "1", { 
+                    NX: true,
+                    EX: options?.expiredInSeconds || 60
+                }
+            );
+            return {
+                isAlreadyLocked: !result
+            }
+        } catch (err) {
+            logger.error("Error locking redis:", shortErrorParser(err));
+            throw err;
+        }
+    }
+    async unlock(key: string) {
+        return this.remove(key);
     }
 }
