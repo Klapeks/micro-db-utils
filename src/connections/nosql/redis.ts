@@ -86,4 +86,18 @@ export class RedisConnection {
     async unlock(key: string) {
         return this.remove(key);
     }
+
+    async autoLock(key: string, fn: () => any, options?: {
+        expiredInSeconds?: number
+    }) {
+        const { isAlreadyLocked } = await this.setLock(key, options);
+        if (isAlreadyLocked) return;
+        try {
+            await fn();
+            this.unlock(key);
+        } catch (err) {
+            this.unlock(key);
+            throw err;
+        }
+    }
 }

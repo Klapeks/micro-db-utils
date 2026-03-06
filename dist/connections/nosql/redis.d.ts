@@ -24,4 +24,7 @@ export declare class RedisConnection {
         isAlreadyLocked: boolean;
     }>;
     unlock(key: string): Promise<boolean>;
+    autoLock(key: string, fn: () => any, options?: {
+        expiredInSeconds?: number;
+    }): Promise<void>;
 }
