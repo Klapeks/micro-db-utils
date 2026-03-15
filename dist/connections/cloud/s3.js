@@ -71,26 +71,6 @@ var S3Connection = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    S3Connection.prototype.presignedUploadObjectUrl = function (path, mimeType) {
-        return __awaiter(this, void 0, void 0, function () {
-            var url;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!s3PresignerModule)
-                            throw "No @aws-sdk/s3-request-presigner module";
-                        return [4 /*yield*/, s3PresignerModule.getSignedUrl(this.client, new s3ClientModule.PutObjectCommand({
-                                Bucket: this.bucketName,
-                                Key: fixPath(path),
-                                ContentType: mimeType,
-                            }), { expiresIn: 3600 })];
-                    case 1:
-                        url = _a.sent();
-                        return [2 /*return*/, { url: url, mimeType: mimeType }];
-                }
-            });
-        });
-    };
     S3Connection.prototype.uploadObject = function (path, buffer, mimeType) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -159,6 +139,102 @@ var S3Connection = /** @class */ (function () {
                     case 2:
                         result = _c.sent();
                         logger.log("Deleted:", result);
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    // ---- PRESIGNED URLS ----
+    S3Connection.prototype.presignedUploadObjectUrl = function (path, mimeType) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!s3PresignerModule)
+                            throw "No @aws-sdk/s3-request-presigner module";
+                        return [4 /*yield*/, s3PresignerModule.getSignedUrl(this.client, new s3ClientModule.PutObjectCommand({
+                                Bucket: this.bucketName,
+                                Key: fixPath(path),
+                                ContentType: mimeType,
+                            }), { expiresIn: 3600 })];
+                    case 1:
+                        url = _a.sent();
+                        return [2 /*return*/, { url: url, mimeType: mimeType }];
+                }
+            });
+        });
+    };
+    S3Connection.prototype.presignedMultipartUpload = function (path, mimeType, parts) {
+        return __awaiter(this, void 0, void 0, function () {
+            var pathKey, createResult, urls, i, url;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!s3ClientModule)
+                            throw "No @aws-sdk/client-s3 module";
+                        if (!s3PresignerModule)
+                            throw "No @aws-sdk/s3-request-presigner module";
+                        pathKey = fixPath(path);
+                        return [4 /*yield*/, this.client.send(new s3ClientModule.CreateMultipartUploadCommand({
+                                Bucket: this.bucketName,
+                                Key: pathKey,
+                                ContentType: mimeType
+                            }))];
+                    case 1:
+                        createResult = _a.sent();
+                        if (!createResult.UploadId)
+                            throw "No uploadId";
+                        urls = [];
+                        i = 1;
+                        _a.label = 2;
+                    case 2:
+                        if (!(i <= (parts + 5))) return [3 /*break*/, 5];
+                        return [4 /*yield*/, s3PresignerModule.getSignedUrl(this.client, new s3ClientModule.UploadPartCommand({
+                                Bucket: this.bucketName,
+                                Key: pathKey,
+                                UploadId: createResult.UploadId,
+                                PartNumber: i
+                            }), { expiresIn: 3600 })];
+                    case 3:
+                        url = _a.sent();
+                        urls.push({
+                            partNumber: i,
+                            url: url,
+                            isAdditional: i > parts
+                        });
+                        _a.label = 4;
+                    case 4:
+                        i++;
+                        return [3 /*break*/, 2];
+                    case 5: return [2 /*return*/, {
+                            pathKey: pathKey,
+                            uploadId: createResult.UploadId,
+                            urls: urls
+                        }];
+                }
+            });
+        });
+    };
+    S3Connection.prototype.confirmMultipart = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!s3ClientModule)
+                            throw "No @aws-sdk/client-s3 module";
+                        return [4 /*yield*/, this.client.send(new s3ClientModule.CompleteMultipartUploadCommand({
+                                Bucket: this.bucketName,
+                                Key: data.pathKey,
+                                UploadId: data.uploadId,
+                                MultipartUpload: {
+                                    Parts: data.uploadResults.map(function (r) { return ({
+                                        ETag: r.eTag, PartNumber: r.partNumber
+                                    }); })
+                                }
+                            }))];
+                    case 1:
+                        _a.sent();
                         return [2 /*return*/];
                 }
             });

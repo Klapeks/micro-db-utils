@@ -44,22 +44,11 @@ export class S3Connection {
         });
         logger.log("S3 connection created:", config.bucket);
     }
-    
+
     get bucketName() {
         return this._config.bucket;
     }
 
-    async presignedUploadObjectUrl(path: string, mimeType: string) {
-        if (!s3PresignerModule) throw "No @aws-sdk/s3-request-presigner module";
-        const url = await s3PresignerModule.getSignedUrl(this.client, 
-            new s3ClientModule!.PutObjectCommand({
-                Bucket: this.bucketName, 
-                Key: fixPath(path), 
-                ContentType: mimeType,
-            }), { expiresIn: 3600 }
-        );
-        return { url, mimeType };
-    }
 
     async uploadObject(path: string, buffer: Buffer, mimeType: string) {
         return await this.client.send(
@@ -71,7 +60,7 @@ export class S3Connection {
             })
         );
     }
-    
+
     async listByPrefix(prefix: string) {
         while (prefix[0] == '/') prefix = prefix.substring(1);
         return await this.client.send(
@@ -104,5 +93,92 @@ export class S3Connection {
 
         const result = await this.deleteFiles(listedObjects.Contents.map(k => k.Key!));
         logger.log("Deleted:", result);
+    }
+
+
+
+
+
+
+
+
+    // ---- PRESIGNED URLS ----
+    async presignedUploadObjectUrl(path: string, mimeType: string) {
+        if (!s3PresignerModule) throw "No @aws-sdk/s3-request-presigner module";
+        const url = await s3PresignerModule.getSignedUrl(this.client,
+            new s3ClientModule!.PutObjectCommand({
+                Bucket: this.bucketName,
+                Key: fixPath(path),
+                ContentType: mimeType,
+            }), { expiresIn: 3600 }
+        );
+        return { url, mimeType };
+    }
+
+    async presignedMultipartUpload(path: string, mimeType: string, parts: number) {
+        if (!s3ClientModule) throw "No @aws-sdk/client-s3 module";
+        if (!s3PresignerModule) throw "No @aws-sdk/s3-request-presigner module";
+
+        const pathKey = fixPath(path);
+
+        const createResult = await this.client.send(
+            new s3ClientModule.CreateMultipartUploadCommand({
+                Bucket: this.bucketName,
+                Key: pathKey,
+                ContentType: mimeType
+            })
+        );
+        if (!createResult.UploadId) throw "No uploadId";
+
+        const urls: {
+            partNumber: number,
+            url: string
+            isAdditional: boolean
+        }[] = [];
+        for (let i = 1; i <= (parts + 5); i++) {
+            const url = await s3PresignerModule.getSignedUrl(
+                this.client,
+                new s3ClientModule.UploadPartCommand({
+                    Bucket: this.bucketName,
+                    Key: pathKey,
+                    UploadId: createResult.UploadId,
+                    PartNumber: i
+                }),
+                { expiresIn: 3600 }
+            );
+            urls.push({
+                partNumber: i,
+                url: url,
+                isAdditional: i > parts
+            });
+        }
+
+        return {
+            pathKey: pathKey,
+            uploadId: createResult.UploadId,
+            urls: urls
+        };
+    }
+    async confirmMultipart(data: {
+        pathKey: string,
+        uploadId: string,
+        uploadResults: {
+            partNumber: number,
+            eTag: string
+        }[]
+    }) {
+        if (!s3ClientModule) throw "No @aws-sdk/client-s3 module";
+        await this.client.send(
+            new s3ClientModule.CompleteMultipartUploadCommand({
+                Bucket: this.bucketName,
+                Key: data.pathKey,
+                UploadId: data.uploadId,
+                MultipartUpload: {
+                    Parts: data.uploadResults.map(r => ({ 
+                        ETag: r.eTag, PartNumber: r.partNumber 
+                    }))
+                }
+            })
+        );
     }
 }
