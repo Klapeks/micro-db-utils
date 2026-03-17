@@ -107,7 +107,7 @@ export class MongoDBConnection {
         const { host, port, password, username } = this.getOptions();
 
         const mongoURI = 'mongodb://' + host + ':' + port + '/' + databaseName
-            + (replicaSet ? '?replicaSet=' + replicaSet : undefined);
+            + (replicaSet ? ('?replicaSet=' + replicaSet) : '');
 
         // logger.log(mongoURI);
         if (!mongooseModule) throw new Error("No mongoose module");

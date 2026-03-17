@@ -152,7 +152,7 @@ var MongoDBConnection = /** @class */ (function () {
                         }
                         _a = this.getOptions(), host = _a.host, port = _a.port, password = _a.password, username = _a.username;
                         mongoURI = 'mongodb://' + host + ':' + port + '/' + databaseName
-                            + (replicaSet ? '?replicaSet=' + replicaSet : undefined);
+                            + (replicaSet ? ('?replicaSet=' + replicaSet) : '');
                         // logger.log(mongoURI);
                         if (!mongooseModule)
                             throw new Error("No mongoose module");
