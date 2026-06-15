@@ -1,5 +1,6 @@
-import { SelectOptions, SelectResult, TimedStatisticInfo, TimedStatisticInfoPart } from '@klapeks/api-creation-tools';
+import type { SelectOptions, SelectResult, TimedStatisticInfo, TimedStatisticInfoPart } from '@klapeks/api-creation-tools';
 import { dateFromNow, toISODate } from '../utils/iso.date.time';
+import { DatabaseOptions } from '@klapeks/utils';
 
 export interface SelectEntityHandlerOptions<
     T extends object, K extends string
@@ -29,6 +30,7 @@ export abstract class AbstractSelectHandler<
     }
 
     abstract getTableName(): string;
+    abstract getDatabaseType(): DatabaseOptions['type'];
     abstract runSQL(query: string, params?: any[]): Promise<any[]>;
     async runSQL_One(query: string, params?: any[]): Promise<any> {
         const res = await this.runSQL(query, params);
@@ -48,10 +50,16 @@ export abstract class AbstractSelectHandler<
         } as SelectResult<T, K>;
     }
     async sqlCount(field: string): Promise<number> {
-        return (await this.runSQL_One(`
+        if (this.getDatabaseType() === 'mssql') {
+            return Number((await this.runSQL_One(`
+                SELECT count(${field}) as [count]
+                FROM ${this.getTableName()};
+            `))?.count);
+        }
+        return Number((await this.runSQL_One(`
             SELECT count(${field}) as 'count'
             FROM ${this.getTableName()};
-        `))?.count;
+        `))?.count);
     }
 
     async getSumStatistic(sumField: keyof T, strWhere?: string): Promise<TimedStatisticInfo> {

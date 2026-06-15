@@ -1,6 +1,7 @@
 import { Brackets, DataSource, EntitySchema, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from './abstract.select.handler';
-import { SelectOptions } from '@klapeks/api-creation-tools';
+import { type SelectOptions } from '@klapeks/api-creation-tools';
+import { DatabaseOptions } from '@klapeks/utils';
 
 
 export type TypeormSelectEntityHandlerOptions<
@@ -22,6 +23,9 @@ export class SelectEntityHandler<T extends ObjectLiteral, K extends string>
     get schema() { return this.options.schema; }
     get repo() { return this.dataSource.getRepository(this.schema); }
 
+    getDatabaseType(): DatabaseOptions['type'] {
+        return this.dataSource.options.type as any;
+    }
     getTableName(): string {
         return this.schema.options.name;
     }
@@ -66,12 +70,12 @@ export class SelectEntityHandler<T extends ObjectLiteral, K extends string>
                             const placeholderKey = key + "_" + i;
                             if (typeof where[key] === 'undefined') continue;
                             if (where[key] == null) {
-                                qb2 = qb2.andWhere('key is NULL');
+                                qb2 = qb2.andWhere(key + ' IS NULL');
                                 continue;
                             }
                             if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
                                 const strVal = (where[key] as string).substring(7).toLowerCase();
-                                qb2 = qb2.andWhere('lower('  + key + ') like :' + placeholderKey, { [placeholderKey]: strVal });
+                                qb2 = qb2.andWhere('LOWER('  + key + ') LIKE :' + placeholderKey, { [placeholderKey]: strVal });
                                 continue;
                             }
                             qb2 = qb2.andWhere(key + ' = :' + placeholderKey, { [placeholderKey]: where[key] });

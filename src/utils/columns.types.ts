@@ -1,3 +1,4 @@
+import { getDatabaseColumnTypes } from "@klapeks/utils";
 import mongoose from "mongoose";
 import { EntitySchemaColumnOptions, EntitySchemaOptions } from "typeorm";
 
@@ -14,9 +15,10 @@ export function createRelation(
     return { target, type, cascade, inverseSide }
 }
 
+export const MULTISQL_COLUMNS_TYPES = getDatabaseColumnTypes();
 
 export const FloatingColumn: EntitySchemaColumnOptions = {
-    type: "float", default: 0
+    type: MULTISQL_COLUMNS_TYPES.float32, default: 0
     // type: "decimal", precision: 10, scale: 6, default: 0
 }
 export const NullableFloatingColumn = { 
@@ -24,7 +26,7 @@ export const NullableFloatingColumn = {
 };
 
 export const Float64Column: EntitySchemaColumnOptions = {
-    type: "double", default: 0
+    type: MULTISQL_COLUMNS_TYPES.float64, default: 0
     // type: "decimal", precision: 10, scale: 6, default: 0
 }
 export const NullableFloat64Column = { 

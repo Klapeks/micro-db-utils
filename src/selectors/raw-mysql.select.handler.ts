@@ -1,6 +1,7 @@
-import { SelectOptions } from "@klapeks/api-creation-tools";
+import { type SelectOptions } from "@klapeks/api-creation-tools";
 import { RawMySQLConnection } from "../connections";
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from "./abstract.select.handler";
+import { DatabaseOptions } from "@klapeks/utils";
 
 
 export type MySQLSelectEntityHandlerOptions<
@@ -18,6 +19,9 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
         super(options);
     }
 
+    getDatabaseType(): DatabaseOptions['type'] {
+        return 'mysql';
+    }
     getTableName(): string {
         return this.options.schemaTableName;
     }
