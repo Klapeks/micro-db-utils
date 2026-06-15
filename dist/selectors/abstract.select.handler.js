@@ -77,12 +77,20 @@ var AbstractSelectHandler = /** @class */ (function () {
         });
     };
     AbstractSelectHandler.prototype.sqlCount = function (field) {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, this.runSQL_One("\n            SELECT count(".concat(field, ") as 'count'\n            FROM ").concat(this.getTableName(), ";\n        "))];
-                    case 1: return [2 /*return*/, (_a = (_b.sent())) === null || _a === void 0 ? void 0 : _a.count];
+            var _c, _d;
+            return __generator(this, function (_e) {
+                switch (_e.label) {
+                    case 0:
+                        if (!(this.getDatabaseType() === 'mssql')) return [3 /*break*/, 2];
+                        _c = Number;
+                        return [4 /*yield*/, this.runSQL_One("\n                SELECT count(".concat(field, ") as [count]\n                FROM ").concat(this.getTableName(), ";\n            "))];
+                    case 1: return [2 /*return*/, _c.apply(void 0, [(_a = (_e.sent())) === null || _a === void 0 ? void 0 : _a.count])];
+                    case 2:
+                        _d = Number;
+                        return [4 /*yield*/, this.runSQL_One("\n            SELECT count(".concat(field, ") as 'count'\n            FROM ").concat(this.getTableName(), ";\n        "))];
+                    case 3: return [2 /*return*/, _d.apply(void 0, [(_b = (_e.sent())) === null || _b === void 0 ? void 0 : _b.count])];
                 }
             });
         });

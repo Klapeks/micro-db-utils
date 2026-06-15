@@ -74,6 +74,9 @@ var SelectEntityHandler = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    SelectEntityHandler.prototype.getDatabaseType = function () {
+        return this.dataSource.options.type;
+    };
     SelectEntityHandler.prototype.getTableName = function () {
         return this.schema.options.name;
     };
@@ -139,12 +142,12 @@ var SelectEntityHandler = /** @class */ (function (_super) {
                                             if (typeof where[key] === 'undefined')
                                                 continue;
                                             if (where[key] == null) {
-                                                qb2 = qb2.andWhere('key is NULL');
+                                                qb2 = qb2.andWhere(key + ' IS NULL');
                                                 continue;
                                             }
                                             if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
                                                 var strVal = where[key].substring(7).toLowerCase();
-                                                qb2 = qb2.andWhere('lower(' + key + ') like :' + placeholderKey, (_a = {}, _a[placeholderKey] = strVal, _a));
+                                                qb2 = qb2.andWhere('LOWER(' + key + ') LIKE :' + placeholderKey, (_a = {}, _a[placeholderKey] = strVal, _a));
                                                 continue;
                                             }
                                             qb2 = qb2.andWhere(key + ' = :' + placeholderKey, (_b = {}, _b[placeholderKey] = where[key], _b));

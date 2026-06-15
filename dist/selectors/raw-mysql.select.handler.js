@@ -58,6 +58,9 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
     function MySQLSelectEntityHandler(options) {
         return _super.call(this, options) || this;
     }
+    MySQLSelectEntityHandler.prototype.getDatabaseType = function () {
+        return 'mysql';
+    };
     MySQLSelectEntityHandler.prototype.getTableName = function () {
         return this.options.schemaTableName;
     };

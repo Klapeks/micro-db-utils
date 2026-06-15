@@ -88,6 +88,8 @@ var MySQLMigrations = /** @class */ (function () {
                     case 0:
                         _b.trys.push([0, 11, , 12]);
                         options_1 = (0, utils_1.dataSourceOptions)();
+                        if (options_1.type != 'mysql')
+                            return [2 /*return*/];
                         mysqlInstance_1 = new mysql_connection_1.RawMySQLConnection(options_1);
                         return [4 /*yield*/, mysqlInstance_1.takePool()];
                     case 1:

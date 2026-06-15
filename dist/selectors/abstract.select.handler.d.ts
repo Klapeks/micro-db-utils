@@ -1,4 +1,5 @@
-import { SelectOptions, SelectResult, TimedStatisticInfo } from '@klapeks/api-creation-tools';
+import type { SelectOptions, SelectResult, TimedStatisticInfo } from '@klapeks/api-creation-tools';
+import { DatabaseOptions } from '@klapeks/utils';
 export interface SelectEntityHandlerOptions<T extends object, K extends string> {
     name: K;
     orderBy?: keyof T | (keyof T)[];
@@ -12,6 +13,7 @@ export declare abstract class AbstractSelectHandler<T extends object, K extends 
     readonly options: O;
     constructor(options: O);
     abstract getTableName(): string;
+    abstract getDatabaseType(): DatabaseOptions['type'];
     abstract runSQL(query: string, params?: any[]): Promise<any[]>;
     runSQL_One(query: string, params?: any[]): Promise<any>;
     abstract getTotal(): Promise<number>;

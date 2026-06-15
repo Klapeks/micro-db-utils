@@ -8,6 +8,14 @@ export declare function createRelation(target: string, type: "one-to-many" | "on
     cascade: boolean;
     inverseSide: string;
 };
+export declare const MULTISQL_COLUMNS_TYPES: {
+    dbtype: "mysql" | "sqlite" | "postgres" | "mssql";
+    enum: "enum" | "simple-enum";
+    datetime: "timestamp" | "datetime" | "datetime2";
+    float32: "double" | "float";
+    float64: "double" | "float";
+    json: "json" | "simple-json";
+};
 export declare const FloatingColumn: EntitySchemaColumnOptions;
 export declare const NullableFloatingColumn: {
     default: null;

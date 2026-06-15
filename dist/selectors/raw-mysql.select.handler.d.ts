@@ -1,12 +1,14 @@
-import { SelectOptions } from "@klapeks/api-creation-tools";
+import { type SelectOptions } from "@klapeks/api-creation-tools";
 import { RawMySQLConnection } from "../connections";
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from "./abstract.select.handler";
+import { DatabaseOptions } from "@klapeks/utils";
 export type MySQLSelectEntityHandlerOptions<T extends object, K extends string> = SelectEntityHandlerOptions<T, K> & {
     schemaTableName: string;
     mysql: RawMySQLConnection;
 };
 export declare class MySQLSelectEntityHandler<T extends object, K extends string> extends AbstractSelectHandler<T, K, MySQLSelectEntityHandlerOptions<T, K>> {
     constructor(options: MySQLSelectEntityHandlerOptions<T, K>);
+    getDatabaseType(): DatabaseOptions['type'];
     getTableName(): string;
     runSQL(sql: string, params?: any[]): Promise<any[]>;
     getTotal(): Promise<number>;
