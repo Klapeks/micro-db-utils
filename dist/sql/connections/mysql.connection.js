@@ -58,12 +58,11 @@ exports.MySQLConnection = void 0;
 var mysql2_1 = __importDefault(require("mysql2"));
 var utils_1 = require("@klapeks/utils");
 var abstract_connection_1 = require("./abstract.connection");
-var config_1 = require("../../config");
 var logger = new utils_1.Logger('MySQL');
 var MySQLConnection = /** @class */ (function (_super) {
     __extends(MySQLConnection, _super);
     function MySQLConnection(options) {
-        var _this = _super.call(this, 'toMySQL', options.database) || this;
+        var _this = _super.call(this, options, 'toMySQL') || this;
         _this.poolOptions = {
             user: options.username,
             password: options.password,
@@ -161,6 +160,7 @@ var MySQLConnection = /** @class */ (function (_super) {
     MySQLConnection.prototype.sendSQL = function (query, params) {
         return __awaiter(this, void 0, void 0, function () {
             var connection;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.getPoolConnection()];
@@ -168,7 +168,7 @@ var MySQLConnection = /** @class */ (function (_super) {
                         connection = _a.sent();
                         return [2 /*return*/, new Promise(function (resolve, reject) {
                                 // logger.debug("SQL query: ", query, '| params:', params||[])
-                                if (config_1.microDBUtilsConfig.debugSQL) {
+                                if (_this.rawOptions.logging) {
                                     logger.log("Running SQL command to MySQL", query, '\n| with params', params);
                                 }
                                 connection.query(query, params || [], function (err, result) {

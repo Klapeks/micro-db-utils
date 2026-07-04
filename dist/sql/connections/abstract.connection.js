@@ -38,10 +38,17 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbstractSQLConnection = void 0;
 var AbstractSQLConnection = /** @class */ (function () {
-    function AbstractSQLConnection(abstractCommandFunctionName, databaseName) {
+    function AbstractSQLConnection(rawOptions, abstractCommandFunctionName) {
+        this.rawOptions = rawOptions;
         this.abstractCommandFunctionName = abstractCommandFunctionName;
-        this.databaseName = databaseName;
     }
+    Object.defineProperty(AbstractSQLConnection.prototype, "databaseName", {
+        get: function () {
+            return this.rawOptions.database;
+        },
+        enumerable: false,
+        configurable: true
+    });
     AbstractSQLConnection.prototype.runSQL = function (query, params) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {

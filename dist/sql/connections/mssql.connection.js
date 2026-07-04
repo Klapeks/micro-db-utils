@@ -56,12 +56,11 @@ var utils_1 = require("@klapeks/utils");
 var abstract_connection_1 = require("./abstract.connection");
 var quiet_require_1 = require("../../utils/quiet.require");
 var mssql = (0, quiet_require_1.quietRequire)('mssql');
-var config_1 = require("../../config");
 var logger = new utils_1.Logger('MSSQL');
 var MSSQLConnection = /** @class */ (function (_super) {
     __extends(MSSQLConnection, _super);
     function MSSQLConnection(options) {
-        var _this = _super.call(this, 'toMSSQL', options.database) || this;
+        var _this = _super.call(this, options, 'toMSSQL') || this;
         _this.poolOptions = {
             user: options.username,
             password: options.password,
@@ -158,7 +157,7 @@ var MSSQLConnection = /** @class */ (function (_super) {
                                 }
                             }
                         }
-                        if (config_1.microDBUtilsConfig.debugSQL) {
+                        if (this.rawOptions.logging) {
                             logger.log("Running SQL command to MSSQL", query, '\n| with params', params);
                         }
                         return [4 /*yield*/, request.query(query)];

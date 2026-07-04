@@ -7,7 +7,6 @@ import type {
     ConnectionPool as MSSQL_ConnectionPool,
     config as MSSQL_ConnectionOptions,
 } from 'mssql';
-import { microDBUtilsConfig } from '../../config';
 
 const logger = new Logger('MSSQL');
 
@@ -17,7 +16,7 @@ export class MSSQLConnection extends AbstractSQLConnection {
 
     readonly poolOptions: MSSQL_ConnectionOptions;
     constructor(options: DatabaseOptions & { type: "mssql" }) {
-        super('toMSSQL', options.database);
+        super(options, 'toMSSQL');
         this.poolOptions = {
             user: options.username,
             password: options.password,
@@ -74,7 +73,7 @@ export class MSSQLConnection extends AbstractSQLConnection {
                 }
             }
         }
-        if (microDBUtilsConfig.debugSQL) {
+        if (this.rawOptions.logging) {
             logger.log("Running SQL command to MSSQL", query, 
                 '\n| with params', params);
         }

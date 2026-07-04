@@ -1,13 +1,16 @@
+import { DatabaseOptions } from "@klapeks/utils";
 import { AbstractSQLCommand, ISQLCommandAdapter, SQLCommandContext, SQLCommandData } from "../commands";
 
 
 export abstract class AbstractSQLConnection {
 
     protected constructor(
+        readonly rawOptions: DatabaseOptions,
         readonly abstractCommandFunctionName: keyof ISQLCommandAdapter,
-        readonly databaseName: string
-    ) {
+    ) {}
 
+    get databaseName() {
+        return this.rawOptions.database;
     }
 
     abstract initConnection(): Promise<void>;
