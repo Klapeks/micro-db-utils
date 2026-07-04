@@ -1,14 +1,16 @@
 import mysql2 from 'mysql2';
 import { DatabaseOptions, Logger } from '@klapeks/utils';
+import { AbstractSQLConnection } from './abstract.connection';
 
 const logger = new Logger('MySQL');
 
-export class RawMySQLConnection {
+export class MySQLConnection extends AbstractSQLConnection {
 
     private _pool: mysql2.Pool | undefined;
 
     readonly poolOptions: mysql2.PoolOptions;
     constructor(options: DatabaseOptions & { type: "mysql" }) {
+        super('toMySQL');
         this.poolOptions = {
             user: options.username,
             password: options.password,
@@ -17,6 +19,10 @@ export class RawMySQLConnection {
             database: options.database,
             charset: options.charset,
         }
+    }
+
+    async initConnection(): Promise<void> {
+        await this.takePool();
     }
 
     get pool() {
@@ -50,7 +56,7 @@ export class RawMySQLConnection {
         })
     }
 
-    async getConnection(): Promise<mysql2.PoolConnection> {
+    async getPoolConnection(): Promise<mysql2.PoolConnection> {
         if (!this._pool) this._pool = await this.takePool();
         return new Promise((resolve, reject) => {
             if (!this._pool) return reject("Can't connect to (unknown) mysql");
@@ -60,19 +66,15 @@ export class RawMySQLConnection {
             })
         })
     }
-    async runSQL<T = any>(query: string, params?: any[]): Promise<T[]> {
-        const connection = await this.getConnection();
+    async sendSQL<T = any>(query: string, params?: any): Promise<T[]> {
+        const connection = await this.getPoolConnection();
         return new Promise<any>((resolve, reject) => {
             // logger.debug("SQL query: ", query, '| params:', params||[])
-            connection.query(query, params||[], (err, result) => {
+            connection.query(query, params || [], (err, result) => {
                 connection.release();
                 if (err) return reject(err);
                 resolve(result);
             });
         });
-    }
-    async runSQL_One<T = any>(query: string, params?: any[]): Promise<T | null> {
-        const res = await this.runSQL(query, params);
-        return res.length ? (res[0] || res) : null;
     }
 }

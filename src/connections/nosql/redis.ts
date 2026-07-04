@@ -1,7 +1,7 @@
 
 import { Logger, shortErrorParser } from '@klapeks/utils';
 import type { createClient as REDIS_createClient } from 'redis';
-import { quietRequire } from '../quiet.require';
+import { quietRequire } from '../../utils/quiet.require';
 const redisModule = quietRequire<typeof import('redis')>('redis');
 
 const logger = new Logger("Redis");

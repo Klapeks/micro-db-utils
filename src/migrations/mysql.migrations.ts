@@ -1,7 +1,7 @@
 import { DataSource, EntitySchema } from "typeorm";
-import { RawMySQLConnection } from '../connections/mysql.connection';
 import { dataSourceOptions, Logger, terminalColors, utils } from "@klapeks/utils";
 import { toISODate } from "../utils/iso.date.time";
+import { MySQLConnection } from "../sql";
 
 // for mysql
 // export type 
@@ -36,7 +36,7 @@ export class MySQLMigrations {
         try {
             const options = dataSourceOptions();
             if (options.type != 'mysql') return;
-            const mysqlInstance = new RawMySQLConnection(options as any);
+            const mysqlInstance = new MySQLConnection(options as any);
             await mysqlInstance.takePool();
         
             const getTable = async (table: string) => {

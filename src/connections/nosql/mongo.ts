@@ -1,7 +1,7 @@
 import { DatabaseOptions, Flatten, logger } from "@klapeks/utils";
 import type { Schema as MongooseSchema, PipelineStage, QuerySelector } from "mongoose";
 import { Point } from "typeorm";
-import { quietRequire } from "../quiet.require";
+import { quietRequire } from "../../utils/quiet.require";
 
 const mongooseModule = quietRequire<typeof import('mongoose')>('mongoose');
 

@@ -2,7 +2,7 @@ import { Logger } from "@klapeks/utils";
 import type { ConfigResourceTypes, ConsumerConfig, Kafka, ProducerConfig } from "kafkajs";
 import { KafkaProducer } from "./kafka.producer";
 import { KafkaConsumer } from "./kafka.consumer";
-import { quietRequire } from "../quiet.require";
+import { quietRequire } from "../../utils/quiet.require";
 
 const kafkajsModule = quietRequire<typeof import('kafkajs')>('kafkajs')
 

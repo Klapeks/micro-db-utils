@@ -1,6 +1,6 @@
 
 // RDBMS
-export * from './mysql.connection';
+// export * from './mysql.connection';
 
 // NoSQL
 export * from './nosql/redis';

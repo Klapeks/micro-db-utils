@@ -1,7 +1,7 @@
 // import type { DeleteObjectsCommand, ListObjectsCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import type { S3Client } from "@aws-sdk/client-s3";
 import { Logger } from "@klapeks/utils";
-import { quietRequire } from "../quiet.require";
+import { quietRequire } from "../../utils/quiet.require";
 
 const s3ClientModule = quietRequire<
     typeof import('@aws-sdk/client-s3')

@@ -1,6 +1,6 @@
 import { getDatabaseColumnTypes } from "@klapeks/utils";
 import mongoose from "mongoose";
-import { EntitySchemaColumnOptions, EntitySchemaOptions } from "typeorm";
+import { ColumnType, EntitySchemaColumnOptions, EntitySchemaOptions } from "typeorm";
 
 
 export type RequiredColumns<T> = Required<EntitySchemaOptions<T>['columns']>;
