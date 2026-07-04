@@ -52,8 +52,11 @@ export class SuperMigrations {
         onMigrationComplete: () => number
     ) {
         const databaseName = sqlInstance.databaseName;
-        let todoMigrations = SuperMigrations._migrations.sort((c1, c2) => c1.date.getTime() - c2.date.getTime());
+        let todoMigrations = SuperMigrations._migrations.sort((c1, c2) => {
+            return c1.date.getTime() - c2.date.getTime();
+        });
         todoMigrations = [...todoMigrations].filter(m => m.table == table);
+        logger.log("TODO MIGRATIONG FOR TABLE", table, todoMigrations);
         if (!todoMigrations?.length) return;
         
         const isTableExistsInfo = await await sqlInstance.runSQL_One(
@@ -81,7 +84,8 @@ export class SuperMigrations {
         }
 
         const _local_runSQL = async (sql: string, params?: any) => {
-            if (sql.toLowerCase().startsWith("alter table")) {
+            if (sql.toLowerCase().startsWith("alter table")
+            || sql.toLowerCase().startsWith('exec sp_rename')) {
                 // log error if error
                 await sqlInstance.runSQL(sql, params).catch(err => {
                     logger.error("Error while alter table:", err);

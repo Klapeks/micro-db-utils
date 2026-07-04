@@ -85,8 +85,11 @@ var SuperMigrations = /** @class */ (function () {
                 switch (_e.label) {
                     case 0:
                         databaseName = sqlInstance.databaseName;
-                        todoMigrations = SuperMigrations._migrations.sort(function (c1, c2) { return c1.date.getTime() - c2.date.getTime(); });
+                        todoMigrations = SuperMigrations._migrations.sort(function (c1, c2) {
+                            return c1.date.getTime() - c2.date.getTime();
+                        });
                         todoMigrations = __spreadArray([], todoMigrations, true).filter(function (m) { return m.table == table; });
+                        logger.log("TODO MIGRATIONG FOR TABLE", table, todoMigrations);
                         if (!(todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length))
                             return [2 /*return*/];
                         return [4 /*yield*/, sqlInstance.runSQL_One(tables_commands_1.SQLTablesCommands.tableInfo(databaseName, table))];
@@ -120,7 +123,8 @@ var SuperMigrations = /** @class */ (function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
-                                        if (!sql.toLowerCase().startsWith("alter table")) return [3 /*break*/, 2];
+                                        if (!(sql.toLowerCase().startsWith("alter table")
+                                            || sql.toLowerCase().startsWith('exec sp_rename'))) return [3 /*break*/, 2];
                                         // log error if error
                                         return [4 /*yield*/, sqlInstance.runSQL(sql, params).catch(function (err) {
                                                 logger.error("Error while alter table:", err);
