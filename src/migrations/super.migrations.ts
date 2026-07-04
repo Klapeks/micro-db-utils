@@ -122,7 +122,7 @@ export class SuperMigrations {
                     return sql2;
                 });
                 logger.log(runnedMigrationsAmount, "| Migrations will be runned:",
-                        migrationName, '|\n' + terminalColors.cyan, sqls);
+                        migrationName, '|\n' + terminalColors.cyan, sqls.map(s => s.query));
                 for (let sql of sqls) await _local_runSQL(sql.query, sql.params);
             } else {
                 const sql = sqlInstance.toRawSQL(migration.sql);

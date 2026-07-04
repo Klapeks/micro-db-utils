@@ -173,7 +173,7 @@ var SuperMigrations = /** @class */ (function () {
                             sql2.query = utils_1.utils.replaceAll(sql2.query.trim(), "%{table_name}", table);
                             return sql2;
                         });
-                        logger.log(runnedMigrationsAmount, "| Migrations will be runned:", migrationName, '|\n' + utils_1.terminalColors.cyan, sqls);
+                        logger.log(runnedMigrationsAmount, "| Migrations will be runned:", migrationName, '|\n' + utils_1.terminalColors.cyan, sqls.map(function (s) { return s.query; }));
                         _d = 0, sqls_1 = sqls;
                         _e.label = 7;
                     case 7:
