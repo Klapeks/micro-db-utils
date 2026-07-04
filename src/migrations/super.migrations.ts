@@ -54,6 +54,7 @@ export class SuperMigrations {
         const databaseName = sqlInstance.databaseName;
         let todoMigrations = SuperMigrations._migrations.sort((c1, c2) => c1.date.getTime() - c2.date.getTime());
         todoMigrations = [...todoMigrations].filter(m => m.table == table);
+        if (!todoMigrations?.length) return;
         
         const isTableExistsInfo = await await sqlInstance.runSQL_One(
             SQLTablesCommands.tableInfo(databaseName, table));

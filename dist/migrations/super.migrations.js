@@ -87,6 +87,8 @@ var SuperMigrations = /** @class */ (function () {
                         databaseName = sqlInstance.databaseName;
                         todoMigrations = SuperMigrations._migrations.sort(function (c1, c2) { return c1.date.getTime() - c2.date.getTime(); });
                         todoMigrations = __spreadArray([], todoMigrations, true).filter(function (m) { return m.table == table; });
+                        if (!(todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length))
+                            return [2 /*return*/];
                         return [4 /*yield*/, sqlInstance.runSQL_One(tables_commands_1.SQLTablesCommands.tableInfo(databaseName, table))];
                     case 1: return [4 /*yield*/, _e.sent()];
                     case 2:
