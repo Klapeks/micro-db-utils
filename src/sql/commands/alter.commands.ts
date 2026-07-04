@@ -5,6 +5,10 @@ export class SQLAlterCommand {
     
     constructor(private readonly table: string) {}
 
+    array(cb: (t: SQLAlterCommand) => ISQLCommandAdapter[]) {
+        return cb(this); 
+    }
+
     renameColumn(old_name: string, new_name: string): ISQLCommandAdapter {
         return {
             toMySQL: () => `ALTER TABLE \`${this.table}\` RENAME COLUMN \`${old_name}\` TO \`${new_name}\`;`,

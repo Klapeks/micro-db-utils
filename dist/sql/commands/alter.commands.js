@@ -6,6 +6,9 @@ var SQLAlterCommand = /** @class */ (function () {
     function SQLAlterCommand(table) {
         this.table = table;
     }
+    SQLAlterCommand.prototype.array = function (cb) {
+        return cb(this);
+    };
     SQLAlterCommand.prototype.renameColumn = function (old_name, new_name) {
         var _this = this;
         return {
