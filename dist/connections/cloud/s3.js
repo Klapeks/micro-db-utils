@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.S3Connection = void 0;
 var utils_1 = require("@klapeks/utils");
-var quiet_require_1 = require("../quiet.require");
+var quiet_require_1 = require("../../utils/quiet.require");
 var s3ClientModule = (0, quiet_require_1.quietRequire)('@aws-sdk/client-s3');
 var s3PresignerModule = (0, quiet_require_1.quietRequire)('@aws-sdk/s3-request-presigner');
 var logger = new utils_1.Logger("S3/R2");

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { EntitySchemaColumnOptions, EntitySchemaOptions } from "typeorm";
+import { ColumnType, EntitySchemaColumnOptions, EntitySchemaOptions } from "typeorm";
 export type RequiredColumns<T> = Required<EntitySchemaOptions<T>['columns']>;
 export type RequiredMongoColumns<T> = Required<mongoose.Schema<T>>;
 export declare function createRelation(target: string, type: "one-to-many" | "one-to-one", inverseSide: string, cascade?: boolean): {
@@ -9,12 +9,12 @@ export declare function createRelation(target: string, type: "one-to-many" | "on
     inverseSide: string;
 };
 export declare const MULTISQL_COLUMNS_TYPES: {
-    dbtype: "mysql" | "sqlite" | "postgres" | "mssql";
-    enum: "enum" | "simple-enum";
-    datetime: "timestamp" | "datetime" | "datetime2";
-    float32: "double" | "float";
-    float64: "double" | "float";
-    json: "json" | "simple-json";
+    dbtype: "sqlite" | "mysql" | "postgres" | "mssql";
+    enum: "simple-enum" | "enum";
+    datetime: "datetime" | "datetime2" | "timestamp";
+    float32: "float" | "double";
+    float64: "float" | "double";
+    json: "simple-json" | "json";
 };
 export declare const FloatingColumn: EntitySchemaColumnOptions;
 export declare const NullableFloatingColumn: {
@@ -29,7 +29,7 @@ export declare const NullableFloatingColumn: {
     treeChildrenCount?: boolean | undefined;
     treeLevel?: boolean | undefined;
     virtualProperty?: boolean | undefined;
-    type: import("typeorm").ColumnType;
+    type: ColumnType;
     name?: string | undefined;
     length?: string | number | undefined;
     width?: number | undefined;
@@ -37,7 +37,7 @@ export declare const NullableFloatingColumn: {
     update?: boolean | undefined;
     select?: boolean | undefined;
     insert?: boolean | undefined;
-    generated?: true | "uuid" | "increment" | "rowid" | undefined;
+    generated?: true | "uuid" | "rowid" | "increment" | undefined;
     unique?: boolean | undefined;
     columnDefinition?: string | undefined;
     comment?: string | undefined;
@@ -74,7 +74,7 @@ export declare const NullableFloat64Column: {
     treeChildrenCount?: boolean | undefined;
     treeLevel?: boolean | undefined;
     virtualProperty?: boolean | undefined;
-    type: import("typeorm").ColumnType;
+    type: ColumnType;
     name?: string | undefined;
     length?: string | number | undefined;
     width?: number | undefined;
@@ -82,7 +82,7 @@ export declare const NullableFloat64Column: {
     update?: boolean | undefined;
     select?: boolean | undefined;
     insert?: boolean | undefined;
-    generated?: true | "uuid" | "increment" | "rowid" | undefined;
+    generated?: true | "uuid" | "rowid" | "increment" | undefined;
     unique?: boolean | undefined;
     columnDefinition?: string | undefined;
     comment?: string | undefined;

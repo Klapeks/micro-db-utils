@@ -47,9 +47,9 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MySQLMigrations = void 0;
 var typeorm_1 = require("typeorm");
-var mysql_connection_1 = require("../connections/mysql.connection");
 var utils_1 = require("@klapeks/utils");
 var iso_date_time_1 = require("../utils/iso.date.time");
+var sql_1 = require("../sql");
 // for mysql
 // export type 
 var _migrations = [];
@@ -90,7 +90,7 @@ var MySQLMigrations = /** @class */ (function () {
                         options_1 = (0, utils_1.dataSourceOptions)();
                         if (options_1.type != 'mysql')
                             return [2 /*return*/];
-                        mysqlInstance_1 = new mysql_connection_1.RawMySQLConnection(options_1);
+                        mysqlInstance_1 = new sql_1.MySQLConnection(options_1);
                         return [4 /*yield*/, mysqlInstance_1.takePool()];
                     case 1:
                         _b.sent();

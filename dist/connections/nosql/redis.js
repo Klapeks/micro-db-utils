@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RedisConnection = void 0;
 var utils_1 = require("@klapeks/utils");
-var quiet_require_1 = require("../quiet.require");
+var quiet_require_1 = require("../../utils/quiet.require");
 var redisModule = (0, quiet_require_1.quietRequire)('redis');
 var logger = new utils_1.Logger("Redis");
 var RedisConnection = /** @class */ (function () {

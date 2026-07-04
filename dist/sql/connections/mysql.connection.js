@@ -1,4 +1,19 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -39,13 +54,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RawMySQLConnection = void 0;
+exports.MySQLConnection = void 0;
 var mysql2_1 = __importDefault(require("mysql2"));
 var utils_1 = require("@klapeks/utils");
+var abstract_connection_1 = require("./abstract.connection");
 var logger = new utils_1.Logger('MySQL');
-var RawMySQLConnection = /** @class */ (function () {
-    function RawMySQLConnection(options) {
-        this.poolOptions = {
+var MySQLConnection = /** @class */ (function (_super) {
+    __extends(MySQLConnection, _super);
+    function MySQLConnection(options) {
+        var _this = _super.call(this, 'toMySQL', options.database) || this;
+        _this.poolOptions = {
             user: options.username,
             password: options.password,
             host: options.host,
@@ -53,15 +71,28 @@ var RawMySQLConnection = /** @class */ (function () {
             database: options.database,
             charset: options.charset,
         };
+        return _this;
     }
-    Object.defineProperty(RawMySQLConnection.prototype, "pool", {
+    MySQLConnection.prototype.initConnection = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, this.takePool()];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    Object.defineProperty(MySQLConnection.prototype, "pool", {
         get: function () {
             return this._pool;
         },
         enumerable: false,
         configurable: true
     });
-    RawMySQLConnection.prototype.takePool = function () {
+    MySQLConnection.prototype.takePool = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -82,7 +113,7 @@ var RawMySQLConnection = /** @class */ (function () {
             });
         });
     };
-    RawMySQLConnection.prototype.destroyConnection = function () {
+    MySQLConnection.prototype.destroyConnection = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -100,7 +131,7 @@ var RawMySQLConnection = /** @class */ (function () {
             });
         });
     };
-    RawMySQLConnection.prototype.getConnection = function () {
+    MySQLConnection.prototype.getPoolConnection = function () {
         return __awaiter(this, void 0, void 0, function () {
             var _a;
             var _this = this;
@@ -126,12 +157,12 @@ var RawMySQLConnection = /** @class */ (function () {
             });
         });
     };
-    RawMySQLConnection.prototype.runSQL = function (query, params) {
+    MySQLConnection.prototype.sendSQL = function (query, params) {
         return __awaiter(this, void 0, void 0, function () {
             var connection;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.getConnection()];
+                    case 0: return [4 /*yield*/, this.getPoolConnection()];
                     case 1:
                         connection = _a.sent();
                         return [2 /*return*/, new Promise(function (resolve, reject) {
@@ -147,19 +178,6 @@ var RawMySQLConnection = /** @class */ (function () {
             });
         });
     };
-    RawMySQLConnection.prototype.runSQL_One = function (query, params) {
-        return __awaiter(this, void 0, void 0, function () {
-            var res;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.runSQL(query, params)];
-                    case 1:
-                        res = _a.sent();
-                        return [2 /*return*/, res.length ? (res[0] || res) : null];
-                }
-            });
-        });
-    };
-    return RawMySQLConnection;
-}());
-exports.RawMySQLConnection = RawMySQLConnection;
+    return MySQLConnection;
+}(abstract_connection_1.AbstractSQLConnection));
+exports.MySQLConnection = MySQLConnection;

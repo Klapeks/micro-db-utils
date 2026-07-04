@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MongoGeoPoint = exports.MongoDBConnection = exports.cursorOffsetAggregation = exports.flattenForUpdate = void 0;
 var utils_1 = require("@klapeks/utils");
-var quiet_require_1 = require("../quiet.require");
+var quiet_require_1 = require("../../utils/quiet.require");
 var mongooseModule = (0, quiet_require_1.quietRequire)('mongoose');
 function flattenForUpdate(object, prefix) {
     if (prefix === void 0) { prefix = ''; }

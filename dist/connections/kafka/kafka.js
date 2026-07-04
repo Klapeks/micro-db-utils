@@ -40,7 +40,7 @@ exports.KafkaConnection = exports.instances = void 0;
 var utils_1 = require("@klapeks/utils");
 var kafka_producer_1 = require("./kafka.producer");
 var kafka_consumer_1 = require("./kafka.consumer");
-var quiet_require_1 = require("../quiet.require");
+var quiet_require_1 = require("../../utils/quiet.require");
 var kafkajsModule = (0, quiet_require_1.quietRequire)('kafkajs');
 var logger = new utils_1.Logger("Kafka");
 exports.instances = {

@@ -14,4 +14,8 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./mysql.migrations"), exports);
+exports.MySQLMigrations = void 0;
+// export * from './mysql.migrations';
+__exportStar(require("./super.migrations"), exports);
+var super_migrations_1 = require("./super.migrations");
+Object.defineProperty(exports, "MySQLMigrations", { enumerable: true, get: function () { return super_migrations_1.SuperMigrations; } });
