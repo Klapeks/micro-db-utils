@@ -20,4 +20,13 @@ export class SQLAlterCommand {
                 + MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'
         }
     }
+
+    addColumn(column: string, type: MicroColumnTypeObject): ISQLCommandAdapter {
+        return {
+            toMySQL: () => `ALTER TABLE \`${this.table}\` ADD COLUMN \`${column}\` `
+                + MicroColumnTypeObject.toSQLQuery('mysql', type, 'alter-column') + ';',
+            toMSSQL: () => `ALTER TABLE [${this.table}] ADD [${column}] `
+                + MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'
+        }
+    }
 }

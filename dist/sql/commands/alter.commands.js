@@ -22,6 +22,15 @@ var SQLAlterCommand = /** @class */ (function () {
                 + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'; }
         };
     };
+    SQLAlterCommand.prototype.addColumn = function (column, type) {
+        var _this = this;
+        return {
+            toMySQL: function () { return "ALTER TABLE `".concat(_this.table, "` ADD COLUMN `").concat(column, "` ")
+                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mysql', type, 'alter-column') + ';'; },
+            toMSSQL: function () { return "ALTER TABLE [".concat(_this.table, "] ADD [").concat(column, "] ")
+                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'; }
+        };
+    };
     return SQLAlterCommand;
 }());
 exports.SQLAlterCommand = SQLAlterCommand;

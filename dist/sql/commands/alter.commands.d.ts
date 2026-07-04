@@ -5,4 +5,5 @@ export declare class SQLAlterCommand {
     constructor(table: string);
     renameColumn(old_name: string, new_name: string): ISQLCommandAdapter;
     changeColumnType(column: string, type: MicroColumnTypeObject): ISQLCommandAdapter;
+    addColumn(column: string, type: MicroColumnTypeObject): ISQLCommandAdapter;
 }
