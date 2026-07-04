@@ -65,19 +65,20 @@ export class SQLTablesCommands {
                 ORDER BY (data_kb + index_kb) DESC;
             `,
             toMSSQL: () => `
-                SELECT
-                    t.name AS table_name,
-                    SUM(ps.in_row_data_page_count + ps.lob_used_page_count
-                        + ps.row_overflow_used_page_count
-                        ) * 8 AS data_kb,
-                    SUM(ps.used_page_count - ps.in_row_data_page_count
-                        - ps.lob_used_page_count - ps.row_overflow_used_page_count
-                        ) * 8 AS index_kb
-                FROM sys.tables t
-                JOIN sys.dm_db_partition_stats ps
-                    ON t.object_id = ps.object_id
-                GROUP BY t.name
-                ORDER BY (data_kb + index_kb) DESC;
+                SELECT * FROM (
+                    SELECT
+                        t.name AS table_name,
+                        SUM(ps.in_row_data_page_count + ps.lob_used_page_count
+                            + ps.row_overflow_used_page_count
+                            ) * 8 AS data_kb,
+                        SUM(ps.used_page_count - ps.in_row_data_page_count
+                            - ps.lob_used_page_count - ps.row_overflow_used_page_count
+                            ) * 8 AS index_kb
+                    FROM sys.tables t
+                    JOIN sys.dm_db_partition_stats ps
+                        ON t.object_id = ps.object_id
+                    GROUP BY t.name
+                ) t ORDER BY (data_kb + index_kb) DESC;
             `,
 
             // postgress
