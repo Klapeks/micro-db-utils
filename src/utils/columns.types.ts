@@ -1,6 +1,7 @@
 import { getDatabaseColumnTypes } from "@klapeks/utils";
 import mongoose from "mongoose";
-import { ColumnType, EntitySchemaColumnOptions, EntitySchemaOptions } from "typeorm";
+import { EntitySchemaOptions } from "typeorm";
+import { MicroColumnTypeObject } from "../sql/column.type.parser";
 
 
 export type RequiredColumns<T> = Required<EntitySchemaOptions<T>['columns']>;
@@ -17,18 +18,18 @@ export function createRelation(
 
 export const MULTISQL_COLUMNS_TYPES = getDatabaseColumnTypes();
 
-export const FloatingColumn: EntitySchemaColumnOptions = {
+export const FloatingColumn: MicroColumnTypeObject = {
     type: MULTISQL_COLUMNS_TYPES.float32, default: 0
     // type: "decimal", precision: 10, scale: 6, default: 0
 }
-export const NullableFloatingColumn = { 
+export const NullableFloatingColumn: MicroColumnTypeObject = { 
     ...FloatingColumn, default: null, nullable: true 
 };
 
-export const Float64Column: EntitySchemaColumnOptions = {
+export const Float64Column: MicroColumnTypeObject = {
     type: MULTISQL_COLUMNS_TYPES.float64, default: 0
     // type: "decimal", precision: 10, scale: 6, default: 0
 }
-export const NullableFloat64Column = { 
+export const NullableFloat64Column: MicroColumnTypeObject = { 
     ...Float64Column, default: null, nullable: true 
 };
