@@ -2,8 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MicroSQL = void 0;
 var sql_1 = require("./sql");
-var select_commands_1 = require("./sql/commands/select.commands");
-var tables_commands_1 = require("./sql/commands/tables.commands");
 var MicroSQL;
 (function (MicroSQL) {
     function alter(table) {
@@ -11,11 +9,15 @@ var MicroSQL;
     }
     MicroSQL.alter = alter;
     function select(table) {
-        return new select_commands_1.SQLSelectCommands(table);
+        return new sql_1.SQLSelectCommands(table);
     }
     MicroSQL.select = select;
     function tables() {
-        return tables_commands_1.SQLTablesCommands;
+        return sql_1.SQLTablesCommands;
     }
     MicroSQL.tables = tables;
+    function timeExpressions(dbtype) {
+        return new sql_1.SQLTimeCommandsExpressions(dbtype);
+    }
+    MicroSQL.timeExpressions = timeExpressions;
 })(MicroSQL = exports.MicroSQL || (exports.MicroSQL = {}));

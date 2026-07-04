@@ -1,0 +1,26 @@
+import { DatabaseOptions } from "@klapeks/utils";
+
+
+export class SQLTimeCommandsExpressions {
+
+    constructor(
+        readonly dbtype: DatabaseOptions['type']
+    ) {}
+
+
+    time(expr: string) {
+        if (this.dbtype === 'mssql' 
+        || this.dbtype == 'postgres') {
+            return `CAST(${expr} AS TIME)`;
+        }
+        return `time(${expr})`;
+    }
+    date(expr: string) {
+        if (this.dbtype === 'mssql' 
+        || this.dbtype == 'postgres') {
+            return `CAST(${expr} AS DATE)`;
+        }
+        return `time(${expr})`;
+    }
+
+}

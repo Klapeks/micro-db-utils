@@ -1,6 +1,5 @@
-import { SQLAlterCommand } from "./sql";
-import { SQLSelectCommands } from "./sql/commands/select.commands";
-import { SQLTablesCommands } from "./sql/commands/tables.commands";
+import { DatabaseOptions } from "@klapeks/utils";
+import { SQLAlterCommand, SQLSelectCommands, SQLTablesCommands, SQLTimeCommandsExpressions } from "./sql";
 
 export namespace MicroSQL {
 
@@ -14,5 +13,9 @@ export namespace MicroSQL {
 
     export function tables() {
         return SQLTablesCommands;
+    }
+
+    export function timeExpressions(dbtype: DatabaseOptions['type']) {
+        return new SQLTimeCommandsExpressions(dbtype);
     }
 }
