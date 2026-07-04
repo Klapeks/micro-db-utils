@@ -14,8 +14,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSQLConnection = exports.isDatabaseTypeIs = void 0;
+exports.RawMySQLConnection = exports.createSQLConnection = exports.isDatabaseTypeIs = void 0;
 var mysql_connection_1 = require("./mysql.connection");
+Object.defineProperty(exports, "RawMySQLConnection", { enumerable: true, get: function () { return mysql_connection_1.MySQLConnection; } });
 var mssql_connection_1 = require("./mssql.connection");
 function isDatabaseTypeIs(options, type) {
     return options.type === type;

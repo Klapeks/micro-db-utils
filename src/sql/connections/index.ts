@@ -19,3 +19,5 @@ export function createSQLConnection(options: DatabaseOptions): AbstractSQLConnec
 export * from './abstract.connection';
 export * from './mysql.connection';
 export * from './mssql.connection';
+
+export { MySQLConnection as RawMySQLConnection };
