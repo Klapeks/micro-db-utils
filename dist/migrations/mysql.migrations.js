@@ -42,7 +42,7 @@ var MySQLMigrations = /** @class */ (function () {
     function MySQLMigrations() {
     }
     MySQLMigrations.addMigration = function (entity, date, sql) {
-        super_migrations_1.SuperMigrations.addMigration('mysql', entity, date, sql);
+        super_migrations_1.SuperMigrations.addRawMigration('mysql', entity, date, sql);
     };
     MySQLMigrations.runMigrations = function (dataSource) {
         return __awaiter(this, void 0, void 0, function () {

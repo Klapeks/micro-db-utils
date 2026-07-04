@@ -53,7 +53,7 @@ var SuperMigrations = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    SuperMigrations.addMigration = function (dbtype, entity, date, sql) {
+    SuperMigrations.addRawMigration = function (dbtype, entity, date, sql) {
         if (typeof date == 'string')
             date = new Date(date);
         this._migrations.push({
@@ -62,6 +62,9 @@ var SuperMigrations = /** @class */ (function () {
             date: date,
             sql: sql
         });
+    };
+    SuperMigrations.addMigration = function (entity, date, sql) {
+        this.addRawMigration('all', entity, date, sql);
     };
     SuperMigrations.runMigrations = function (dataSource) {
         var _a;

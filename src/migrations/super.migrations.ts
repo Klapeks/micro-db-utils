@@ -21,7 +21,7 @@ export class SuperMigrations {
         return process.env.DB_UTILS_MIGRATION_TABLE_NAME || "_kldb_mini_migrations";
     }
 
-    static addMigration(
+    static addRawMigration(
         dbtype: DatabaseOptions['type'] | 'all', 
         entity: EntitySchema, 
         date: Date | string, 
@@ -34,6 +34,13 @@ export class SuperMigrations {
             date: date, 
             sql: sql
         });
+    }
+    static addMigration(
+        entity: EntitySchema, 
+        date: Date | string, 
+        sql: ISQLCommandAdapter | ISQLCommandAdapter[]
+    ) {
+        this.addRawMigration('all', entity, date, sql);
     }
     
 
