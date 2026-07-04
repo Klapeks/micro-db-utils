@@ -142,6 +142,7 @@ var SuperMigrations = /** @class */ (function () {
                         }); };
                         lastRealMigration = lastRealMigrationDateTime
                             ? new Date(lastRealMigrationDateTime) : null;
+                        logger.log("lastRealMigrationDateTimelastRealMigrationDateTime", lastRealMigrationDateTime);
                         _i = 0, todoMigrations_1 = todoMigrations;
                         _e.label = 6;
                     case 6:

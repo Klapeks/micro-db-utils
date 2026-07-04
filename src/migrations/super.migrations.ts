@@ -94,6 +94,7 @@ export class SuperMigrations {
 
         const lastRealMigration = lastRealMigrationDateTime
             ? new Date(lastRealMigrationDateTime) : null;
+        logger.log("lastRealMigrationDateTimelastRealMigrationDateTime", lastRealMigrationDateTime);
 
         for (let migration of todoMigrations) {
             if (migration.dbtype && migration.dbtype != 'all') {
