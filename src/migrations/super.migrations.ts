@@ -71,7 +71,7 @@ export class SuperMigrations {
                 if (todoMigrations?.length && lastMigrationDate) {
                     await sqlInstance.runSQL(
                         MicroSQL.editData(this.migrationTableName).upsert({
-                            table, lastMigrationDate: toISODate(lastMigrationDate)
+                            table, lastMigrationTime: toISODate(lastMigrationDate)
                         }, ['table'])
                     );
                 }
@@ -124,7 +124,7 @@ export class SuperMigrations {
             }
             await sqlInstance.runSQL(
                 MicroSQL.editData(this.migrationTableName).upsert({
-                    table, lastMigrationDate: toISODate(migration.date)
+                    table, lastMigrationTime: toISODate(migration.date)
                 }, ['table'])
             );
             logger.log(runnedMigrationsAmount, "| Migration", migrationName, "successfully done");

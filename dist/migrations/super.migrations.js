@@ -107,7 +107,7 @@ var SuperMigrations = /** @class */ (function () {
                         if (!((todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length) && lastMigrationDate)) return [3 /*break*/, 4];
                         return [4 /*yield*/, sqlInstance.runSQL(micro_sql_1.MicroSQL.editData(this.migrationTableName).upsert({
                                 table: table,
-                                lastMigrationDate: (0, iso_date_time_1.toISODate)(lastMigrationDate)
+                                lastMigrationTime: (0, iso_date_time_1.toISODate)(lastMigrationDate)
                             }, ['table']))];
                     case 3:
                         _e.sent();
@@ -186,7 +186,7 @@ var SuperMigrations = /** @class */ (function () {
                         _e.label = 13;
                     case 13: return [4 /*yield*/, sqlInstance.runSQL(micro_sql_1.MicroSQL.editData(this.migrationTableName).upsert({
                             table: table,
-                            lastMigrationDate: (0, iso_date_time_1.toISODate)(migration.date)
+                            lastMigrationTime: (0, iso_date_time_1.toISODate)(migration.date)
                         }, ['table']))];
                     case 14:
                         _e.sent();
