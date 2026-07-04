@@ -1,6 +1,7 @@
 import mysql2 from 'mysql2';
 import { DatabaseOptions, Logger } from '@klapeks/utils';
 import { AbstractSQLConnection } from './abstract.connection';
+import { microDBUtilsConfig } from '../../config';
 
 const logger = new Logger('MySQL');
 
@@ -70,6 +71,10 @@ export class MySQLConnection extends AbstractSQLConnection {
         const connection = await this.getPoolConnection();
         return new Promise<any>((resolve, reject) => {
             // logger.debug("SQL query: ", query, '| params:', params||[])
+            if (microDBUtilsConfig.debugSQL) {
+                logger.log("Running SQL command to MySQL", query, 
+                    '\n| with params', params);
+            }
             connection.query(query, params || [], (err, result) => {
                 connection.release();
                 if (err) return reject(err);

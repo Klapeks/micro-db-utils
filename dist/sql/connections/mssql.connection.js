@@ -56,6 +56,7 @@ var utils_1 = require("@klapeks/utils");
 var abstract_connection_1 = require("./abstract.connection");
 var quiet_require_1 = require("../../utils/quiet.require");
 var mssql = (0, quiet_require_1.quietRequire)('mssql');
+var config_1 = require("../../config");
 var logger = new utils_1.Logger('MSSQL');
 var MSSQLConnection = /** @class */ (function (_super) {
     __extends(MSSQLConnection, _super);
@@ -156,6 +157,9 @@ var MSSQLConnection = /** @class */ (function (_super) {
                                     request.input(key, value);
                                 }
                             }
+                        }
+                        if (config_1.microDBUtilsConfig.debugSQL) {
+                            logger.log("Running SQL command to MSSQL", query, '\n| with params', params);
                         }
                         return [4 /*yield*/, request.query(query)];
                     case 2:

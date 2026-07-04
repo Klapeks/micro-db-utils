@@ -1,7 +1,6 @@
 import { AbstractSQLCommand, ISQLCommandAdapter, SQLCommandContext, SQLCommandData } from "../commands";
 
 
-
 export abstract class AbstractSQLConnection {
 
     protected constructor(

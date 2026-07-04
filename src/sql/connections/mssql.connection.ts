@@ -7,6 +7,7 @@ import type {
     ConnectionPool as MSSQL_ConnectionPool,
     config as MSSQL_ConnectionOptions,
 } from 'mssql';
+import { microDBUtilsConfig } from '../../config';
 
 const logger = new Logger('MSSQL');
 
@@ -72,6 +73,10 @@ export class MSSQLConnection extends AbstractSQLConnection {
                     request.input(key, value as any);
                 }
             }
+        }
+        if (microDBUtilsConfig.debugSQL) {
+            logger.log("Running SQL command to MSSQL", query, 
+                '\n| with params', params);
         }
         const result = await request.query(query);
         return (result.recordset ?? []) as T[]

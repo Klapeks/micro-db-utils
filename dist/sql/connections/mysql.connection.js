@@ -58,6 +58,7 @@ exports.MySQLConnection = void 0;
 var mysql2_1 = __importDefault(require("mysql2"));
 var utils_1 = require("@klapeks/utils");
 var abstract_connection_1 = require("./abstract.connection");
+var config_1 = require("../../config");
 var logger = new utils_1.Logger('MySQL');
 var MySQLConnection = /** @class */ (function (_super) {
     __extends(MySQLConnection, _super);
@@ -167,6 +168,9 @@ var MySQLConnection = /** @class */ (function (_super) {
                         connection = _a.sent();
                         return [2 /*return*/, new Promise(function (resolve, reject) {
                                 // logger.debug("SQL query: ", query, '| params:', params||[])
+                                if (config_1.microDBUtilsConfig.debugSQL) {
+                                    logger.log("Running SQL command to MySQL", query, '\n| with params', params);
+                                }
                                 connection.query(query, params || [], function (err, result) {
                                     connection.release();
                                     if (err)
