@@ -1,4 +1,4 @@
-import { DatabaseOptions } from "@klapeks/utils";
+import { DatabaseOptions, logger, terminalColors } from "@klapeks/utils";
 import { AbstractSQLCommand, ISQLCommandAdapter, SQLCommandContext, SQLCommandData } from "../commands";
 
 
@@ -16,6 +16,13 @@ export abstract class AbstractSQLConnection {
     get isDebugLoggerEnabled() {
         if (this.rawOptions.logging) return true;
         return process.env['DATABASE_LOG_MICRO_SQL'] == 'true';
+    }
+    protected debugQuery(query: string, params: any) {
+        if (!this.isDebugLoggerEnabled) return;
+        logger.log("Running SQL command for " + this.rawOptions.type + ":", 
+            terminalColors.BgMagenta + query, terminalColors.reset,
+            params ? ('\n| with params:') : '', params || ''
+        );
     }
 
     abstract initConnection(): Promise<void>;

@@ -69,11 +69,7 @@ export class MySQLConnection extends AbstractSQLConnection {
     async sendSQL<T = any>(query: string, params?: any): Promise<T[]> {
         const connection = await this.getPoolConnection();
         return new Promise<any>((resolve, reject) => {
-            // logger.debug("SQL query: ", query, '| params:', params||[])
-            if (this.isDebugLoggerEnabled) {
-                logger.log("Running SQL command to MySQL", query, 
-                    '\n| with params', params);
-            }
+            this.debugQuery(query, params);
             connection.query(query, params || [], (err, result) => {
                 connection.release();
                 if (err) return reject(err);

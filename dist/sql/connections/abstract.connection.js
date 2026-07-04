@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbstractSQLConnection = void 0;
+var utils_1 = require("@klapeks/utils");
 var AbstractSQLConnection = /** @class */ (function () {
     function AbstractSQLConnection(rawOptions, abstractCommandFunctionName) {
         this.rawOptions = rawOptions;
@@ -58,6 +59,11 @@ var AbstractSQLConnection = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    AbstractSQLConnection.prototype.debugQuery = function (query, params) {
+        if (!this.isDebugLoggerEnabled)
+            return;
+        utils_1.logger.log("Running SQL command for " + this.rawOptions.type + ":", utils_1.terminalColors.BgMagenta + query, utils_1.terminalColors.reset, params ? ('\n| with params:') : '', params || '');
+    };
     AbstractSQLConnection.prototype.runSQL = function (query, params) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {

@@ -73,10 +73,7 @@ export class MSSQLConnection extends AbstractSQLConnection {
                 }
             }
         }
-        if (this.isDebugLoggerEnabled) {
-            logger.log("Running SQL command to MSSQL", query, 
-                '\n| with params', params);
-        }
+        this.debugQuery(query, params);
         const result = await request.query(query);
         return (result.recordset ?? []) as T[]
     }
