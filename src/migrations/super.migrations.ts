@@ -55,7 +55,13 @@ export class SuperMigrations {
         let todoMigrations = SuperMigrations._migrations.sort((c1, c2) => {
             return c1.date.getTime() - c2.date.getTime();
         });
-        todoMigrations = [...todoMigrations].filter(m => m.table == table);
+        todoMigrations = [...todoMigrations].filter(migration => {
+            if (migration.table != table) return false;
+            if (migration.dbtype && migration.dbtype != 'all') {
+                if (migration.dbtype != sqlInstance.rawOptions.type) return false;
+            }
+            return true;
+        });
         logger.log("TODO MIGRATIONG FOR TABLE", table, todoMigrations);
         if (!todoMigrations?.length) return;
         
@@ -101,9 +107,6 @@ export class SuperMigrations {
         logger.log("lastRealMigrationDateTimelastRealMigrationDateTime", lastRealMigrationDateTime);
 
         for (let migration of todoMigrations) {
-            if (migration.dbtype && migration.dbtype != 'all') {
-                if (migration.dbtype != sqlInstance.rawOptions.type) continue;
-            }
             if (migration.table != table) continue;
             if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {
                 continue;

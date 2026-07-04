@@ -88,7 +88,15 @@ var SuperMigrations = /** @class */ (function () {
                         todoMigrations = SuperMigrations._migrations.sort(function (c1, c2) {
                             return c1.date.getTime() - c2.date.getTime();
                         });
-                        todoMigrations = __spreadArray([], todoMigrations, true).filter(function (m) { return m.table == table; });
+                        todoMigrations = __spreadArray([], todoMigrations, true).filter(function (migration) {
+                            if (migration.table != table)
+                                return false;
+                            if (migration.dbtype && migration.dbtype != 'all') {
+                                if (migration.dbtype != sqlInstance.rawOptions.type)
+                                    return false;
+                            }
+                            return true;
+                        });
                         logger.log("TODO MIGRATIONG FOR TABLE", table, todoMigrations);
                         if (!(todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length))
                             return [2 /*return*/];
@@ -152,10 +160,6 @@ var SuperMigrations = /** @class */ (function () {
                     case 6:
                         if (!(_i < todoMigrations_1.length)) return [3 /*break*/, 17];
                         migration = todoMigrations_1[_i];
-                        if (migration.dbtype && migration.dbtype != 'all') {
-                            if (migration.dbtype != sqlInstance.rawOptions.type)
-                                return [3 /*break*/, 16];
-                        }
                         if (migration.table != table)
                             return [3 /*break*/, 16];
                         if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {
