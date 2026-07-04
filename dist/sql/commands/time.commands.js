@@ -23,7 +23,7 @@ var SQLTimeCommandsExpressions = /** @class */ (function () {
     SQLTimeCommandsExpressions.prototype.dateFromToWhere = function (dateAlias, from, to) {
         var sql = this.date(dateAlias) + " >= " + "'" + (0, iso_date_time_1.toISODate)(from, "yyyy-mm-dd") + "'";
         if (to)
-            sql += this.date(dateAlias) + " <= " + "'" + (0, iso_date_time_1.toISODate)(to, "yyyy-mm-dd") + "'";
+            sql += ' AND ' + this.date(dateAlias) + " <= " + "'" + (0, iso_date_time_1.toISODate)(to, "yyyy-mm-dd") + "'";
         return sql;
     };
     return SQLTimeCommandsExpressions;
