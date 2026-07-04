@@ -31,7 +31,8 @@ export interface MicroColumnTypeObject {
     primary?: boolean,
     length?: number,
     nullable?: boolean,
-    default?: any
+    default?: any,
+    generated?: boolean
 }
 export namespace MicroColumnTypeObject {
     export function toSQLQuery(
@@ -50,6 +51,13 @@ export namespace MicroColumnTypeObject {
         // nullable
         if (options.nullable) str += ' NULL';
         else str += ' NOT NULL';
+
+        // auto increment
+        if (options.generated) {
+            if (dbType === 'mssql') str += ' IDENTITY';
+            else if (dbType === 'mysql') str += ' AUTO_INCREMENT';
+            else throw "options.generated is not supported yet for " + dbType;
+        }
 
         // default
         if (options.default !== undefined) {

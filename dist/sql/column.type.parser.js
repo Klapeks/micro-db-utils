@@ -43,6 +43,15 @@ var MicroColumnTypeObject;
             str += ' NULL';
         else
             str += ' NOT NULL';
+        // auto increment
+        if (options.generated) {
+            if (dbType === 'mssql')
+                str += ' IDENTITY';
+            else if (dbType === 'mysql')
+                str += ' AUTO_INCREMENT';
+            else
+                throw "options.generated is not supported yet for " + dbType;
+        }
         // default
         if (options.default !== undefined) {
             var value = options.default;
