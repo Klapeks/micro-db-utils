@@ -28,7 +28,7 @@ export class SuperMigrations {
         sql: SuperMigrationsSQLParam
     ) {
         if (typeof date == 'string') date = new Date(date);
-        this._migrations.push({
+        SuperMigrations._migrations.push({
             dbtype: dbtype == 'all' ? undefined : dbtype,
             table: entity.options.tableName || entity.options.name,
             date: date, 
@@ -40,7 +40,7 @@ export class SuperMigrations {
         date: Date | string, 
         sql: ISQLCommandAdapter | ISQLCommandAdapter[]
     ) {
-        this.addRawMigration('all', entity, date, sql);
+        SuperMigrations.addRawMigration('all', entity, date, sql);
     }
     
 
@@ -55,7 +55,7 @@ export class SuperMigrations {
                     // check if migration table exists
                     const _existsMigrationTable = await sqlInstance
                     .runSQL_One(SQLTablesCommands.tableInfo(
-                        options.database, this.migrationTableName
+                        options.database, SuperMigrations.migrationTableName
                     ));
                     logger.debug("Migrations table info:", _existsMigrationTable);
                     if (!_existsMigrationTable) {
@@ -63,7 +63,7 @@ export class SuperMigrations {
                         logger.log("Creating migration table..");
                         await sqlInstance.runSQL_One(
                             SQLTablesCommands.createTable({
-                                table: this.migrationTableName,
+                                table: SuperMigrations.migrationTableName,
                                 columns: {
                                     table: { type: String, length: 255, primary: true },
                                     lastMigrationTime: { type: String, length: 128 }
@@ -76,7 +76,7 @@ export class SuperMigrations {
 
                 // pre running migrations
                 const migrationRecors = mapOf(await sqlInstance.runSQL(
-                    MicroSQL.select(this.migrationTableName).all()
+                    MicroSQL.select(SuperMigrations.migrationTableName).all()
                 ), 'table');
                 logger.log('Migration records:', migrationRecors);
 
@@ -117,3 +117,7 @@ export class SuperMigrations {
         }
     }
 }
+
+SuperMigrations.addMigration = SuperMigrations.addMigration.bind(SuperMigrations);
+SuperMigrations.addRawMigration = SuperMigrations.addRawMigration.bind(SuperMigrations);
+SuperMigrations.runMigrations = SuperMigrations.runMigrations.bind(SuperMigrations);

@@ -56,7 +56,7 @@ var SuperMigrations = /** @class */ (function () {
     SuperMigrations.addRawMigration = function (dbtype, entity, date, sql) {
         if (typeof date == 'string')
             date = new Date(date);
-        this._migrations.push({
+        SuperMigrations._migrations.push({
             dbtype: dbtype == 'all' ? undefined : dbtype,
             table: entity.options.tableName || entity.options.name,
             date: date,
@@ -64,7 +64,7 @@ var SuperMigrations = /** @class */ (function () {
         });
     };
     SuperMigrations.addMigration = function (entity, date, sql) {
-        this.addRawMigration('all', entity, date, sql);
+        SuperMigrations.addRawMigration('all', entity, date, sql);
     };
     SuperMigrations.runMigrations = function (dataSource) {
         var _a;
@@ -86,7 +86,7 @@ var SuperMigrations = /** @class */ (function () {
                     case 3:
                         _c.trys.push([3, 13, , 15]);
                         return [4 /*yield*/, sqlInstance
-                                .runSQL_One(tables_commands_1.SQLTablesCommands.tableInfo(options.database, this.migrationTableName))];
+                                .runSQL_One(tables_commands_1.SQLTablesCommands.tableInfo(options.database, SuperMigrations.migrationTableName))];
                     case 4:
                         _existsMigrationTable = _c.sent();
                         logger.debug("Migrations table info:", _existsMigrationTable);
@@ -94,7 +94,7 @@ var SuperMigrations = /** @class */ (function () {
                         // creating migration table if not exists
                         logger.log("Creating migration table..");
                         return [4 /*yield*/, sqlInstance.runSQL_One(tables_commands_1.SQLTablesCommands.createTable({
-                                table: this.migrationTableName,
+                                table: SuperMigrations.migrationTableName,
                                 columns: {
                                     table: { type: String, length: 255, primary: true },
                                     lastMigrationTime: { type: String, length: 128 }
@@ -105,7 +105,7 @@ var SuperMigrations = /** @class */ (function () {
                         _c.label = 6;
                     case 6:
                         _b = utils_1.mapOf;
-                        return [4 /*yield*/, sqlInstance.runSQL(micro_sql_1.MicroSQL.select(this.migrationTableName).all())];
+                        return [4 /*yield*/, sqlInstance.runSQL(micro_sql_1.MicroSQL.select(SuperMigrations.migrationTableName).all())];
                     case 7:
                         migrationRecors = _b.apply(void 0, [_c.sent(), 'table']);
                         logger.log('Migration records:', migrationRecors);
@@ -167,3 +167,6 @@ var SuperMigrations = /** @class */ (function () {
     return SuperMigrations;
 }());
 exports.SuperMigrations = SuperMigrations;
+SuperMigrations.addMigration = SuperMigrations.addMigration.bind(SuperMigrations);
+SuperMigrations.addRawMigration = SuperMigrations.addRawMigration.bind(SuperMigrations);
+SuperMigrations.runMigrations = SuperMigrations.runMigrations.bind(SuperMigrations);
