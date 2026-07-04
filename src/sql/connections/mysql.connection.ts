@@ -10,7 +10,7 @@ export class MySQLConnection extends AbstractSQLConnection {
 
     readonly poolOptions: mysql2.PoolOptions;
     constructor(options: DatabaseOptions & { type: "mysql" }) {
-        super('toMySQL');
+        super('toMySQL', options.database);
         this.poolOptions = {
             user: options.username,
             password: options.password,

@@ -1,3 +1,4 @@
+import { MicroColumnTypeObject } from "../column.type.parser";
 import { ISQLCommandAdapter } from "./abstract.sql.command";
 
 export class SQLAlterCommand {
@@ -6,19 +7,17 @@ export class SQLAlterCommand {
 
     renameColumn(old_name: string, new_name: string): ISQLCommandAdapter {
         return {
-            toMySQL: () => `ALTER TABLE ${this.table} RENAME COLUMN \`${old_name}\` TO \`${new_name}\`;`,
+            toMySQL: () => `ALTER TABLE \`${this.table}\` RENAME COLUMN \`${old_name}\` TO \`${new_name}\`;`,
             toMSSQL: () => `EXEC sp_rename '${this.table}.${old_name}', '${new_name}', 'COLUMN';`
         }
     }
 
-    changeColumnType(column: string, type: string): ISQLCommandAdapter {
+    changeColumnType(column: string, type: MicroColumnTypeObject): ISQLCommandAdapter {
         return {
-            toMySQL: () => `ALTER TABLE ${this.table} MODIFY \`${column}\` ${type};`,
-            toMSSQL: () => `ALTER TABLE ${this.table} ALTER COLUMN ${column} ${type};`
+            toMySQL: () => `ALTER TABLE \`${this.table}\` MODIFY COLUMN \`${column}\` `
+                + MicroColumnTypeObject.toSQLQuery('mysql', type, 'alter-column') + ';',
+            toMSSQL: () => `ALTER TABLE [${this.table}] ALTER COLUMN [${column}] `
+                + MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'
         }
     }
-}
-
-export function alter(table: string) {
-    return new SQLAlterCommand(table);
 }

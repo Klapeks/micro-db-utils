@@ -24,3 +24,35 @@ export function getRawDatabaseColumnTypeOfTypeORM(dbtype: DatabaseOptions['type'
     if (type === Date) return MULTISQL_COLUMNS_TYPES.datetime;
     return type;
 }
+
+
+export interface MicroColumnTypeObject {
+    type: ColumnType,
+    primary?: boolean,
+    length?: number,
+    nullable?: boolean
+}
+export namespace MicroColumnTypeObject {
+    export function toSQLQuery(
+        dbType: DatabaseOptions['type'], 
+        options: MicroColumnTypeObject,
+        queryType?: "create-table" | "alter-column"
+    ): string {
+        const columnType = getRawDatabaseColumnTypeOfTypeORM(dbType, options.type);
+        const columnLength = options.length || ((
+            columnType === 'varchar' 
+            || columnType === 'nvarchar'
+        ) ? 255 : undefined);
+        
+        let str = columnType + (columnLength ? `(${columnLength})` : '');
+        if (options.nullable) str += ' NULL';
+        else str += ' NOT NULL';
+
+        if (queryType === 'create-table') {
+            if (options.primary) {
+                str += ' PRIMARY KEY';
+            }
+        }
+        return str;
+    }
+}
