@@ -26,7 +26,7 @@ export class SQLTimeCommandsExpressions {
 
     dateFromToWhere(dateAlias: string, from: Date, to?: Date) {
         let sql = this.date(dateAlias) + " >= " + "'" + toISODate(from, "yyyy-mm-dd") + "'";
-        if (to) sql += this.date(dateAlias) + " <= " + "'" + toISODate(to, "yyyy-mm-dd") + "'";
+        if (to) sql += ' AND ' + this.date(dateAlias) + " <= " + "'" + toISODate(to, "yyyy-mm-dd") + "'";
         return sql;
     }
 }
