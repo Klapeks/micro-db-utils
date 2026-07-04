@@ -73,7 +73,7 @@ export class MSSQLConnection extends AbstractSQLConnection {
                 }
             }
         }
-        if (this.rawOptions.logging) {
+        if (this.isDebugLoggerEnabled) {
             logger.log("Running SQL command to MSSQL", query, 
                 '\n| with params', params);
         }

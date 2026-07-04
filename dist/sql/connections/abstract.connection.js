@@ -49,6 +49,15 @@ var AbstractSQLConnection = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(AbstractSQLConnection.prototype, "isDebugLoggerEnabled", {
+        get: function () {
+            if (this.rawOptions.logging)
+                return true;
+            return process.env['DATABASE_LOG_MICRO_SQL'] == 'true';
+        },
+        enumerable: false,
+        configurable: true
+    });
     AbstractSQLConnection.prototype.runSQL = function (query, params) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {

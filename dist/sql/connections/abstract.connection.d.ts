@@ -5,6 +5,7 @@ export declare abstract class AbstractSQLConnection {
     readonly abstractCommandFunctionName: keyof ISQLCommandAdapter;
     protected constructor(rawOptions: DatabaseOptions, abstractCommandFunctionName: keyof ISQLCommandAdapter);
     get databaseName(): string;
+    get isDebugLoggerEnabled(): boolean;
     abstract initConnection(): Promise<void>;
     abstract destroyConnection(): Promise<void>;
     protected abstract sendSQL<T = any>(query: string, params?: any[]): Promise<T[]>;

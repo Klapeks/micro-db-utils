@@ -157,7 +157,7 @@ var MSSQLConnection = /** @class */ (function (_super) {
                                 }
                             }
                         }
-                        if (this.rawOptions.logging) {
+                        if (this.isDebugLoggerEnabled) {
                             logger.log("Running SQL command to MSSQL", query, '\n| with params', params);
                         }
                         return [4 /*yield*/, request.query(query)];

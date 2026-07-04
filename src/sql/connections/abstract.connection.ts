@@ -13,6 +13,11 @@ export abstract class AbstractSQLConnection {
         return this.rawOptions.database;
     }
 
+    get isDebugLoggerEnabled() {
+        if (this.rawOptions.logging) return true;
+        return process.env['DATABASE_LOG_MICRO_SQL'] == 'true';
+    }
+
     abstract initConnection(): Promise<void>;
     abstract destroyConnection(): Promise<void>;
     protected abstract sendSQL<T = any>(query: string, params?: any[]): Promise<T[]>;

@@ -70,7 +70,7 @@ export class MySQLConnection extends AbstractSQLConnection {
         const connection = await this.getPoolConnection();
         return new Promise<any>((resolve, reject) => {
             // logger.debug("SQL query: ", query, '| params:', params||[])
-            if (this.rawOptions.logging) {
+            if (this.isDebugLoggerEnabled) {
                 logger.log("Running SQL command to MySQL", query, 
                     '\n| with params', params);
             }

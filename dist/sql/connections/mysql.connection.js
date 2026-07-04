@@ -168,7 +168,7 @@ var MySQLConnection = /** @class */ (function (_super) {
                         connection = _a.sent();
                         return [2 /*return*/, new Promise(function (resolve, reject) {
                                 // logger.debug("SQL query: ", query, '| params:', params||[])
-                                if (_this.rawOptions.logging) {
+                                if (_this.isDebugLoggerEnabled) {
                                     logger.log("Running SQL command to MySQL", query, '\n| with params', params);
                                 }
                                 connection.query(query, params || [], function (err, result) {
