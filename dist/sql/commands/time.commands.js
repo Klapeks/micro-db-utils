@@ -8,7 +8,7 @@ var SQLTimeCommandsExpressions = /** @class */ (function () {
     SQLTimeCommandsExpressions.prototype.time = function (expr) {
         if (this.dbtype === 'mssql'
             || this.dbtype == 'postgres') {
-            return "CAST(".concat(expr, " AS TIME)");
+            return "CAST(".concat(expr, " AS TIME(0))");
         }
         return "time(".concat(expr, ")");
     };

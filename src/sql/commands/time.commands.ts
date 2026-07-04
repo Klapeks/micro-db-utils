@@ -11,7 +11,7 @@ export class SQLTimeCommandsExpressions {
     time(expr: string) {
         if (this.dbtype === 'mssql' 
         || this.dbtype == 'postgres') {
-            return `CAST(${expr} AS TIME)`;
+            return `CAST(${expr} AS TIME(0))`;
         }
         return `time(${expr})`;
     }
