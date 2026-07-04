@@ -145,6 +145,10 @@ var SuperMigrations = /** @class */ (function () {
                     case 6:
                         if (!(_i < todoMigrations_1.length)) return [3 /*break*/, 17];
                         migration = todoMigrations_1[_i];
+                        if (migration.dbtype && migration.dbtype != 'all') {
+                            if (migration.dbtype != sqlInstance.rawOptions.type)
+                                return [3 /*break*/, 16];
+                        }
                         if (migration.table != table)
                             return [3 /*break*/, 16];
                         if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {

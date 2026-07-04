@@ -95,6 +95,9 @@ export class SuperMigrations {
             ? new Date(lastRealMigrationDateTime) : null;
 
         for (let migration of todoMigrations) {
+            if (migration.dbtype && migration.dbtype != 'all') {
+                if (migration.dbtype != sqlInstance.rawOptions.type) continue;
+            }
             if (migration.table != table) continue;
             if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {
                 continue;
