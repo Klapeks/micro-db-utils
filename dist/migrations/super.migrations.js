@@ -97,7 +97,7 @@ var SuperMigrations = /** @class */ (function () {
                             }
                             return true;
                         });
-                        logger.log("TODO MIGRATIONG FOR TABLE", table, todoMigrations);
+                        // logger.log("TODO MIGRATIONG FOR TABLE", table, todoMigrations);
                         if (!(todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length))
                             return [2 /*return*/];
                         return [4 /*yield*/, sqlInstance.runSQL_One(tables_commands_1.SQLTablesCommands.tableInfo(databaseName, table))];
@@ -154,7 +154,6 @@ var SuperMigrations = /** @class */ (function () {
                         }); };
                         lastRealMigration = lastRealMigrationDateTime
                             ? new Date(lastRealMigrationDateTime) : null;
-                        logger.log("lastRealMigrationDateTimelastRealMigrationDateTime", lastRealMigrationDateTime);
                         _i = 0, todoMigrations_1 = todoMigrations;
                         _e.label = 6;
                     case 6:
@@ -162,6 +161,7 @@ var SuperMigrations = /** @class */ (function () {
                         migration = todoMigrations_1[_i];
                         if (migration.table != table)
                             return [3 /*break*/, 16];
+                        logger;
                         if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {
                             return [3 /*break*/, 16];
                         }
@@ -217,27 +217,27 @@ var SuperMigrations = /** @class */ (function () {
         });
     };
     SuperMigrations.runMigrations = function (dataSource) {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var options, sqlInstance, _existsMigrationTable, migrationRecords, _b, runnedMigrationsAmount_1, tablesToMigrate, _i, tablesToMigrate_1, table, err_1, err_2;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            var options, sqlInstance, _existsMigrationTable, migrationRecords, _c, runnedMigrationsAmount_1, tablesToMigrate, _i, tablesToMigrate_1, table, err_1, err_2;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
                     case 0:
                         options = (0, utils_1.dataSourceOptions)();
-                        _c.label = 1;
+                        _d.label = 1;
                     case 1:
-                        _c.trys.push([1, 16, , 17]);
+                        _d.trys.push([1, 16, , 17]);
                         sqlInstance = (0, sql_1.createSQLConnection)(options);
                         return [4 /*yield*/, sqlInstance.initConnection()];
                     case 2:
-                        _c.sent();
-                        _c.label = 3;
+                        _d.sent();
+                        _d.label = 3;
                     case 3:
-                        _c.trys.push([3, 13, , 15]);
+                        _d.trys.push([3, 13, , 15]);
                         return [4 /*yield*/, sqlInstance
                                 .runSQL_One(tables_commands_1.SQLTablesCommands.tableInfo(options.database, SuperMigrations.migrationTableName))];
                     case 4:
-                        _existsMigrationTable = _c.sent();
+                        _existsMigrationTable = _d.sent();
                         logger.debug("Migrations table info:", _existsMigrationTable);
                         if (!!_existsMigrationTable) return [3 /*break*/, 6];
                         // creating migration table if not exists
@@ -250,14 +250,13 @@ var SuperMigrations = /** @class */ (function () {
                                 }
                             }))];
                     case 5:
-                        _c.sent();
-                        _c.label = 6;
+                        _d.sent();
+                        _d.label = 6;
                     case 6:
-                        _b = utils_1.mapOf;
+                        _c = utils_1.mapOf;
                         return [4 /*yield*/, sqlInstance.runSQL(micro_sql_1.MicroSQL.select(SuperMigrations.migrationTableName).all())];
                     case 7:
-                        migrationRecords = _b.apply(void 0, [_c.sent(), 'table']);
-                        logger.log('Migration records:', migrationRecords);
+                        migrationRecords = _c.apply(void 0, [_d.sent(), 'table']);
                         runnedMigrationsAmount_1 = 0;
                         tablesToMigrate = Object.values(dataSource.options.entities || []).map(function (m) {
                             if (m instanceof typeorm_1.EntitySchema)
@@ -265,14 +264,14 @@ var SuperMigrations = /** @class */ (function () {
                             return undefined;
                         }).filter(Boolean);
                         _i = 0, tablesToMigrate_1 = tablesToMigrate;
-                        _c.label = 8;
+                        _d.label = 8;
                     case 8:
                         if (!(_i < tablesToMigrate_1.length)) return [3 /*break*/, 11];
                         table = tablesToMigrate_1[_i];
-                        return [4 /*yield*/, SuperMigrations.runMigrationForTable(sqlInstance, table, migrationRecords.get(table), function () { return ++runnedMigrationsAmount_1; })];
+                        return [4 /*yield*/, SuperMigrations.runMigrationForTable(sqlInstance, table, (_a = migrationRecords.get(table)) === null || _a === void 0 ? void 0 : _a.lastMigrationTime, function () { return ++runnedMigrationsAmount_1; })];
                     case 9:
-                        _c.sent();
-                        _c.label = 10;
+                        _d.sent();
+                        _d.label = 10;
                     case 10:
                         _i++;
                         return [3 /*break*/, 8];
@@ -285,20 +284,20 @@ var SuperMigrations = /** @class */ (function () {
                                 logger.error("Error while closing pool:", err);
                             })];
                     case 12:
-                        _c.sent();
+                        _d.sent();
                         return [3 /*break*/, 15];
                     case 13:
-                        err_1 = _c.sent();
+                        err_1 = _d.sent();
                         return [4 /*yield*/, sqlInstance.destroyConnection().catch(function (err) {
                                 logger.error("Error while closing pool:", err);
                             })];
                     case 14:
-                        _c.sent();
+                        _d.sent();
                         throw err_1;
                     case 15: return [3 /*break*/, 17];
                     case 16:
-                        err_2 = _c.sent();
-                        if ((_a = err_2 === null || err_2 === void 0 ? void 0 : err_2.sqlMessage) === null || _a === void 0 ? void 0 : _a.toLowerCase().includes("unknown database"))
+                        err_2 = _d.sent();
+                        if ((_b = err_2 === null || err_2 === void 0 ? void 0 : err_2.sqlMessage) === null || _b === void 0 ? void 0 : _b.toLowerCase().includes("unknown database"))
                             return [2 /*return*/];
                         // logger.error("err of musql:", err.sqlMessage);
                         throw err_2;
