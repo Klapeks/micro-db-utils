@@ -38,10 +38,40 @@ var MicroColumnTypeObject;
         var columnLength = options.length || ((columnType === 'varchar'
             || columnType === 'nvarchar') ? 255 : undefined);
         var str = columnType + (columnLength ? "(".concat(columnLength, ")") : '');
+        // nullable
         if (options.nullable)
             str += ' NULL';
         else
             str += ' NOT NULL';
+        // default
+        if (options.default !== undefined) {
+            var value = options.default;
+            if (value === null || value === 'null' || value === 'NULL') {
+                value = "NULL";
+            }
+            else if (typeof value === 'number') {
+                value = value.toString(); // :)
+            }
+            else if (typeof value === 'boolean') {
+                if (dbType === 'mssql') {
+                    value = value ? '1' : '0';
+                }
+                else {
+                    value = value ? "true" : "false";
+                }
+            }
+            else if (typeof value === 'string') {
+                value = "'".concat(value.replace(/'/g, "''"), "'");
+            }
+            else if (typeof value === 'object') {
+                value = "'".concat(JSON.stringify(value), "'");
+            }
+            else {
+                value = "'".concat(value, "'");
+            }
+            str += " DEFAULT ".concat(value);
+        }
+        // primary key
         if (queryType === 'create-table') {
             if (options.primary) {
                 str += ' PRIMARY KEY';
