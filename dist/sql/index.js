@@ -16,3 +16,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./commands"), exports);
 __exportStar(require("./connections"), exports);
+__exportStar(require("./raw.where.utils"), exports);
+__exportStar(require("./column.type.parser"), exports);
