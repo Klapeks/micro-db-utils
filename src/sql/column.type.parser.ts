@@ -32,7 +32,7 @@ export interface MicroColumnTypeObject {
     length?: number,
     nullable?: boolean,
     default?: any,
-    generated?: boolean
+    generated?: true | "increment"
 }
 export namespace MicroColumnTypeObject {
     export function toSQLQuery(

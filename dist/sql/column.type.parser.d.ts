@@ -7,7 +7,7 @@ export interface MicroColumnTypeObject {
     length?: number;
     nullable?: boolean;
     default?: any;
-    generated?: boolean;
+    generated?: true | "increment";
 }
 export declare namespace MicroColumnTypeObject {
     function toSQLQuery(dbType: DatabaseOptions['type'], options: MicroColumnTypeObject, queryType?: "create-table" | "alter-column"): string;
