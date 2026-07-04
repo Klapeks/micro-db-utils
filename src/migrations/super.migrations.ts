@@ -139,8 +139,6 @@ export class SuperMigrations {
             logger.log(runnedMigrationsAmount, "| Migration", migrationName, "successfully done");
             await utils.sleep(100);
         }
-
-        logger.log("Is table exists info:", isTableExistsInfo)
     }
 
     static async runMigrations(dataSource: DataSource) {

@@ -209,9 +209,7 @@ var SuperMigrations = /** @class */ (function () {
                     case 16:
                         _i++;
                         return [3 /*break*/, 6];
-                    case 17:
-                        logger.log("Is table exists info:", isTableExistsInfo);
-                        return [2 /*return*/];
+                    case 17: return [2 /*return*/];
                 }
             });
         });
