@@ -64,7 +64,7 @@ export class MSSQLConnection extends AbstractSQLConnection {
         if (params) {
             if (Array.isArray(params) && params.length) {
                 for (let i = 0; i < params.length; i++) {
-                    query = query.replace('?', ':arg' + i);
+                    query = query.replace('?', '@arg' + i);
                     request.input('arg' + i, params[i]);
                 }
             } else {

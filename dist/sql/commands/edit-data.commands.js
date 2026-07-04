@@ -38,7 +38,7 @@ var SQLEditDataCommands = /** @class */ (function () {
                 params: __spreadArray(__spreadArray([], Object.values(data), true), Object.values(toUpdObj), true)
             }); },
             toMSSQL: function () { return ({
-                query: "\n                    UPDATE [".concat(_this.table, "] \n                    SET ").concat(Object.keys(toUpdObj).map(function (key) { return "[".concat(key, "] = :").concat(key); }).join(','), "\n                    WHERE ").concat(idKeys.map(function (key) { return "[".concat(key, "] = :").concat(key); }).join(' AND '), ";\n\n                    IF @@ROWCOUNT = 0 INSERT INTO [").concat(_this.table, "]\n                        (").concat(dataKeys.map(function (a) { return "[".concat(a, "]"); }).join(', '), ")\n                        VALUES (").concat(dataKeys.map(function (key) { return ':' + key; }).join(', '), ");\n                "),
+                query: "\n                    UPDATE [".concat(_this.table, "] \n                    SET ").concat(Object.keys(toUpdObj).map(function (key) { return "[".concat(key, "] = @").concat(key); }).join(','), "\n                    WHERE ").concat(idKeys.map(function (key) { return "[".concat(key, "] = @").concat(key); }).join(' AND '), ";\n\n                    IF @@ROWCOUNT = 0 INSERT INTO [").concat(_this.table, "]\n                        (").concat(dataKeys.map(function (a) { return "[".concat(a, "]"); }).join(', '), ")\n                        VALUES (").concat(dataKeys.map(function (key) { return '@' + key; }).join(', '), ");\n                "),
                 params: data
             }); },
         };

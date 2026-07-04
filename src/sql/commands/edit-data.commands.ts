@@ -35,12 +35,12 @@ export class SQLEditDataCommands {
             toMSSQL: () => ({
                 query: `
                     UPDATE [${this.table}] 
-                    SET ${Object.keys(toUpdObj).map(key => `[${key}] = :${key}`).join(',')}
-                    WHERE ${idKeys.map(key => `[${key}] = :${key}`).join(' AND ')};
+                    SET ${Object.keys(toUpdObj).map(key => `[${key}] = @${key}`).join(',')}
+                    WHERE ${idKeys.map(key => `[${key}] = @${key}`).join(' AND ')};
 
                     IF @@ROWCOUNT = 0 INSERT INTO [${this.table}]
                         (${dataKeys.map(a => `[${a}]`).join(', ')})
-                        VALUES (${dataKeys.map((key) => ':' + key).join(', ')});
+                        VALUES (${dataKeys.map((key) => '@' + key).join(', ')});
                 `,
                 params: data
             }),

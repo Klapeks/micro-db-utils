@@ -146,7 +146,7 @@ var MSSQLConnection = /** @class */ (function (_super) {
                         if (params) {
                             if (Array.isArray(params) && params.length) {
                                 for (i = 0; i < params.length; i++) {
-                                    query = query.replace('?', ':arg' + i);
+                                    query = query.replace('?', '@arg' + i);
                                     request.input('arg' + i, params[i]);
                                 }
                             }
