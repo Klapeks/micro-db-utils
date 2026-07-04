@@ -62,7 +62,7 @@ export class SuperMigrations {
             }
             return true;
         });
-        logger.log("TODO MIGRATIONG FOR TABLE", table, todoMigrations);
+        // logger.log("TODO MIGRATIONG FOR TABLE", table, todoMigrations);
         if (!todoMigrations?.length) return;
         
         const isTableExistsInfo = await await sqlInstance.runSQL_One(
@@ -104,10 +104,10 @@ export class SuperMigrations {
 
         const lastRealMigration = lastRealMigrationDateTime
             ? new Date(lastRealMigrationDateTime) : null;
-        logger.log("lastRealMigrationDateTimelastRealMigrationDateTime", lastRealMigrationDateTime);
 
         for (let migration of todoMigrations) {
             if (migration.table != table) continue;
+            logger
             if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {
                 continue;
             }
@@ -176,7 +176,7 @@ export class SuperMigrations {
                 const migrationRecords = mapOf(await sqlInstance.runSQL(
                     MicroSQL.select(SuperMigrations.migrationTableName).all()
                 ), 'table');
-                logger.log('Migration records:', migrationRecords);
+                // logger.log('Migration records:', migrationRecords);
 
                 // run migrations of all tables;
                 let runnedMigrationsAmount = 0;
@@ -187,7 +187,7 @@ export class SuperMigrations {
                 for (let table of tablesToMigrate) {
                     await SuperMigrations.runMigrationForTable(
                         sqlInstance, table, 
-                        migrationRecords.get(table),
+                        migrationRecords.get(table)?.lastMigrationTime,
                         () => ++runnedMigrationsAmount
                     );
                 }
