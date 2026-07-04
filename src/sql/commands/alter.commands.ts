@@ -3,7 +3,7 @@ import { ISQLCommandAdapter } from "./abstract.sql.command";
 
 export class SQLAlterCommand {
     
-    constructor(readonly table: string) {}
+    constructor(private readonly table: string) {}
 
     renameColumn(old_name: string, new_name: string): ISQLCommandAdapter {
         return {

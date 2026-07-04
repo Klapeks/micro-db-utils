@@ -1,6 +1,6 @@
 import { DatabaseOptions } from "@klapeks/utils";
 export declare class SQLTimeCommandsExpressions {
-    readonly dbtype: DatabaseOptions['type'];
+    private readonly dbtype;
     constructor(dbtype: DatabaseOptions['type']);
     time(expr: string): string;
     date(expr: string): string;

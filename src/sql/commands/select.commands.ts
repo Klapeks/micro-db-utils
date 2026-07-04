@@ -3,7 +3,7 @@ import { ISQLCommandAdapter } from "./abstract.sql.command";
 
 export class SQLSelectCommands {
     
-    constructor(readonly table: string) {}
+    constructor(private readonly table: string) {}
 
     all(): ISQLCommandAdapter {
         return {

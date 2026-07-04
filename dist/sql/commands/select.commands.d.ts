@@ -1,6 +1,6 @@
 import { ISQLCommandAdapter } from "./abstract.sql.command";
 export declare class SQLSelectCommands {
-    readonly table: string;
+    private readonly table;
     constructor(table: string);
     all(): ISQLCommandAdapter;
 }

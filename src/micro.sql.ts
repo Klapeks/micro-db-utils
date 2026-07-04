@@ -1,5 +1,6 @@
 import { DatabaseOptions } from "@klapeks/utils";
 import { SQLAlterCommand, SQLSelectCommands, SQLTablesCommands, SQLTimeCommandsExpressions } from "./sql";
+import { DataSourceOptions } from "typeorm";
 
 export namespace MicroSQL {
 
@@ -15,7 +16,7 @@ export namespace MicroSQL {
         return SQLTablesCommands;
     }
 
-    export function timeExpressions(dbtype: DatabaseOptions['type']) {
-        return new SQLTimeCommandsExpressions(dbtype);
+    export function timeExpressions(dbtype: DatabaseOptions['type'] | DataSourceOptions['type']) {
+        return new SQLTimeCommandsExpressions(dbtype as any);
     }
 }
