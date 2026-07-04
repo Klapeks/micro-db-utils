@@ -53,10 +53,14 @@ var SuperMigrations = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    SuperMigrations.addMigration = function (entity, date, sql) {
+    SuperMigrations.addMigration = function (dbtype, entity, date, sql) {
+        if (typeof date == 'string')
+            date = new Date(date);
         this._migrations.push({
+            dbtype: dbtype == 'all' ? undefined : dbtype,
             table: entity.options.tableName || entity.options.name,
-            date: date, sql: sql
+            date: date,
+            sql: sql
         });
     };
     SuperMigrations.runMigrations = function (dataSource) {

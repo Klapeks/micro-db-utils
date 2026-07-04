@@ -1,7 +1,7 @@
 import { DataSource, EntitySchema } from "typeorm";
 import { createSQLConnection, ISQLCommandAdapter } from "../sql";
 import { MicroSQL } from "../micro.sql";
-import { dataSourceOptions, Logger, mapOf, terminalColors } from "@klapeks/utils";
+import { DatabaseOptions, dataSourceOptions, Logger, mapOf, terminalColors } from "@klapeks/utils";
 import { SQLTablesCommands } from "../sql/commands/tables.commands";
 
 const logger = new Logger("SuperMigrations");
@@ -11,6 +11,7 @@ type SuperMigrationsSQLParam = string | ISQLCommandAdapter | (string | ISQLComma
 export class SuperMigrations {
 
     private static _migrations: {
+        dbtype?: DatabaseOptions['type'] | "all",
         table: string,
         date: Date,
         sql: SuperMigrationsSQLParam
@@ -20,10 +21,18 @@ export class SuperMigrations {
         return process.env.DB_UTILS_MIGRATION_TABLE_NAME || "_kldb_mini_migrations";
     }
 
-    static addMigration(entity: EntitySchema, date: Date, sql: SuperMigrationsSQLParam) {
+    static addMigration(
+        dbtype: DatabaseOptions['type'] | 'all', 
+        entity: EntitySchema, 
+        date: Date | string, 
+        sql: SuperMigrationsSQLParam
+    ) {
+        if (typeof date == 'string') date = new Date(date);
         this._migrations.push({
+            dbtype: dbtype == 'all' ? undefined : dbtype,
             table: entity.options.tableName || entity.options.name,
-            date: date, sql: sql
+            date: date, 
+            sql: sql
         });
     }
     
