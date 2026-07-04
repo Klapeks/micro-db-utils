@@ -6,4 +6,5 @@ export declare class SQLTablesCommands {
         table: string;
         columns: Record<string, MicroColumnTypeObject>;
     }): ISQLCommandAdapter;
+    static getTablesSizes(database: string): ISQLCommandAdapter;
 }

@@ -51,4 +51,52 @@ export class SQLTablesCommands {
             toMSSQL: () => _createQuery('mssql'),
         }
     }
+
+
+    static getTablesSizes(database: string): ISQLCommandAdapter {
+        return {
+            toMySQL: () => `
+                SELECT 
+                    TABLE_NAME as 'table_name', 
+                    (DATA_LENGTH / 1024) as 'data_kb', 
+                    (INDEX_LENGTH / 1024) as 'index_kb'
+                FROM information_schema.TABLES
+                WHERE table_schema = '${database}'
+                ORDER BY (data_kb + index_kb) DESC;
+            `,
+            toMSSQL: () => `
+                SELECT
+                    t.name AS table_name,
+                    SUM(ps.in_row_data_page_count + ps.lob_used_page_count
+                        + ps.row_overflow_used_page_count
+                        ) * 8 AS data_kb,
+                    SUM(ps.used_page_count - ps.in_row_data_page_count
+                        - ps.lob_used_page_count - ps.row_overflow_used_page_count
+                        ) * 8 AS index_kb
+                FROM sys.tables t
+                JOIN sys.dm_db_partition_stats ps
+                    ON t.object_id = ps.object_id
+                GROUP BY t.name
+                ORDER BY (data_kb + index_kb) DESC;
+            `,
+
+            // postgress
+            // SELECT
+            //     relname AS table_name,
+            //     pg_relation_size(relid) / 1024 AS data_kb,
+            //     pg_indexes_size(relid) / 1024 AS index_kb
+            // FROM pg_catalog.pg_statio_user_tables
+            // ORDER BY pg_total_relation_size(relid) DESC;
+
+            // sqlite
+            // 1. SELECT
+            //     name AS table_name
+            // FROM sqlite_master
+            // WHERE type = 'table';
+            // 2. SELECT
+            //     SUM(pgsize) / 1024.0 AS data_kb
+            // FROM dbstat
+            // WHERE name = ?;
+        }
+    }
 }
