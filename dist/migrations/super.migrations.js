@@ -236,7 +236,6 @@ var SuperMigrations = /** @class */ (function () {
                                 .runSQL_One(tables_commands_1.SQLTablesCommands.tableInfo(options.database, SuperMigrations.migrationTableName))];
                     case 4:
                         _existsMigrationTable = _d.sent();
-                        logger.debug("Migrations table info:", _existsMigrationTable);
                         if (!!_existsMigrationTable) return [3 /*break*/, 6];
                         // creating migration table if not exists
                         logger.log("Creating migration table..");

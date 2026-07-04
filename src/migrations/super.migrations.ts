@@ -154,7 +154,7 @@ export class SuperMigrations {
                     .runSQL_One(SQLTablesCommands.tableInfo(
                         options.database, SuperMigrations.migrationTableName
                     ));
-                    logger.debug("Migrations table info:", _existsMigrationTable);
+                    // logger.debug("Migrations table info:", _existsMigrationTable);
                     if (!_existsMigrationTable) {
                         // creating migration table if not exists
                         logger.log("Creating migration table..");
