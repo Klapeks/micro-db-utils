@@ -1,5 +1,5 @@
 import { DatabaseOptions, logger, terminalColors } from "@klapeks/utils";
-import { AbstractSQLCommand, ISQLCommandAdapter, SQLCommandContext, SQLCommandData } from "../commands";
+import { AbstractSQLCommand, ISQLCommandAdapter, SQLCommandContext, SQLCommandData, toRawSQL } from "../commands";
 
 
 export abstract class AbstractSQLConnection {
@@ -13,21 +13,13 @@ export abstract class AbstractSQLConnection {
         return this.rawOptions.database;
     }
 
-    get isDebugLoggerEnabled() {
-        if (this.rawOptions.logging) return true;
-        return process.env['DATABASE_LOG_MICRO_SQL'] == 'true';
-    }
-    protected debugQuery(query: string, params: any) {
-        if (!this.isDebugLoggerEnabled) return;
-        logger.log("Running SQL command for " + this.rawOptions.type + ":", 
-            terminalColors.magenta + query, terminalColors.reset,
-            params ? ('\n| with params:') : '', params || ''
-        );
-    }
-
     abstract initConnection(): Promise<void>;
     abstract destroyConnection(): Promise<void>;
     protected abstract sendSQL<T = any>(query: string, params?: any[]): Promise<T[]>;
+
+    toRawSQL(sql: ISQLCommandAdapter | SQLCommandData | string) {
+        return toRawSQL(this.rawOptions.type, sql);
+    }
 
     // !! PARAMS WARNING: mysql use array of params, but mssql use key-value (object) params
     async runSQL<T = any>(query: SQLCommandData): Promise<T[]>;
@@ -73,5 +65,19 @@ export abstract class AbstractSQLConnection {
             return res[0] || null;
         }
         return res || null;
+    }
+
+
+
+    get isDebugLoggerEnabled() {
+        if (this.rawOptions.logging) return true;
+        return process.env['DATABASE_LOG_MICRO_SQL'] == 'true';
+    }
+    protected debugQuery(query: string, params: any) {
+        if (!this.isDebugLoggerEnabled) return;
+        logger.log("Running SQL command for " + this.rawOptions.type + ":", 
+            terminalColors.magenta + query, terminalColors.reset,
+            params ? ('\n| with params:') : '', params || ''
+        );
     }
 }

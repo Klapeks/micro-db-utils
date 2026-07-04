@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rawSQL = exports.AbstractSQLCommand = void 0;
+exports.toRawSQL = exports.rawSQL = exports.AbstractSQLCommand = void 0;
 var AbstractSQLCommand = /** @class */ (function () {
     function AbstractSQLCommand() {
     }
@@ -14,3 +14,17 @@ var rawSQL = function (sqls) {
     };
 };
 exports.rawSQL = rawSQL;
+function toRawSQL(dbType, query) {
+    if (typeof query === 'string')
+        return { query: query };
+    if (typeof query === 'object' && !('query' in query)) {
+        if (dbType === 'mysql')
+            query = query.toMySQL({});
+        else if (dbType === 'mssql')
+            query = query.toMSSQL({});
+        else
+            throw "Unknown database type: " + dbType;
+    }
+    return typeof query === 'string' ? { query: query } : query;
+}
+exports.toRawSQL = toRawSQL;

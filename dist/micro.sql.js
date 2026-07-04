@@ -57,18 +57,7 @@ var MicroSQL;
                         _b.label = 3;
                     case 3:
                         query = (_a);
-                        if (typeof query === 'string')
-                            return [2 /*return*/, dataSource.query(query)];
-                        if (typeof query === 'object' && !('query' in query)) {
-                            if (dbType === 'mysql')
-                                query = query.toMySQL({});
-                            else if (dbType === 'mssql')
-                                query = query.toMSSQL({});
-                            else
-                                throw "Unknown database type: " + dbType;
-                        }
-                        if (typeof query === 'string')
-                            return [2 /*return*/, dataSource.query(query)];
+                        query = (0, sql_1.toRawSQL)(dbType, query);
                         return [2 /*return*/, dataSource.query(query.query, query.params)];
                 }
             });
@@ -83,6 +72,10 @@ var MicroSQL;
         return new sql_1.SQLSelectCommands(table);
     }
     MicroSQL.select = select;
+    function editData(table) {
+        return new sql_1.SQLEditDataCommands(table);
+    }
+    MicroSQL.editData = editData;
     function tables() {
         return sql_1.SQLTablesCommands;
     }

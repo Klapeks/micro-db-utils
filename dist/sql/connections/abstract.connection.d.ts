@@ -5,11 +5,10 @@ export declare abstract class AbstractSQLConnection {
     readonly abstractCommandFunctionName: keyof ISQLCommandAdapter;
     protected constructor(rawOptions: DatabaseOptions, abstractCommandFunctionName: keyof ISQLCommandAdapter);
     get databaseName(): string;
-    get isDebugLoggerEnabled(): boolean;
-    protected debugQuery(query: string, params: any): void;
     abstract initConnection(): Promise<void>;
     abstract destroyConnection(): Promise<void>;
     protected abstract sendSQL<T = any>(query: string, params?: any[]): Promise<T[]>;
+    toRawSQL(sql: ISQLCommandAdapter | SQLCommandData | string): SQLCommandData;
     runSQL<T = any>(query: SQLCommandData): Promise<T[]>;
     runSQL<T = any>(query: ISQLCommandAdapter): Promise<T[]>;
     runSQL<T = any>(query: AbstractSQLCommand): Promise<T[]>;
@@ -18,4 +17,6 @@ export declare abstract class AbstractSQLConnection {
     runSQL_One<T = any>(query: ISQLCommandAdapter): Promise<T | null>;
     runSQL_One<T = any>(query: AbstractSQLCommand): Promise<T | null>;
     runSQL_One<T = any>(query: string, params?: any): Promise<T | null>;
+    get isDebugLoggerEnabled(): boolean;
+    protected debugQuery(query: string, params: any): void;
 }

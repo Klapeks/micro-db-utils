@@ -1,5 +1,5 @@
 import { DatabaseOptions } from "@klapeks/utils";
-import { ISQLCommandAdapter, SQLAlterCommand, SQLCommandData, SQLSelectCommands, SQLTablesCommands, SQLTimeCommandsExpressions } from "./sql";
+import { ISQLCommandAdapter, SQLAlterCommand, SQLCommandData, SQLEditDataCommands, SQLSelectCommands, SQLTablesCommands, SQLTimeCommandsExpressions, toRawSQL } from "./sql";
 import { DataSource, DataSourceOptions } from "typeorm";
 
 export namespace MicroSQL {
@@ -18,13 +18,7 @@ export namespace MicroSQL {
                 dbType, dataSource.options.database as any
             ) : cb
         );
-        if (typeof query === 'string') return dataSource.query(query);
-        if (typeof query === 'object' && !('query' in query)) {
-            if (dbType === 'mysql') query = query.toMySQL({});
-            else if (dbType === 'mssql') query = query.toMSSQL({});
-            else throw "Unknown database type: " + dbType;
-        }
-        if (typeof query === 'string') return dataSource.query(query);
+        query = toRawSQL(dbType, query);
         return dataSource.query(query.query, query.params);
     }
 
@@ -34,6 +28,9 @@ export namespace MicroSQL {
 
     export function select(table: string) {
         return new SQLSelectCommands(table);
+    }
+    export function editData(table: string) {
+        return new SQLEditDataCommands(table);
     }
 
     export function tables() {

@@ -18,4 +18,5 @@ __exportStar(require("./abstract.sql.command"), exports);
 __exportStar(require("./alter.commands"), exports);
 __exportStar(require("./tables.commands"), exports);
 __exportStar(require("./select.commands"), exports);
+__exportStar(require("./edit-data.commands"), exports);
 __exportStar(require("./time.commands"), exports);

@@ -1,3 +1,4 @@
+import { DatabaseOptions } from "@klapeks/utils";
 export interface SQLCommandData {
     query: string;
     params?: any[];
@@ -17,3 +18,4 @@ export declare const rawSQL: (sqls: {
     mysqlQuery?: string;
     mssqlQuery?: string;
 }) => ISQLCommandAdapter;
+export declare function toRawSQL(dbType: DatabaseOptions['type'], query: ISQLCommandAdapter | SQLCommandData | string): SQLCommandData;

@@ -27,3 +27,16 @@ export const rawSQL = (sqls: {
         toMSSQL: () => sqls.mssqlQuery || sqls.defaultQuery,
     }
 }
+
+export function toRawSQL(
+    dbType: DatabaseOptions['type'],
+    query: ISQLCommandAdapter | SQLCommandData | string
+): SQLCommandData {
+    if (typeof query === 'string') return { query };
+    if (typeof query === 'object' && !('query' in query)) {
+        if (dbType === 'mysql') query = query.toMySQL({});
+        else if (dbType === 'mssql') query = query.toMSSQL({});
+        else throw "Unknown database type: " + dbType;
+    }
+    return typeof query === 'string' ? { query } : query;
+}

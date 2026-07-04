@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbstractSQLConnection = void 0;
 var utils_1 = require("@klapeks/utils");
+var commands_1 = require("../commands");
 var AbstractSQLConnection = /** @class */ (function () {
     function AbstractSQLConnection(rawOptions, abstractCommandFunctionName) {
         this.rawOptions = rawOptions;
@@ -50,19 +51,8 @@ var AbstractSQLConnection = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(AbstractSQLConnection.prototype, "isDebugLoggerEnabled", {
-        get: function () {
-            if (this.rawOptions.logging)
-                return true;
-            return process.env['DATABASE_LOG_MICRO_SQL'] == 'true';
-        },
-        enumerable: false,
-        configurable: true
-    });
-    AbstractSQLConnection.prototype.debugQuery = function (query, params) {
-        if (!this.isDebugLoggerEnabled)
-            return;
-        utils_1.logger.log("Running SQL command for " + this.rawOptions.type + ":", utils_1.terminalColors.magenta + query, utils_1.terminalColors.reset, params ? ('\n| with params:') : '', params || '');
+    AbstractSQLConnection.prototype.toRawSQL = function (sql) {
+        return (0, commands_1.toRawSQL)(this.rawOptions.type, sql);
     };
     AbstractSQLConnection.prototype.runSQL = function (query, params) {
         var _a;
@@ -117,6 +107,20 @@ var AbstractSQLConnection = /** @class */ (function () {
                 }
             });
         });
+    };
+    Object.defineProperty(AbstractSQLConnection.prototype, "isDebugLoggerEnabled", {
+        get: function () {
+            if (this.rawOptions.logging)
+                return true;
+            return process.env['DATABASE_LOG_MICRO_SQL'] == 'true';
+        },
+        enumerable: false,
+        configurable: true
+    });
+    AbstractSQLConnection.prototype.debugQuery = function (query, params) {
+        if (!this.isDebugLoggerEnabled)
+            return;
+        utils_1.logger.log("Running SQL command for " + this.rawOptions.type + ":", utils_1.terminalColors.magenta + query, utils_1.terminalColors.reset, params ? ('\n| with params:') : '', params || '');
     };
     return AbstractSQLConnection;
 }());
