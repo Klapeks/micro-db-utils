@@ -32,7 +32,13 @@ export class SQLTablesCommands {
             let _index = 0;
             for (let [columnName, columnType] of Object.entries(options.columns)) {
                 if (_index) str += ', ';
-                str += `\`${columnName}\` `;
+                _index += 1;
+
+                if (dbtype === 'mysql') str += `\`${columnName}\` `;
+                else if (dbtype === 'mssql') str += `[${columnName}] `;
+                else if (dbtype === 'postgres') str += `"${columnName}" `;
+                else str += `${columnName} `;
+
                 str += MicroColumnTypeObject.toSQLQuery(
                     dbtype, columnType, 'create-table'
                 );

@@ -29,7 +29,15 @@ var SQLTablesCommands = /** @class */ (function () {
                 var _b = _a[_i], columnName = _b[0], columnType = _b[1];
                 if (_index)
                     str += ', ';
-                str += "`".concat(columnName, "` ");
+                _index += 1;
+                if (dbtype === 'mysql')
+                    str += "`".concat(columnName, "` ");
+                else if (dbtype === 'mssql')
+                    str += "[".concat(columnName, "] ");
+                else if (dbtype === 'postgres')
+                    str += "\"".concat(columnName, "\" ");
+                else
+                    str += "".concat(columnName, " ");
                 str += column_type_parser_1.MicroColumnTypeObject.toSQLQuery(dbtype, columnType, 'create-table');
             }
             str += ');';
