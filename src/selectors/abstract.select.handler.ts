@@ -1,6 +1,7 @@
 import type { SelectOptions, SelectResult, TimedStatisticInfo, TimedStatisticInfoPart } from '@klapeks/api-creation-tools';
 import { dateFromNow, toISODate } from '../utils/iso.date.time';
 import { DatabaseOptions } from '@klapeks/utils';
+import { MicroSQL } from '../micro.sql';
 
 export interface SelectEntityHandlerOptions<
     T extends object, K extends string
@@ -66,6 +67,7 @@ export abstract class AbstractSelectHandler<
         const stat = async (
             fromDate: Date | ((date: Date) => void), time?: string
         ): Promise<TimedStatisticInfoPart> => {
+            const expr = MicroSQL.timeExpressions(this.getDatabaseType());
             if (typeof fromDate == 'function') {
                 fromDate = dateFromNow(fromDate);
             }
@@ -74,7 +76,7 @@ export abstract class AbstractSelectHandler<
                 SELECT SUM(${sumField as string}) as sum
                 FROM ${this.getTableName()}
                 WHERE ${time ? `createdAt >= '${isoDate} ${time}'` 
-                    : `date(createdAt) >= date('${isoDate}')`}
+                    : (expr.date('createdAt') + ' >= ' + expr.date(`'${isoDate}'`))}
                 ${strWhere ? ('AND (' + strWhere + ')') : ''}
             `))?.sum || 0;
             return {
