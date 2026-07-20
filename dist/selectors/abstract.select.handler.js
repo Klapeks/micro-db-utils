@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AbstractSelectHandler = void 0;
 var iso_date_time_1 = require("../utils/iso.date.time");
+var micro_sql_1 = require("../micro.sql");
 var AbstractSelectHandler = /** @class */ (function () {
     function AbstractSelectHandler(options) {
         this.options = options;
@@ -105,17 +106,18 @@ var AbstractSelectHandler = /** @class */ (function () {
                 switch (_r.label) {
                     case 0:
                         stat = function (fromDate, time) { return __awaiter(_this, void 0, void 0, function () {
-                            var isoDate, sum;
+                            var expr, isoDate, sum;
                             var _a;
                             return __generator(this, function (_b) {
                                 switch (_b.label) {
                                     case 0:
+                                        expr = micro_sql_1.MicroSQL.timeExpressions(this.getDatabaseType());
                                         if (typeof fromDate == 'function') {
                                             fromDate = (0, iso_date_time_1.dateFromNow)(fromDate);
                                         }
                                         isoDate = (0, iso_date_time_1.toISODate)(fromDate, 'yyyy-mm-dd');
                                         return [4 /*yield*/, this.runSQL_One("\n                SELECT SUM(".concat(sumField, ") as sum\n                FROM ").concat(this.getTableName(), "\n                WHERE ").concat(time ? "createdAt >= '".concat(isoDate, " ").concat(time, "'")
-                                                : "date(createdAt) >= date('".concat(isoDate, "')"), "\n                ").concat(strWhere ? ('AND (' + strWhere + ')') : '', "\n            "))];
+                                                : (expr.date('createdAt') + ' >= ' + expr.date("'".concat(isoDate, "'"))), "\n                ").concat(strWhere ? ('AND (' + strWhere + ')') : '', "\n            "))];
                                     case 1:
                                         sum = ((_a = (_b.sent())) === null || _a === void 0 ? void 0 : _a.sum) || 0;
                                         return [2 /*return*/, {

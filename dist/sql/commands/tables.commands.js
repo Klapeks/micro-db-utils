@@ -5,6 +5,14 @@ var column_type_parser_1 = require("../column.type.parser");
 var SQLTablesCommands = /** @class */ (function () {
     function SQLTablesCommands() {
     }
+    SQLTablesCommands.renameTable = function (old_name, new_name) {
+        return {
+            toMySQL: function () { return "RENAME TABLE `".concat(old_name, "` TO `").concat(new_name, "`;"); },
+            toMSSQL: function () { return "EXEC sp_rename '".concat(old_name, "', '").concat(new_name, "';"); },
+            // PG: ALTER TABLE "old_name" RENAME TO "new_name";
+            // SQLITE: ALTER TABLE "old_name" RENAME TO "new_name";
+        };
+    };
     SQLTablesCommands.tableInfo = function (database, table) {
         return {
             toMySQL: function () { return [

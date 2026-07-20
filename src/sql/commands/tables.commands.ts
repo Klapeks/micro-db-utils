@@ -5,6 +5,17 @@ import { columns } from "mssql"
 import { DatabaseOptions } from "@klapeks/utils"
 
 export class SQLTablesCommands {
+
+    static renameTable(old_name: string, new_name: string): ISQLCommandAdapter {
+        return {
+            toMySQL: () => `RENAME TABLE \`${old_name}\` TO \`${new_name}\`;`,
+            toMSSQL: () => `EXEC sp_rename '${old_name}', '${new_name}';`,
+            // PG: ALTER TABLE "old_name" RENAME TO "new_name";
+            // SQLITE: ALTER TABLE "old_name" RENAME TO "new_name";
+        }
+    }
+
+
     
     static tableInfo(database: string, table: string): ISQLCommandAdapter {
         return {
