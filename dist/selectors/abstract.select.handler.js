@@ -97,13 +97,13 @@ var AbstractSelectHandler = /** @class */ (function () {
         });
     };
     AbstractSelectHandler.prototype.getSumStatistic = function (sumField, strWhere) {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var stat, time, response, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
-            var _p, _q;
+            var stat, time, response, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p;
+            var _q, _r;
             var _this = this;
-            return __generator(this, function (_r) {
-                switch (_r.label) {
+            return __generator(this, function (_s) {
+                switch (_s.label) {
                     case 0:
                         stat = function (fromDate, time) { return __awaiter(_this, void 0, void 0, function () {
                             var expr, isoDate, sum;
@@ -128,65 +128,65 @@ var AbstractSelectHandler = /** @class */ (function () {
                             });
                         }); };
                         time = new Date().toLocaleTimeString('uk-UA');
-                        _p = {
+                        _q = {
                             serverTime: time
                         };
-                        return [4 /*yield*/, this.getTotal()];
+                        return [4 /*yield*/, this.runSQL_One("\n                SELECT COUNT(1) AS count\n                FROM ".concat(this.getTableName(), " \n                ").concat(strWhere ? ("WHERE " + strWhere) : '', "\n            "))];
                     case 1:
-                        response = (_p.count = _r.sent(),
-                            _p);
-                        _b = response;
-                        _q = {
-                            from: new Date(0)
-                        };
-                        return [4 /*yield*/, this.runSQL_One("\n                SELECT SUM(".concat(sumField, ") as sum\n                FROM ").concat(this.getTableName(), "\n                ").concat(strWhere ? ("WHERE " + strWhere) : '', "\n            "))];
-                    case 2:
-                        _b.total = (_q.sum = (_a = (_r.sent())) === null || _a === void 0 ? void 0 : _a.sum,
+                        response = (_q.count = (_a = (_s.sent())) === null || _a === void 0 ? void 0 : _a.count,
                             _q);
                         _c = response;
+                        _r = {
+                            from: new Date(0)
+                        };
+                        return [4 /*yield*/, this.runSQL_One("\n                SELECT SUM(".concat(sumField, ") AS sum\n                FROM ").concat(this.getTableName(), "\n                ").concat(strWhere ? ("WHERE " + strWhere) : '', "\n            "))];
+                    case 2:
+                        _c.total = (_r.sum = (_b = (_s.sent())) === null || _b === void 0 ? void 0 : _b.sum,
+                            _r);
+                        _d = response;
                         return [4 /*yield*/, stat(new Date())];
                     case 3:
-                        _c.thisDay = _r.sent();
-                        _d = response;
+                        _d.thisDay = _s.sent();
+                        _e = response;
                         return [4 /*yield*/, stat(function (d) { return d.setDate(d.getDate() - (d.getDay() || 7) + 1); })];
                     case 4:
-                        _d.thisWeek = _r.sent();
-                        _e = response;
+                        _e.thisWeek = _s.sent();
+                        _f = response;
                         return [4 /*yield*/, stat(function (d) { return d.setDate(1); })];
                     case 5:
-                        _e.thisMonth = _r.sent();
-                        _f = response;
+                        _f.thisMonth = _s.sent();
+                        _g = response;
                         return [4 /*yield*/, stat(function (d) { d.setMonth(0); d.setDate(1); })];
                     case 6:
-                        _f.thisYear = _r.sent();
-                        _g = response;
+                        _g.thisYear = _s.sent();
+                        _h = response;
                         return [4 /*yield*/, stat(function (d) { return d.setDate(d.getDate() - 1); }, time)];
                     case 7:
-                        _g.past24hours = _r.sent();
-                        _h = response;
+                        _h.past24hours = _s.sent();
+                        _j = response;
                         return [4 /*yield*/, stat(function (d) { return d.setDate(d.getDate() - 2); })];
                     case 8:
-                        _h.past3days = _r.sent();
-                        _j = response;
+                        _j.past3days = _s.sent();
+                        _k = response;
                         return [4 /*yield*/, stat(function (d) { return d.setDate(d.getDate() - 6); })];
                     case 9:
-                        _j.past7days = _r.sent();
-                        _k = response;
+                        _k.past7days = _s.sent();
+                        _l = response;
                         return [4 /*yield*/, stat(function (d) { return d.setDate(d.getDate() - 13); })];
                     case 10:
-                        _k.past14days = _r.sent();
-                        _l = response;
+                        _l.past14days = _s.sent();
+                        _m = response;
                         return [4 /*yield*/, stat(function (d) { return d.setDate(d.getDate() - 29); })];
                     case 11:
-                        _l.past30days = _r.sent();
-                        _m = response;
+                        _m.past30days = _s.sent();
+                        _o = response;
                         return [4 /*yield*/, stat(function (d) { return d.setMonth(d.getMonth() - 6); })];
                     case 12:
-                        _m.past6months = _r.sent();
-                        _o = response;
+                        _o.past6months = _s.sent();
+                        _p = response;
                         return [4 /*yield*/, stat(function (d) { return d.setMonth(d.getMonth() - 12); })];
                     case 13:
-                        _o.past12months = _r.sent();
+                        _p.past12months = _s.sent();
                         return [2 /*return*/, response];
                 }
             });

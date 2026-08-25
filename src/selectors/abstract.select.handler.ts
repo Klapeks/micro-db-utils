@@ -90,16 +90,20 @@ export abstract class AbstractSelectHandler<
 
         const response: TimedStatisticInfo = {
             serverTime: time,
-            count: await this.getTotal()
+            count: (await this.runSQL_One(`
+                SELECT COUNT(1) AS count
+                FROM ${this.getTableName()} 
+                ${strWhere ? ("WHERE " + strWhere) : ''}
+            `))?.count as number,
         }
 
         response.total = {
             from: new Date(0), // TODO get first?
             sum: (await this.runSQL_One(`
-                SELECT SUM(${sumField as string}) as sum
+                SELECT SUM(${sumField as string}) AS sum
                 FROM ${this.getTableName()}
                 ${strWhere ? ("WHERE " + strWhere) : ''}
-            `))?.sum as number
+            `))?.sum as number,
         };
 
         response.thisDay = await stat(new Date());
