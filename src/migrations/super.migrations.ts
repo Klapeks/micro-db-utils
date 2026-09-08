@@ -91,7 +91,8 @@ export class SuperMigrations {
 
         const _local_runSQL = async (sql: string, params?: any) => {
             if (sql.toLowerCase().startsWith("alter table")
-            || sql.toLowerCase().startsWith('exec sp_rename')) {
+            || sql.toLowerCase().startsWith('exec sp_rename')
+            || (sqlInstance.rawOptions.type === 'sqlite' && sql.toLowerCase().includes('alter table ')) ) {
                 // log error if error
                 await sqlInstance.runSQL(sql, params).catch(err => {
                     logger.error("Error while alter table:", err);
