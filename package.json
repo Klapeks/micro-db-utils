@@ -1,13 +1,14 @@
 {
     "name": "@klapeks/micro-db-utils",
     "description": "klapeks utils for db and other storages",
-    "version": "0.0.18",
+    "version": "0.0.20",
     "type": "commonjs",
     "author": "Klapeks",
     "license": "ISC",
     "scripts": {
         "patch": "npm version patch -f --no-git-tag-version",
         "build": "npm run patch && tsc --skipLibCheck",
+        "build:no-patch": "tsc --skipLibCheck",
         "prepublishOnly": "tsc --skipLibCheck"
     },
     "keywords": [
@@ -22,7 +23,7 @@
         "@aws-sdk/client-s3": "^3.842.0",
         "@aws-sdk/s3-request-presigner": "^3.844.0",
         "@klapeks/api-creation-tools": "^0.0.7",
-        "@klapeks/utils": "^0.1.9",
+        "@klapeks/utils": "^0.2.1",
         "@types/mssql": "^12.3.0",
         "@types/node": "^18.11.18",
         "@types/pg": "^8.23.1",

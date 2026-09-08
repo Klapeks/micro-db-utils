@@ -18,7 +18,7 @@ function createRelation(target, type, inverseSide, cascade) {
     return { target: target, type: type, cascade: cascade, inverseSide: inverseSide };
 }
 exports.createRelation = createRelation;
-exports.MULTISQL_COLUMNS_TYPES = (0, utils_1.getDatabaseColumnTypes)();
+exports.MULTISQL_COLUMNS_TYPES = (0, utils_1.getEnvDatabaseColumnTypes)();
 exports.FloatingColumn = {
     type: exports.MULTISQL_COLUMNS_TYPES.float32, default: 0
     // type: "decimal", precision: 10, scale: 6, default: 0

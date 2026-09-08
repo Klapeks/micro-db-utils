@@ -136,7 +136,7 @@ var SQLiteConnection = /** @class */ (function (_super) {
                                 }
                                 if (!params)
                                     params = [];
-                                if (upperSQL.startsWith('SELECT')) {
+                                if (upperSQL.startsWith('SELECT') || upperSQL.startsWith("PRAGMA")) {
                                     return connection.all(query, params, function (err1, rows) {
                                         if (err1)
                                             return reject(err1);

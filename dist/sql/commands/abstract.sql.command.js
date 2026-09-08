@@ -54,19 +54,31 @@ exports.rawSQL = rawSQL;
 function toRawSQL(dbType, query, ctx) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            if (typeof query === 'string')
-                return [2 /*return*/, { query: query }];
-            if (typeof query === 'object' && !('query' in query)) {
-                if (dbType === 'mysql')
-                    query = query.toMySQL(ctx);
-                else if (dbType === 'mssql')
-                    query = query.toMSSQL(ctx);
-                else if (dbType === 'sqlite')
-                    query = query.toSQLite(ctx);
-                else
-                    throw "Unknown database type: " + dbType;
+            switch (_a.label) {
+                case 0:
+                    if (typeof query === 'string')
+                        return [2 /*return*/, { query: query }];
+                    if (!(typeof query === 'object' && !('query' in query))) return [3 /*break*/, 7];
+                    if (!(dbType === 'mysql')) return [3 /*break*/, 2];
+                    return [4 /*yield*/, query.toMySQL(ctx)];
+                case 1:
+                    query = _a.sent();
+                    return [3 /*break*/, 7];
+                case 2:
+                    if (!(dbType === 'mssql')) return [3 /*break*/, 4];
+                    return [4 /*yield*/, query.toMSSQL(ctx)];
+                case 3:
+                    query = _a.sent();
+                    return [3 /*break*/, 7];
+                case 4:
+                    if (!(dbType === 'sqlite')) return [3 /*break*/, 6];
+                    return [4 /*yield*/, query.toSQLite(ctx)];
+                case 5:
+                    query = _a.sent();
+                    return [3 /*break*/, 7];
+                case 6: throw "Unknown database type: " + dbType;
+                case 7: return [2 /*return*/, typeof query === 'string' ? { query: query } : query];
             }
-            return [2 /*return*/, typeof query === 'string' ? { query: query } : query];
         });
     });
 }

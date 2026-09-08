@@ -43,6 +43,7 @@ var AbstractSQLConnection = /** @class */ (function () {
     function AbstractSQLConnection(rawOptions, abstractCommandFunctionName) {
         this.rawOptions = rawOptions;
         this.abstractCommandFunctionName = abstractCommandFunctionName;
+        this.sendSQL = this.sendSQL.bind(this);
     }
     Object.defineProperty(AbstractSQLConnection.prototype, "databaseName", {
         get: function () {

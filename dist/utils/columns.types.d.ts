@@ -9,18 +9,7 @@ export declare function createRelation(target: string, type: "one-to-many" | "on
     cascade: boolean;
     inverseSide: string;
 };
-export declare const MULTISQL_COLUMNS_TYPES: {
-    dbtype: "sqlite" | "mysql" | "postgres" | "mssql";
-    int32: "int" | "integer";
-    string: "character varying" | "nvarchar" | "varchar" | "text";
-    boolean: "boolean" | "tinyint" | "integer" | "bit";
-    enum: "simple-enum" | "enum";
-    bigint: "bigint" | "integer";
-    datetime: "datetime" | "datetime2" | "timestamp";
-    float32: "float" | "double";
-    float64: "float" | "double";
-    json: "simple-json" | "json";
-};
+export declare const MULTISQL_COLUMNS_TYPES: import("@klapeks/utils").IDatabaseColumnTypesList;
 export declare const FloatingColumn: MicroColumnTypeObject;
 export declare const NullableFloatingColumn: MicroColumnTypeObject;
 export declare const Float64Column: MicroColumnTypeObject;

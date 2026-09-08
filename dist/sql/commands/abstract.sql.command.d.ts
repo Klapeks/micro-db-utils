@@ -5,17 +5,17 @@ export interface SQLCommandData {
 }
 export interface SQLCommandContext {
     database: string;
-    runAdditionalSQL: (sql: string, params: any[]) => any;
+    runAdditionalSQL: (sql: string, params?: any[]) => any;
 }
 export interface ISQLCommandAdapter {
-    toMySQL(ctx?: SQLCommandContext): SQLCommandData | string;
-    toMSSQL(ctx?: SQLCommandContext): SQLCommandData | string;
-    toSQLite(ctx?: SQLCommandContext): SQLCommandData | string;
+    toMySQL(ctx?: SQLCommandContext): SQLCommandData | string | Promise<string>;
+    toMSSQL(ctx?: SQLCommandContext): SQLCommandData | string | Promise<string>;
+    toSQLite(ctx?: SQLCommandContext): SQLCommandData | string | Promise<string>;
 }
 export declare abstract class AbstractSQLCommand implements ISQLCommandAdapter {
-    abstract toMySQL(ctx?: SQLCommandContext): SQLCommandData | string;
-    abstract toMSSQL(ctx?: SQLCommandContext): SQLCommandData | string;
-    abstract toSQLite(ctx?: SQLCommandContext): SQLCommandData | string;
+    abstract toMySQL(ctx?: SQLCommandContext): SQLCommandData | string | Promise<string>;
+    abstract toMSSQL(ctx?: SQLCommandContext): SQLCommandData | string | Promise<string>;
+    abstract toSQLite(ctx?: SQLCommandContext): SQLCommandData | string | Promise<string>;
 }
 export declare const rawSQL: (sqls: {
     defaultQuery: string;

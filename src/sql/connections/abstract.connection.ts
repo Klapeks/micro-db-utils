@@ -7,7 +7,9 @@ export abstract class AbstractSQLConnection {
     protected constructor(
         readonly rawOptions: DatabaseOptions,
         readonly abstractCommandFunctionName: keyof ISQLCommandAdapter,
-    ) {}
+    ) {
+        this.sendSQL = this.sendSQL.bind(this);
+    }
 
     get databaseName() {
         return this.rawOptions.database;
