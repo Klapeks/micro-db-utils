@@ -57,7 +57,12 @@ var MicroSQL;
                         _b.label = 3;
                     case 3:
                         query = (_a);
-                        query = (0, sql_1.toRawSQL)(dbType, query);
+                        return [4 /*yield*/, (0, sql_1.toRawSQL)(dbType, query, {
+                                database: dataSource.options.database,
+                                runAdditionalSQL: dataSource.query
+                            })];
+                    case 4:
+                        query = _b.sent();
                         return [2 /*return*/, dataSource.query(query.query, query.params)];
                 }
             });

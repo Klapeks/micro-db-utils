@@ -8,7 +8,7 @@ export declare abstract class AbstractSQLConnection {
     abstract initConnection(): Promise<void>;
     abstract destroyConnection(): Promise<void>;
     protected abstract sendSQL<T = any>(query: string, params?: any[]): Promise<T[]>;
-    toRawSQL(sql: ISQLCommandAdapter | SQLCommandData | string): SQLCommandData;
+    toRawSQL(sql: ISQLCommandAdapter | SQLCommandData | string): Promise<SQLCommandData>;
     runSQL<T = any>(query: SQLCommandData): Promise<T[]>;
     runSQL<T = any>(query: ISQLCommandAdapter): Promise<T[]>;
     runSQL<T = any>(query: AbstractSQLCommand): Promise<T[]>;

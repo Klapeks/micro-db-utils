@@ -17,8 +17,8 @@ export abstract class AbstractSQLConnection {
     abstract destroyConnection(): Promise<void>;
     protected abstract sendSQL<T = any>(query: string, params?: any[]): Promise<T[]>;
 
-    toRawSQL(sql: ISQLCommandAdapter | SQLCommandData | string) {
-        return toRawSQL(this.rawOptions.type, sql, {
+    async toRawSQL(sql: ISQLCommandAdapter | SQLCommandData | string): Promise<SQLCommandData> {
+        return await toRawSQL(this.rawOptions.type, sql, {
             database: this.databaseName,
             runAdditionalSQL: this.sendSQL
         });

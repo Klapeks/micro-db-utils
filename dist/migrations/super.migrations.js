@@ -104,29 +104,34 @@ var SuperMigrations = /** @class */ (function () {
                     case 1: return [4 /*yield*/, _e.sent()];
                     case 2:
                         isTableExistsInfo = _e.sent();
-                        if (!!isTableExistsInfo) return [3 /*break*/, 5];
-                        firstSQL = (function () {
-                            var _a;
-                            var sql = (_a = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[0]) === null || _a === void 0 ? void 0 : _a.sql;
-                            if (!sql)
-                                return null;
-                            if (Array.isArray(sql))
-                                sql = sql[0];
-                            return sqlInstance.toRawSQL(sql);
-                        })();
-                        if (!!((_b = (_a = firstSQL === null || firstSQL === void 0 ? void 0 : firstSQL.query) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === null || _b === void 0 ? void 0 : _b.includes('create table'))) return [3 /*break*/, 5];
+                        if (!!isTableExistsInfo) return [3 /*break*/, 6];
+                        return [4 /*yield*/, (function () { return __awaiter(_this, void 0, void 0, function () {
+                                var sql;
+                                var _a;
+                                return __generator(this, function (_b) {
+                                    sql = (_a = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[0]) === null || _a === void 0 ? void 0 : _a.sql;
+                                    if (!sql)
+                                        return [2 /*return*/, null];
+                                    if (Array.isArray(sql))
+                                        sql = sql[0];
+                                    return [2 /*return*/, sqlInstance.toRawSQL(sql)];
+                                });
+                            }); })()];
+                    case 3:
+                        firstSQL = _e.sent();
+                        if (!!((_b = (_a = firstSQL === null || firstSQL === void 0 ? void 0 : firstSQL.query) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === null || _b === void 0 ? void 0 : _b.includes('create table'))) return [3 /*break*/, 6];
                         logger.log("Table ".concat(table, " not found. Migrations ").concat(todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length, " will be skipped"));
                         lastMigrationDate = todoMigrations.length ? (_c = todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations[todoMigrations.length - 1]) === null || _c === void 0 ? void 0 : _c.date : undefined;
-                        if (!((todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length) && lastMigrationDate)) return [3 /*break*/, 4];
+                        if (!((todoMigrations === null || todoMigrations === void 0 ? void 0 : todoMigrations.length) && lastMigrationDate)) return [3 /*break*/, 5];
                         return [4 /*yield*/, sqlInstance.runSQL(micro_sql_1.MicroSQL.editData(this.migrationTableName).upsert({
                                 table: table,
                                 lastMigrationTime: (0, iso_date_time_1.toISODate)(lastMigrationDate)
                             }, ['table']))];
-                    case 3:
+                    case 4:
                         _e.sent();
-                        _e.label = 4;
-                    case 4: return [2 /*return*/];
-                    case 5:
+                        _e.label = 5;
+                    case 5: return [2 /*return*/];
+                    case 6:
                         _local_runSQL = function (sql, params) { return __awaiter(_this, void 0, void 0, function () {
                             return __generator(this, function (_a) {
                                 switch (_a.label) {
@@ -155,61 +160,71 @@ var SuperMigrations = /** @class */ (function () {
                         lastRealMigration = lastRealMigrationDateTime
                             ? new Date(lastRealMigrationDateTime) : null;
                         _i = 0, todoMigrations_1 = todoMigrations;
-                        _e.label = 6;
-                    case 6:
-                        if (!(_i < todoMigrations_1.length)) return [3 /*break*/, 17];
+                        _e.label = 7;
+                    case 7:
+                        if (!(_i < todoMigrations_1.length)) return [3 /*break*/, 20];
                         migration = todoMigrations_1[_i];
                         if (migration.table != table)
-                            return [3 /*break*/, 16];
+                            return [3 /*break*/, 19];
                         logger;
                         if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {
-                            return [3 /*break*/, 16];
+                            return [3 /*break*/, 19];
                         }
                         runnedMigrationsAmount = onMigrationComplete();
                         migrationName = '"' + table + ' ' + (0, iso_date_time_1.toISODate)(migration.date) + '"';
-                        if (!Array.isArray(migration.sql)) return [3 /*break*/, 11];
-                        sqls = migration.sql.filter(Boolean).map(function (sql) {
-                            var sql2 = sqlInstance.toRawSQL(sql);
-                            sql2.query = utils_1.utils.replaceAll(sql2.query.trim(), "%{table_name}", table);
-                            return sql2;
-                        });
+                        if (!Array.isArray(migration.sql)) return [3 /*break*/, 13];
+                        return [4 /*yield*/, Promise.all(migration.sql.filter(Boolean).map(function (sql) { return __awaiter(_this, void 0, void 0, function () {
+                                var sql2;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0: return [4 /*yield*/, sqlInstance.toRawSQL(sql)];
+                                        case 1:
+                                            sql2 = _a.sent();
+                                            sql2.query = utils_1.utils.replaceAll(sql2.query.trim(), "%{table_name}", table);
+                                            return [2 /*return*/, sql2];
+                                    }
+                                });
+                            }); }))];
+                    case 8:
+                        sqls = _e.sent();
                         logger.log(runnedMigrationsAmount, "| Migrations will be runned:", migrationName, '|\n' + utils_1.terminalColors.cyan, sqls.map(function (s) { return s.query; }));
                         _d = 0, sqls_1 = sqls;
-                        _e.label = 7;
-                    case 7:
-                        if (!(_d < sqls_1.length)) return [3 /*break*/, 10];
-                        sql = sqls_1[_d];
-                        return [4 /*yield*/, _local_runSQL(sql.query, sql.params)];
-                    case 8:
-                        _e.sent();
                         _e.label = 9;
                     case 9:
-                        _d++;
-                        return [3 /*break*/, 7];
-                    case 10: return [3 /*break*/, 13];
+                        if (!(_d < sqls_1.length)) return [3 /*break*/, 12];
+                        sql = sqls_1[_d];
+                        return [4 /*yield*/, _local_runSQL(sql.query, sql.params)];
+                    case 10:
+                        _e.sent();
+                        _e.label = 11;
                     case 11:
-                        sql = sqlInstance.toRawSQL(migration.sql);
+                        _d++;
+                        return [3 /*break*/, 9];
+                    case 12: return [3 /*break*/, 16];
+                    case 13: return [4 /*yield*/, sqlInstance.toRawSQL(migration.sql)];
+                    case 14:
+                        sql = _e.sent();
                         sql.query = utils_1.utils.replaceAll(sql.query.trim(), "%{table_name}", table);
                         logger.log(runnedMigrationsAmount, "| Migration will be runned:", migrationName, '|\n' + utils_1.terminalColors.cyan, sql.query);
                         return [4 /*yield*/, _local_runSQL(sql.query, sql.params)];
-                    case 12:
-                        _e.sent();
-                        _e.label = 13;
-                    case 13: return [4 /*yield*/, sqlInstance.runSQL(micro_sql_1.MicroSQL.editData(this.migrationTableName).upsert({
-                            table: table,
-                            lastMigrationTime: (0, iso_date_time_1.toISODate)(migration.date)
-                        }, ['table']))];
-                    case 14:
-                        _e.sent();
-                        logger.log(runnedMigrationsAmount, "| Migration", migrationName, "successfully done");
-                        return [4 /*yield*/, utils_1.utils.sleep(100)];
                     case 15:
                         _e.sent();
                         _e.label = 16;
-                    case 16:
+                    case 16: return [4 /*yield*/, sqlInstance.runSQL(micro_sql_1.MicroSQL.editData(this.migrationTableName).upsert({
+                            table: table,
+                            lastMigrationTime: (0, iso_date_time_1.toISODate)(migration.date)
+                        }, ['table']))];
+                    case 17:
+                        _e.sent();
+                        logger.log(runnedMigrationsAmount, "| Migration", migrationName, "successfully done");
+                        return [4 /*yield*/, utils_1.utils.sleep(100)];
+                    case 18:
+                        _e.sent();
+                        _e.label = 19;
+                    case 19:
                         _i++;
-                        return [3 /*break*/, 6];
-                    case 17: return [2 /*return*/];
+                        return [3 /*break*/, 7];
+                    case 20: return [2 /*return*/];
                 }
             });
         });

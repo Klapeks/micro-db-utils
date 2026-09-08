@@ -35,7 +35,9 @@ var SQLAlterCommand = /** @class */ (function () {
                 + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mysql', type, 'alter-column') + ';'; },
             toMSSQL: function () { return "ALTER TABLE [".concat(_this.table, "] ALTER COLUMN [").concat(column, "] ")
                 + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'; },
-            toSQLite: function () { throw "Not implemented yet: changeColumnType for sqlite :("; },
+            toSQLite: function (ctx) {
+                throw "Not implemented yet: changeColumnType for sqlite";
+            },
         };
     };
     return SQLAlterCommand;

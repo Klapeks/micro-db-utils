@@ -20,3 +20,4 @@ __exportStar(require("./sql"), exports);
 __exportStar(require("./connections"), exports);
 __exportStar(require("./migrations"), exports);
 __exportStar(require("./selectors"), exports);
+__exportStar(require("./patch.typeorm"), exports);

@@ -4,6 +4,8 @@ export interface SQLCommandData {
     params?: any[];
 }
 export interface SQLCommandContext {
+    database: string;
+    runAdditionalSQL: (sql: string, params: any[]) => any;
 }
 export interface ISQLCommandAdapter {
     toMySQL(ctx?: SQLCommandContext): SQLCommandData | string;
@@ -21,4 +23,4 @@ export declare const rawSQL: (sqls: {
     mssqlQuery?: string;
     sqliteQuery?: string;
 }) => ISQLCommandAdapter;
-export declare function toRawSQL(dbType: DatabaseOptions['type'], query: ISQLCommandAdapter | SQLCommandData | string): SQLCommandData;
+export declare function toRawSQL(dbType: DatabaseOptions['type'], query: ISQLCommandAdapter | SQLCommandData | string, ctx?: SQLCommandContext): Promise<SQLCommandData>;

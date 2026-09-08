@@ -52,7 +52,17 @@ var AbstractSQLConnection = /** @class */ (function () {
         configurable: true
     });
     AbstractSQLConnection.prototype.toRawSQL = function (sql) {
-        return (0, commands_1.toRawSQL)(this.rawOptions.type, sql);
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, (0, commands_1.toRawSQL)(this.rawOptions.type, sql, {
+                            database: this.databaseName,
+                            runAdditionalSQL: this.sendSQL
+                        })];
+                    case 1: return [2 /*return*/, _a.sent()];
+                }
+            });
+        });
     };
     AbstractSQLConnection.prototype.runSQL = function (query, params) {
         var _a;
@@ -71,7 +81,8 @@ var AbstractSQLConnection = /** @class */ (function () {
                         abstrKey = this.abstractCommandFunctionName;
                         if (!(abstrKey in query)) return [3 /*break*/, 2];
                         return [4 /*yield*/, ((_a = query === null || query === void 0 ? void 0 : query[abstrKey]) === null || _a === void 0 ? void 0 : _a.call(query, {
-                                database: this.databaseName
+                                database: this.databaseName,
+                                runAdditionalSQL: this.sendSQL
                             }))];
                     case 1:
                         query = _b.sent();

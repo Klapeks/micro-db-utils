@@ -33,11 +33,11 @@ export const rawSQL = (sqls: {
     }
 }
 
-export function toRawSQL(
+export async function toRawSQL(
     dbType: DatabaseOptions['type'],
     query: ISQLCommandAdapter | SQLCommandData | string,
     ctx?: SQLCommandContext
-): SQLCommandData {
+): Promise<SQLCommandData> {
     if (typeof query === 'string') return { query };
     if (typeof query === 'object' && !('query' in query)) {
         if (dbType === 'mysql') query = query.toMySQL(ctx);

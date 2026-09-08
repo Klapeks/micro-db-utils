@@ -18,7 +18,7 @@ export namespace MicroSQL {
                 dbType, dataSource.options.database as any
             ) : cb
         );
-        query = toRawSQL(dbType, query, {
+        query = await toRawSQL(dbType, query, {
             database: dataSource.options.database as any,
             runAdditionalSQL: dataSource.query
         });

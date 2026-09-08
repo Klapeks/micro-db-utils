@@ -1,5 +1,5 @@
 import { DataSource, EntitySchema } from "typeorm";
-import { AbstractSQLConnection, createSQLConnection, ISQLCommandAdapter, SQLCommandData, toRawSQL } from "../sql";
+import { AbstractSQLConnection, createSQLConnection, ISQLCommandAdapter, SQLCommandData } from "../sql";
 import { MicroSQL } from "../micro.sql";
 import { DatabaseOptions, dataSourceOptions, Logger, mapOf, terminalColors, utils } from "@klapeks/utils";
 import { SQLTablesCommands } from "../sql/commands/tables.commands";
@@ -69,7 +69,7 @@ export class SuperMigrations {
             SQLTablesCommands.tableInfo(databaseName, table));
 
         if (!isTableExistsInfo) {
-            const firstSQL = (() => {
+            const firstSQL = await (async () => {
                 let sql = todoMigrations?.[0]?.sql;
                 if (!sql) return null;
                 if (Array.isArray(sql)) sql = sql[0];
@@ -114,18 +114,20 @@ export class SuperMigrations {
             const runnedMigrationsAmount = onMigrationComplete();
             const migrationName = '"' + table + ' ' + toISODate(migration.date)+ '"';
             if (Array.isArray(migration.sql)) {
-                const sqls = migration.sql.filter(Boolean).map(sql => {
-                    const sql2 = sqlInstance.toRawSQL(sql);
-                    sql2.query = utils.replaceAll(
-                        sql2.query.trim(), "%{table_name}", table
-                    );
-                    return sql2;
-                });
+                const sqls = await Promise.all(
+                    migration.sql.filter(Boolean).map(async sql => {
+                        const sql2 = await sqlInstance.toRawSQL(sql);
+                        sql2.query = utils.replaceAll(
+                            sql2.query.trim(), "%{table_name}", table
+                        );
+                        return sql2;
+                    })
+                );
                 logger.log(runnedMigrationsAmount, "| Migrations will be runned:",
                         migrationName, '|\n' + terminalColors.cyan, sqls.map(s => s.query));
                 for (let sql of sqls) await _local_runSQL(sql.query, sql.params);
             } else {
-                const sql = sqlInstance.toRawSQL(migration.sql);
+                const sql = await sqlInstance.toRawSQL(migration.sql);
                 sql.query = utils.replaceAll(sql.query.trim(), "%{table_name}", table);
                 logger.log(runnedMigrationsAmount, "| Migration will be runned:", 
                         migrationName, '|\n' + terminalColors.cyan, sql.query);
