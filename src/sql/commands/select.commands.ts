@@ -9,6 +9,7 @@ export class SQLSelectCommands {
         return {
             toMySQL: () => `SELECT * FROM \`${this.table}\`;`,
             toMSSQL: () => `SELECT * FROM [${this.table}];`,
+            toSQLite: () => `SELECT * FROM "${this.table}";`,
         }
     }
 }

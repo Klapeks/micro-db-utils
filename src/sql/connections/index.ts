@@ -2,6 +2,7 @@ import { DatabaseOptions } from '@klapeks/utils';
 import { AbstractSQLConnection } from './abstract.connection';
 import { MySQLConnection } from './mysql.connection';
 import { MSSQLConnection } from './mssql.connection';
+import { SQLiteConnection } from './sqlite.connection';
 
 
 export function isDatabaseTypeIs<T extends DatabaseOptions['type']>(
@@ -13,11 +14,13 @@ export function isDatabaseTypeIs<T extends DatabaseOptions['type']>(
 export function createSQLConnection(options: DatabaseOptions): AbstractSQLConnection {
     if (isDatabaseTypeIs(options, 'mysql')) return new MySQLConnection(options);
     if (isDatabaseTypeIs(options, 'mssql')) return new MSSQLConnection(options);
+    if (isDatabaseTypeIs(options, 'sqlite')) return new SQLiteConnection(options);
     throw "Connection for database type " + options.type + ' is not implemented :(';
 }
 
 export * from './abstract.connection';
 export * from './mysql.connection';
 export * from './mssql.connection';
+export * from './sqlite.connection';
 
-export { MySQLConnection as RawMySQLConnection };
+export { MySQLConnection as RawMySQLConnection }; // for backward compatibility

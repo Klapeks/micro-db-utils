@@ -5,6 +5,7 @@ import { FindOperator } from "typeorm";
 function sqlQuoteKey(dbType: DatabaseOptions['type'], str: string) {
     if (dbType === 'mysql') return `\`${str}\``;
     if (dbType === 'mssql') return `[${str}]`;
+    if (dbType === 'sqlite') return `"${str}"`;
     return str;
 }
 
@@ -22,7 +23,7 @@ export function converWhereQuery(dbType: DatabaseOptions['type'], key: string, v
     if (value === null) {
         return sqlQuoteKey(dbType, key) + ' IS NULL';
     }
-    if (keyAlias === '?' || dbType === 'mysql') {
+    if (keyAlias === '?' || dbType === 'mysql' || dbType === 'sqlite') {
         return sqlQuoteKey(dbType, key) + ` = ?`;
     }
     if (dbType === 'mssql') {

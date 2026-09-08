@@ -11,20 +11,24 @@ export interface SQLCommandContext {
 export interface ISQLCommandAdapter {
     toMySQL(ctx?: SQLCommandContext): SQLCommandData | string;
     toMSSQL(ctx?: SQLCommandContext): SQLCommandData | string;
+    toSQLite(ctx?: SQLCommandContext): SQLCommandData | string;
 }
 export abstract class AbstractSQLCommand implements ISQLCommandAdapter {
     abstract toMySQL(ctx?: SQLCommandContext): SQLCommandData | string;
     abstract toMSSQL(ctx?: SQLCommandContext): SQLCommandData | string;
+    abstract toSQLite(ctx?: SQLCommandContext): SQLCommandData | string;
 }
 
 export const rawSQL = (sqls: {
     defaultQuery: string
     mysqlQuery?: string,
     mssqlQuery?: string,
+    sqliteQuery?: string,
 }): ISQLCommandAdapter => {
     return {
         toMySQL: () => sqls.mysqlQuery || sqls.defaultQuery,
         toMSSQL: () => sqls.mssqlQuery || sqls.defaultQuery,
+        toSQLite: () => sqls.sqliteQuery || sqls.defaultQuery,
     }
 }
 
@@ -36,6 +40,7 @@ export function toRawSQL(
     if (typeof query === 'object' && !('query' in query)) {
         if (dbType === 'mysql') query = query.toMySQL({});
         else if (dbType === 'mssql') query = query.toMSSQL({});
+        else if (dbType === 'sqlite') query = query.toSQLite({});
         else throw "Unknown database type: " + dbType;
     }
     return typeof query === 'string' ? { query } : query;

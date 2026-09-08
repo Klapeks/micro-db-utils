@@ -8,13 +8,46 @@ export class SQLEditDataCommands {
     
     constructor(private readonly table: string) {}
 
+    insert(data: any): ISQLCommandAdapter {
+        if (!data) throw "No data param";
+        const dataKeys = Object.keys(data);
+        return {
+            toMySQL: () => ({
+                query: `
+                    INSERT INTO \`${this.table}\` 
+                    (${dataKeys.map(key => `\`${key}\``).join(', ')}) 
+                    VALUES (${dataKeys.map(() => '?').join(', ')});
+                `,
+                params: Object.values(data),
+            }),
+
+            toMSSQL: () => ({
+                query: `
+                    INSERT INTO [${this.table}]
+                    (${dataKeys.map(key => `[${key}]`).join(', ')})
+                    VALUES (${dataKeys.map(key => '@' + key).join(', ')});
+                `,
+                params: data,
+            }),
+
+            toSQLite: () => ({
+                query: `
+                    INSERT INTO "${this.table}" 
+                    (${dataKeys.map(key => `"${key}"`).join(', ')}) 
+                    VALUES (${dataKeys.map(() => '?').join(', ')});
+                `,
+                params: Object.values(data),
+            }),
+        };
+    }
+
 
     update(data: any, where: any): ISQLCommandAdapter {
         return {
             toMySQL: () => ({
                 query: `
                     UPDATE \`${this.table}\`
-                    SET ${Object.keys(data).map(key => `\`${key}\` = ?`).join(',')}
+                    SET ${Object.keys(data).map(key => `\`${key}\` = ?`).join(', ')}
                     WHERE ${Object.keys(where).map(key => converWhereQuery(
                         'mysql', key, data[key], '?')).join(' AND ')};
                 `,
@@ -26,7 +59,7 @@ export class SQLEditDataCommands {
             toMSSQL: () => ({
                 query: `
                     UPDATE [${this.table}] 
-                    SET ${Object.keys(data).map(key => `[${key}] = @${key}`).join(',')}
+                    SET ${Object.keys(data).map(key => `[${key}] = @${key}`).join(', ')}
                     WHERE ${Object.keys(where).map(key => converWhereQuery(
                         'mssql', key, data[key], 'where_' + key)).join(' AND ')};
                 `,
@@ -37,6 +70,17 @@ export class SQLEditDataCommands {
                     }
                     return params;
                 })()
+            }),
+            toSQLite: () => ({
+                query: `
+                    UPDATE "${this.table}" 
+                    SET ${Object.keys(data).map(key => `"${key}" = ?`).join(', ')}
+                    WHERE ${Object.keys(where).map(key => converWhereQuery(
+                        'sqlite', key, where[key], '?')).join(' AND ')};`,
+                params: [
+                    ...Object.values(data),
+                    ...Object.values(where),
+                ]
             }),
         }
     }
@@ -79,6 +123,17 @@ export class SQLEditDataCommands {
                         VALUES (${dataKeys.map((key) => '@' + key).join(', ')});
                 `,
                 params: data
+            }),
+            toSQLite: () => ({
+                query: `
+                    INSERT INTO "${this.table}" 
+                    (${dataKeys.map(key => `"${key}"`).join(', ')}) 
+                    VALUES (${dataKeys.map(() => '?').join(', ')}) 
+                    ON CONFLICT (${idKeys.map(key => `"${key}"`).join(', ')}) 
+                    DO UPDATE SET ${Object.keys(toUpdObj).map(key => {
+                        return `"${key}" = excluded."${key}"`;
+                    }).join(', ')};`,
+                params: Object.values(data)
             }),
         }
     }

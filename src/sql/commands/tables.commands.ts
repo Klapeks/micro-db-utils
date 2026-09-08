@@ -10,8 +10,8 @@ export class SQLTablesCommands {
         return {
             toMySQL: () => `RENAME TABLE \`${old_name}\` TO \`${new_name}\`;`,
             toMSSQL: () => `EXEC sp_rename '${old_name}', '${new_name}';`,
+            toSQLite: () => `ALTER TABLE "${old_name}" RENAME TO "${new_name}";`,
             // PG: ALTER TABLE "old_name" RENAME TO "new_name";
-            // SQLITE: ALTER TABLE "old_name" RENAME TO "new_name";
         }
     }
 
@@ -31,6 +31,12 @@ export class SQLTablesCommands {
                 `AND TABLE_SCHEMA = 'dbo'`,
                 `AND TABLE_NAME = '${table}'`,
             ].join(' '),
+            toSQLite: () => [
+                `SELECT * FROM sqlite_master`,
+                `WHERE type = 'table'`,
+                `AND name = '${table}'`,
+                `LIMIT 1;`
+            ].join(' '),
         }
     }
 
@@ -47,6 +53,7 @@ export class SQLTablesCommands {
 
                 if (dbtype === 'mysql') str += `\`${columnName}\` `;
                 else if (dbtype === 'mssql') str += `[${columnName}] `;
+                else if (dbtype === 'sqlite') str += `"${columnName}" `;
                 else if (dbtype === 'postgres') str += `"${columnName}" `;
                 else str += `${columnName} `;
 
@@ -60,6 +67,7 @@ export class SQLTablesCommands {
         return {
             toMySQL: () => _createQuery('mysql'),
             toMSSQL: () => _createQuery('mssql'),
+            toSQLite: () => _createQuery('sqlite'),
         }
     }
 
@@ -90,6 +98,12 @@ export class SQLTablesCommands {
                         ON t.object_id = ps.object_id
                     GROUP BY t.name
                 ) t ORDER BY (data_kb + index_kb) DESC;
+            `,
+            toSQLite: () => `
+                SELECT name AS table_name, 
+                (SUM(pgsize) / 1024.0) AS data_kb 
+                FROM dbstat WHERE name NOT LIKE 'sqlite_%' 
+                GROUP BY name ORDER BY data_kb DESC;
             `,
 
             // postgress
