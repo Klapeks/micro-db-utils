@@ -11,7 +11,11 @@ export declare function createRelation(target: string, type: "one-to-many" | "on
 };
 export declare const MULTISQL_COLUMNS_TYPES: {
     dbtype: "sqlite" | "mysql" | "postgres" | "mssql";
+    int32: "int" | "integer";
+    string: "character varying" | "nvarchar" | "varchar" | "text";
+    boolean: "boolean" | "tinyint" | "integer" | "bit";
     enum: "simple-enum" | "enum";
+    bigint: "bigint" | "integer";
     datetime: "datetime" | "datetime2" | "timestamp";
     float32: "float" | "double";
     float64: "float" | "double";

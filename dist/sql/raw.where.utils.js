@@ -7,6 +7,8 @@ function sqlQuoteKey(dbType, str) {
         return "`".concat(str, "`");
     if (dbType === 'mssql')
         return "[".concat(str, "]");
+    if (dbType === 'sqlite')
+        return "\"".concat(str, "\"");
     return str;
 }
 function converWhereQuery(dbType, key, value, keyAlias) {
@@ -24,7 +26,7 @@ function converWhereQuery(dbType, key, value, keyAlias) {
     if (value === null) {
         return sqlQuoteKey(dbType, key) + ' IS NULL';
     }
-    if (keyAlias === '?' || dbType === 'mysql') {
+    if (keyAlias === '?' || dbType === 'mysql' || dbType === 'sqlite') {
         return sqlQuoteKey(dbType, key) + " = ?";
     }
     if (dbType === 'mssql') {

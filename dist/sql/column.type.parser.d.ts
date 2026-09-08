@@ -1,6 +1,6 @@
-import { DatabaseOptions } from "@klapeks/utils";
+import { DatabaseOptions, getRawDatabaseColumnTypeOfTypeORM } from "@klapeks/utils";
 import { ColumnType } from "typeorm";
-export declare function getRawDatabaseColumnTypeOfTypeORM(dbtype: DatabaseOptions['type'], type: ColumnType): ColumnType;
+export { getRawDatabaseColumnTypeOfTypeORM };
 export interface MicroColumnTypeObject {
     type: ColumnType;
     primary?: boolean;

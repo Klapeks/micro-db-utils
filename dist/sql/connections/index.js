@@ -18,6 +18,7 @@ exports.RawMySQLConnection = exports.createSQLConnection = exports.isDatabaseTyp
 var mysql_connection_1 = require("./mysql.connection");
 Object.defineProperty(exports, "RawMySQLConnection", { enumerable: true, get: function () { return mysql_connection_1.MySQLConnection; } });
 var mssql_connection_1 = require("./mssql.connection");
+var sqlite_connection_1 = require("./sqlite.connection");
 function isDatabaseTypeIs(options, type) {
     return options.type === type;
 }
@@ -27,9 +28,12 @@ function createSQLConnection(options) {
         return new mysql_connection_1.MySQLConnection(options);
     if (isDatabaseTypeIs(options, 'mssql'))
         return new mssql_connection_1.MSSQLConnection(options);
+    if (isDatabaseTypeIs(options, 'sqlite'))
+        return new sqlite_connection_1.SQLiteConnection(options);
     throw "Connection for database type " + options.type + ' is not implemented :(';
 }
 exports.createSQLConnection = createSQLConnection;
 __exportStar(require("./abstract.connection"), exports);
 __exportStar(require("./mysql.connection"), exports);
 __exportStar(require("./mssql.connection"), exports);
+__exportStar(require("./sqlite.connection"), exports);

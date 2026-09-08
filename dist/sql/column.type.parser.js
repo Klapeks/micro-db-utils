@@ -1,40 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MicroColumnTypeObject = exports.getRawDatabaseColumnTypeOfTypeORM = void 0;
-var utils_1 = require("../utils");
-// https://vscode.dev/github.com/typeorm/typeorm/blob/master/src/driver/mysql/MysqlDriver.ts#L750
-// https://vscode.dev/github.com/typeorm/typeorm/blob/master/src/driver/sqlserver/SqlServerDriver.ts#L678
-function getRawDatabaseColumnTypeOfTypeORM(dbtype, type) {
-    if (type === Number) {
-        if (dbtype == 'sqlite')
-            return 'integer';
-        if (dbtype == 'postgres')
-            return 'integer';
-        return 'int';
-    }
-    if (type === String) {
-        if (dbtype === 'postgres')
-            return 'character varying';
-        if (dbtype === 'mssql')
-            return 'nvarchar';
-        return 'varchar';
-    }
-    if (type === Boolean) {
-        if (dbtype === 'mssql')
-            return 'bit';
-        if (dbtype === 'mysql')
-            return 'tinyint';
-        return 'boolean';
-    }
-    if (type === Date)
-        return utils_1.MULTISQL_COLUMNS_TYPES.datetime;
-    return type;
-}
-exports.getRawDatabaseColumnTypeOfTypeORM = getRawDatabaseColumnTypeOfTypeORM;
+var utils_1 = require("@klapeks/utils");
+Object.defineProperty(exports, "getRawDatabaseColumnTypeOfTypeORM", { enumerable: true, get: function () { return utils_1.getRawDatabaseColumnTypeOfTypeORM; } });
 var MicroColumnTypeObject;
 (function (MicroColumnTypeObject) {
     function toSQLQuery(dbType, options, queryType) {
-        var columnType = getRawDatabaseColumnTypeOfTypeORM(dbType, options.type);
+        var columnType = (0, utils_1.getRawDatabaseColumnTypeOfTypeORM)(dbType, options.type);
         var columnLength = options.length || ((columnType === 'varchar'
             || columnType === 'nvarchar') ? 255 : undefined);
         var str = columnType + (columnLength ? "(".concat(columnLength, ")") : '');
@@ -49,6 +21,7 @@ var MicroColumnTypeObject;
                 str += ' IDENTITY';
             else if (dbType === 'mysql')
                 str += ' AUTO_INCREMENT';
+            else if (dbType === 'sqlite') { /** after primary key */ }
             else
                 throw "options.generated is not supported yet for " + dbType;
         }
@@ -84,6 +57,9 @@ var MicroColumnTypeObject;
         if (queryType === 'create-table') {
             if (options.primary) {
                 str += ' PRIMARY KEY';
+            }
+            if (dbType === 'sqlite' && options.generated) {
+                str += ' AUTOINCREMENT';
             }
         }
         return str;

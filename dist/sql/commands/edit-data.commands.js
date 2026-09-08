@@ -26,15 +26,35 @@ var SQLEditDataCommands = /** @class */ (function () {
     function SQLEditDataCommands(table) {
         this.table = table;
     }
+    SQLEditDataCommands.prototype.insert = function (data) {
+        var _this = this;
+        if (!data)
+            throw "No data param";
+        var dataKeys = Object.keys(data);
+        return {
+            toMySQL: function () { return ({
+                query: "\n                    INSERT INTO `".concat(_this.table, "` \n                    (").concat(dataKeys.map(function (key) { return "`".concat(key, "`"); }).join(', '), ") \n                    VALUES (").concat(dataKeys.map(function () { return '?'; }).join(', '), ");\n                "),
+                params: Object.values(data),
+            }); },
+            toMSSQL: function () { return ({
+                query: "\n                    INSERT INTO [".concat(_this.table, "]\n                    (").concat(dataKeys.map(function (key) { return "[".concat(key, "]"); }).join(', '), ")\n                    VALUES (").concat(dataKeys.map(function (key) { return '@' + key; }).join(', '), ");\n                "),
+                params: data,
+            }); },
+            toSQLite: function () { return ({
+                query: "\n                    INSERT INTO \"".concat(_this.table, "\" \n                    (").concat(dataKeys.map(function (key) { return "\"".concat(key, "\""); }).join(', '), ") \n                    VALUES (").concat(dataKeys.map(function () { return '?'; }).join(', '), ");\n                "),
+                params: Object.values(data),
+            }); },
+        };
+    };
     SQLEditDataCommands.prototype.update = function (data, where) {
         var _this = this;
         return {
             toMySQL: function () { return ({
-                query: "\n                    UPDATE `".concat(_this.table, "`\n                    SET ").concat(Object.keys(data).map(function (key) { return "`".concat(key, "` = ?"); }).join(','), "\n                    WHERE ").concat(Object.keys(where).map(function (key) { return (0, raw_where_utils_1.converWhereQuery)('mysql', key, data[key], '?'); }).join(' AND '), ";\n                "),
+                query: "\n                    UPDATE `".concat(_this.table, "`\n                    SET ").concat(Object.keys(data).map(function (key) { return "`".concat(key, "` = ?"); }).join(', '), "\n                    WHERE ").concat(Object.keys(where).map(function (key) { return (0, raw_where_utils_1.converWhereQuery)('mysql', key, data[key], '?'); }).join(' AND '), ";\n                "),
                 params: __spreadArray(__spreadArray([], Object.values(data), true), Object.values(where), true)
             }); },
             toMSSQL: function () { return ({
-                query: "\n                    UPDATE [".concat(_this.table, "] \n                    SET ").concat(Object.keys(data).map(function (key) { return "[".concat(key, "] = @").concat(key); }).join(','), "\n                    WHERE ").concat(Object.keys(where).map(function (key) { return (0, raw_where_utils_1.converWhereQuery)('mssql', key, data[key], 'where_' + key); }).join(' AND '), ";\n                "),
+                query: "\n                    UPDATE [".concat(_this.table, "] \n                    SET ").concat(Object.keys(data).map(function (key) { return "[".concat(key, "] = @").concat(key); }).join(', '), "\n                    WHERE ").concat(Object.keys(where).map(function (key) { return (0, raw_where_utils_1.converWhereQuery)('mssql', key, data[key], 'where_' + key); }).join(' AND '), ";\n                "),
                 params: (function () {
                     var params = __assign({}, data);
                     for (var _i = 0, _a = Object.keys(where); _i < _a.length; _i++) {
@@ -43,6 +63,10 @@ var SQLEditDataCommands = /** @class */ (function () {
                     }
                     return params;
                 })()
+            }); },
+            toSQLite: function () { return ({
+                query: "\n                    UPDATE \"".concat(_this.table, "\" \n                    SET ").concat(Object.keys(data).map(function (key) { return "\"".concat(key, "\" = ?"); }).join(', '), "\n                    WHERE ").concat(Object.keys(where).map(function (key) { return (0, raw_where_utils_1.converWhereQuery)('sqlite', key, where[key], '?'); }).join(' AND '), ";"),
+                params: __spreadArray(__spreadArray([], Object.values(data), true), Object.values(where), true)
             }); },
         };
     };
@@ -72,6 +96,12 @@ var SQLEditDataCommands = /** @class */ (function () {
             toMSSQL: function () { return ({
                 query: "\n                    UPDATE [".concat(_this.table, "] \n                    SET ").concat(Object.keys(toUpdObj).map(function (key) { return "[".concat(key, "] = @").concat(key); }).join(','), "\n                    WHERE ").concat(idKeys.map(function (key) { return (0, raw_where_utils_1.converWhereQuery)('mssql', key, data[key], key); }).join(' AND '), ";\n\n                    IF @@ROWCOUNT = 0 INSERT INTO [").concat(_this.table, "]\n                        (").concat(dataKeys.map(function (a) { return "[".concat(a, "]"); }).join(', '), ")\n                        VALUES (").concat(dataKeys.map(function (key) { return '@' + key; }).join(', '), ");\n                "),
                 params: data
+            }); },
+            toSQLite: function () { return ({
+                query: "\n                    INSERT INTO \"".concat(_this.table, "\" \n                    (").concat(dataKeys.map(function (key) { return "\"".concat(key, "\""); }).join(', '), ") \n                    VALUES (").concat(dataKeys.map(function () { return '?'; }).join(', '), ") \n                    ON CONFLICT (").concat(idKeys.map(function (key) { return "\"".concat(key, "\""); }).join(', '), ") \n                    DO UPDATE SET ").concat(Object.keys(toUpdObj).map(function (key) {
+                    return "\"".concat(key, "\" = excluded.\"").concat(key, "\"");
+                }).join(', '), ";"),
+                params: Object.values(data)
             }); },
         };
     };

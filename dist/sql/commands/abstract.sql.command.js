@@ -11,6 +11,7 @@ var rawSQL = function (sqls) {
     return {
         toMySQL: function () { return sqls.mysqlQuery || sqls.defaultQuery; },
         toMSSQL: function () { return sqls.mssqlQuery || sqls.defaultQuery; },
+        toSQLite: function () { return sqls.sqliteQuery || sqls.defaultQuery; },
     };
 };
 exports.rawSQL = rawSQL;
@@ -22,6 +23,8 @@ function toRawSQL(dbType, query) {
             query = query.toMySQL({});
         else if (dbType === 'mssql')
             query = query.toMSSQL({});
+        else if (dbType === 'sqlite')
+            query = query.toSQLite({});
         else
             throw "Unknown database type: " + dbType;
     }

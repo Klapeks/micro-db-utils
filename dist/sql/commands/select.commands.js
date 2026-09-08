@@ -10,6 +10,7 @@ var SQLSelectCommands = /** @class */ (function () {
         return {
             toMySQL: function () { return "SELECT * FROM `".concat(_this.table, "`;"); },
             toMSSQL: function () { return "SELECT * FROM [".concat(_this.table, "];"); },
+            toSQLite: function () { return "SELECT * FROM \"".concat(_this.table, "\";"); },
         };
     };
     return SQLSelectCommands;

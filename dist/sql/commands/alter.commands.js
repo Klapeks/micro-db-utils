@@ -13,16 +13,8 @@ var SQLAlterCommand = /** @class */ (function () {
         var _this = this;
         return {
             toMySQL: function () { return "ALTER TABLE `".concat(_this.table, "` RENAME COLUMN `").concat(old_name, "` TO `").concat(new_name, "`;"); },
-            toMSSQL: function () { return "EXEC sp_rename '".concat(_this.table, ".").concat(old_name, "', '").concat(new_name, "', 'COLUMN';"); }
-        };
-    };
-    SQLAlterCommand.prototype.changeColumnType = function (column, type) {
-        var _this = this;
-        return {
-            toMySQL: function () { return "ALTER TABLE `".concat(_this.table, "` MODIFY COLUMN `").concat(column, "` ")
-                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mysql', type, 'alter-column') + ';'; },
-            toMSSQL: function () { return "ALTER TABLE [".concat(_this.table, "] ALTER COLUMN [").concat(column, "] ")
-                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'; }
+            toMSSQL: function () { return "EXEC sp_rename '".concat(_this.table, ".").concat(old_name, "', '").concat(new_name, "', 'COLUMN';"); },
+            toSQLite: function () { return "ALTER TABLE \"".concat(_this.table, "\" RENAME COLUMN \"").concat(old_name, "\" TO \"").concat(new_name, "\";"); },
         };
     };
     SQLAlterCommand.prototype.addColumn = function (column, type) {
@@ -31,7 +23,19 @@ var SQLAlterCommand = /** @class */ (function () {
             toMySQL: function () { return "ALTER TABLE `".concat(_this.table, "` ADD COLUMN `").concat(column, "` ")
                 + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mysql', type, 'alter-column') + ';'; },
             toMSSQL: function () { return "ALTER TABLE [".concat(_this.table, "] ADD [").concat(column, "] ")
-                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'; }
+                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'; },
+            toSQLite: function () { return "ALTER TABLE \"".concat(_this.table, "\" ADD COLUMN \"").concat(column, "\" ")
+                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery("sqlite", type, "alter-column") + ";"; }
+        };
+    };
+    SQLAlterCommand.prototype.changeColumnType = function (column, type) {
+        var _this = this;
+        return {
+            toMySQL: function () { return "ALTER TABLE `".concat(_this.table, "` MODIFY COLUMN `").concat(column, "` ")
+                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mysql', type, 'alter-column') + ';'; },
+            toMSSQL: function () { return "ALTER TABLE [".concat(_this.table, "] ALTER COLUMN [").concat(column, "] ")
+                + column_type_parser_1.MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';'; },
+            toSQLite: function () { throw "Not implemented yet: changeColumnType for sqlite :("; },
         };
     };
     return SQLAlterCommand;

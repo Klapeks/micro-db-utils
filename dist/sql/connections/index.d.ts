@@ -8,4 +8,5 @@ export declare function createSQLConnection(options: DatabaseOptions): AbstractS
 export * from './abstract.connection';
 export * from './mysql.connection';
 export * from './mssql.connection';
+export * from './sqlite.connection';
 export { MySQLConnection as RawMySQLConnection };
