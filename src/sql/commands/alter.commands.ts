@@ -33,7 +33,9 @@ export class SQLAlterCommand {
                 + MicroColumnTypeObject.toSQLQuery('mysql', type, 'alter-column') + ';',
             toMSSQL: () => `ALTER TABLE [${this.table}] ALTER COLUMN [${column}] `
                 + MicroColumnTypeObject.toSQLQuery('mssql', type, 'alter-column') + ';',
-            toSQLite: () => { throw "Not implemented yet: changeColumnType for sqlite :(" },
+            toSQLite: (ctx) => { 
+                throw "Not implemented"
+            },
         }
     }
 }

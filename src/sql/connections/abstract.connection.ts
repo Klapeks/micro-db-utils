@@ -18,7 +18,10 @@ export abstract class AbstractSQLConnection {
     protected abstract sendSQL<T = any>(query: string, params?: any[]): Promise<T[]>;
 
     toRawSQL(sql: ISQLCommandAdapter | SQLCommandData | string) {
-        return toRawSQL(this.rawOptions.type, sql);
+        return toRawSQL(this.rawOptions.type, sql, {
+            database: this.databaseName,
+            runAdditionalSQL: this.sendSQL
+        });
     }
 
     // !! PARAMS WARNING: mysql use array of params, but mssql use key-value (object) params
@@ -40,7 +43,8 @@ export abstract class AbstractSQLConnection {
         const abstrKey = this.abstractCommandFunctionName;
         if (abstrKey in query) {
             query = await (query as any)?.[abstrKey]?.({
-                database: this.databaseName
+                database: this.databaseName,
+                runAdditionalSQL: this.sendSQL
             } satisfies SQLCommandContext);
         }
         if (!query) throw "Invalid arg";

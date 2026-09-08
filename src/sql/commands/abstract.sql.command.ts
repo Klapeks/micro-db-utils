@@ -5,7 +5,8 @@ export interface SQLCommandData {
     params?: any[];
 }
 export interface SQLCommandContext {
-    // database: string
+    database: string,
+    runAdditionalSQL: (sql: string, params: any[]) => any,
 }
 
 export interface ISQLCommandAdapter {
@@ -34,13 +35,14 @@ export const rawSQL = (sqls: {
 
 export function toRawSQL(
     dbType: DatabaseOptions['type'],
-    query: ISQLCommandAdapter | SQLCommandData | string
+    query: ISQLCommandAdapter | SQLCommandData | string,
+    ctx?: SQLCommandContext
 ): SQLCommandData {
     if (typeof query === 'string') return { query };
     if (typeof query === 'object' && !('query' in query)) {
-        if (dbType === 'mysql') query = query.toMySQL({});
-        else if (dbType === 'mssql') query = query.toMSSQL({});
-        else if (dbType === 'sqlite') query = query.toSQLite({});
+        if (dbType === 'mysql') query = query.toMySQL(ctx);
+        else if (dbType === 'mssql') query = query.toMSSQL(ctx);
+        else if (dbType === 'sqlite') query = query.toSQLite(ctx);
         else throw "Unknown database type: " + dbType;
     }
     return typeof query === 'string' ? { query } : query;
