@@ -1,4 +1,4 @@
-import { utils } from "@klapeks/utils";
+import { logger, utils } from "@klapeks/utils";
 import { MicroSQL } from "../../micro.sql";
 import { MicroColumnTypeObject } from "../column.type.parser";
 import { ISQLCommandAdapter } from "./abstract.sql.command";
@@ -41,7 +41,10 @@ export class SQLAlterCommand {
                 const tableCreateOld = (await ctx.runAdditionalSQL(`
                     SELECT sql FROM sqlite_master WHERE type = "table" AND name = "${this.table}";
                 `))?.[0]?.sql as string;
-                if (!tableCreateOld) throw `Table ${this.table} not exists`;
+                if (!tableCreateOld) {
+                    logger.warn("SQLite: Table for column type migration doesn't exist:", this.table);
+                    return `SELECT 1`;
+                }
 
                 const indexesToRecreate = (await ctx.runAdditionalSQL(`
                     SELECT sql FROM sqlite_master WHERE type = "index"

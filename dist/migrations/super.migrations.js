@@ -137,7 +137,8 @@ var SuperMigrations = /** @class */ (function () {
                                 switch (_a.label) {
                                     case 0:
                                         if (!(sql.toLowerCase().startsWith("alter table")
-                                            || sql.toLowerCase().startsWith('exec sp_rename'))) return [3 /*break*/, 2];
+                                            || sql.toLowerCase().startsWith('exec sp_rename')
+                                            || (sqlInstance.rawOptions.type === 'sqlite' && sql.toLowerCase().includes('alter table ')))) return [3 /*break*/, 2];
                                         // log error if error
                                         return [4 /*yield*/, sqlInstance.runSQL(sql, params).catch(function (err) {
                                                 logger.error("Error while alter table:", err);
@@ -166,7 +167,6 @@ var SuperMigrations = /** @class */ (function () {
                         migration = todoMigrations_1[_i];
                         if (migration.table != table)
                             return [3 /*break*/, 19];
-                        logger;
                         if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {
                             return [3 /*break*/, 19];
                         }

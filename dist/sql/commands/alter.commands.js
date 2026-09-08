@@ -83,8 +83,10 @@ var SQLAlterCommand = /** @class */ (function () {
                             return [4 /*yield*/, ctx.runAdditionalSQL("\n                    SELECT sql FROM sqlite_master WHERE type = \"table\" AND name = \"".concat(this.table, "\";\n                "))];
                         case 1:
                             tableCreateOld = (_b = (_a = (_c.sent())) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.sql;
-                            if (!tableCreateOld)
-                                throw "Table ".concat(this.table, " not exists");
+                            if (!tableCreateOld) {
+                                utils_1.logger.warn("SQLite: Table for column type migration doesn't exist:", this.table);
+                                return [2 /*return*/, "SELECT 1"];
+                            }
                             return [4 /*yield*/, ctx.runAdditionalSQL("\n                    SELECT sql FROM sqlite_master WHERE type = \"index\"\n                    AND tbl_name = \"".concat(this.table, "\" AND sql IS NOT NULL;\n                "))];
                         case 2:
                             indexesToRecreate = (_c.sent()).map(function (s) { return s.sql || s; }).filter(Boolean).join("; ") + ';';

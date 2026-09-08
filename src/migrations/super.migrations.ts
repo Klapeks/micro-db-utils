@@ -108,7 +108,6 @@ export class SuperMigrations {
 
         for (let migration of todoMigrations) {
             if (migration.table != table) continue;
-            logger
             if (lastRealMigration && lastRealMigration.getTime() >= migration.date.getTime()) {
                 continue;
             }
