@@ -5,6 +5,7 @@ import { DatabaseOptions } from '@klapeks/utils';
 export type TypeormSelectEntityHandlerOptions<T extends ObjectLiteral, K extends string> = SelectEntityHandlerOptions<T, K> & {
     schema: EntitySchema<T>;
     dataSource: DataSource;
+    typeormHydrateValue?: boolean;
     beforeGetMany?: (builder: SelectQueryBuilder<T>, options: SelectOptions<T>) => Promise<void> | void;
 };
 export declare class SelectEntityHandler<T extends ObjectLiteral, K extends string> extends AbstractSelectHandler<T, K, TypeormSelectEntityHandlerOptions<T, K>> {

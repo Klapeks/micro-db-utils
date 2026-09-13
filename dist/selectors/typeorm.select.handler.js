@@ -95,12 +95,13 @@ var SelectEntityHandler = /** @class */ (function (_super) {
         });
     };
     SelectEntityHandler.prototype.rawSelect = function (options) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var builder, addOrderBy, i, multipleWheres_1, result;
-            var _a;
+            var builder, addOrderBy, i, multipleWheres_1, result, $columns, _i, result_1, row, _c, $columns_1, column;
+            var _d;
             var _this = this;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_e) {
+                switch (_e.label) {
                     case 0:
                         builder = this.repo.createQueryBuilder(this.schema.options.name);
                         builder.select(this.schema.options.name + '.*');
@@ -163,24 +164,36 @@ var SelectEntityHandler = /** @class */ (function (_super) {
                         if (!this.options.beforeGetMany) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.options.beforeGetMany(builder, options)];
                     case 1:
-                        _b.sent();
-                        _b.label = 2;
+                        _e.sent();
+                        _e.label = 2;
                     case 2:
                         builder.limit(options.limit);
                         if (options.offset)
                             builder.offset(options.offset);
                         return [4 /*yield*/, builder.getRawMany()];
                     case 3:
-                        result = _b.sent();
+                        result = _e.sent();
+                        if (this.options.typeormHydrateValue) {
+                            $columns = (_b = (_a = builder.expressionMap.mainAlias) === null || _a === void 0 ? void 0 : _a.metadata) === null || _b === void 0 ? void 0 : _b.columns;
+                            if ($columns)
+                                for (_i = 0, result_1 = result; _i < result_1.length; _i++) {
+                                    row = result_1[_i];
+                                    for (_c = 0, $columns_1 = $columns; _c < $columns_1.length; _c++) {
+                                        column = $columns_1[_c];
+                                        row[column.databaseName] = this.dataSource
+                                            .driver.prepareHydratedValue(row[column.databaseName], column);
+                                    }
+                                }
+                        }
                         if (!this.options.afterSelect) return [3 /*break*/, 5];
                         return [4 /*yield*/, this.options.afterSelect(result, options)];
                     case 4:
-                        result = _b.sent();
-                        _b.label = 5;
+                        result = _e.sent();
+                        _e.label = 5;
                     case 5:
-                        _a = { objects: result };
+                        _d = { objects: result };
                         return [4 /*yield*/, builder.getCount()];
-                    case 6: return [2 /*return*/, (_a.total = _b.sent(), _a)];
+                    case 6: return [2 /*return*/, (_d.total = _e.sent(), _d)];
                 }
             });
         });

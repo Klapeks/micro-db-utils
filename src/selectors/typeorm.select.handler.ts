@@ -9,6 +9,7 @@ export type TypeormSelectEntityHandlerOptions<
 > = SelectEntityHandlerOptions<T, K> & {
     schema: EntitySchema<T>, 
     dataSource: DataSource,
+    typeormHydrateValue?: boolean,
     beforeGetMany?: (builder: SelectQueryBuilder<T>, options: SelectOptions<T>) => Promise<void> | void
 }
 
@@ -94,6 +95,19 @@ export class SelectEntityHandler<T extends ObjectLiteral, K extends string>
 
         // logger.log('typeorm select query:', builder.getQuery());
         let result = await builder.getRawMany();
+
+        if (this.options.typeormHydrateValue) {
+            const $columns = builder.expressionMap.mainAlias?.metadata?.columns;
+            if ($columns) for (let row of result) {
+                for (let column of $columns) {
+                    (row as any)[column.databaseName] = this.dataSource
+                        .driver.prepareHydratedValue(
+                            (row as any)[column.databaseName], column
+                        );
+                }
+            }
+        }
+        
         if (this.options.afterSelect) {
             result = await this.options.afterSelect(result, options);
         }
