@@ -24,20 +24,22 @@ export class SuperMigrations {
 
     static addRawMigration(
         dbtype: DatabaseOptions['type'] | 'all', 
-        entity: EntitySchema, 
+        entity: EntitySchema | string, 
         date: Date | string, 
         sql: SuperMigrationsSQLParam
     ) {
         if (typeof date == 'string') date = new Date(date);
         SuperMigrations._migrations.push({
             dbtype: dbtype == 'all' ? undefined : dbtype,
-            table: entity.options.tableName || entity.options.name,
+            table: typeof entity === 'string' ? entity : (
+                entity.options.tableName || entity.options.name
+            ),
             date: date, 
             sql: sql
         });
     }
     static addMigration(
-        entity: EntitySchema, 
+        entity: EntitySchema | string, 
         date: Date | string, 
         sql: ISQLCommandAdapter | ISQLCommandAdapter[]
     ) {

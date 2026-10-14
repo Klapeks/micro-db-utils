@@ -68,7 +68,7 @@ var SuperMigrations = /** @class */ (function () {
             date = new Date(date);
         SuperMigrations._migrations.push({
             dbtype: dbtype == 'all' ? undefined : dbtype,
-            table: entity.options.tableName || entity.options.name,
+            table: typeof entity === 'string' ? entity : (entity.options.tableName || entity.options.name),
             date: date,
             sql: sql
         });

@@ -140,6 +140,15 @@ var SQLAlterCommand = /** @class */ (function () {
             }); },
         };
     };
+    SQLAlterCommand.prototype.dropPrimaryKey = function () {
+        var _this = this;
+        return {
+            toSQLite: function () { return "SELECT 1;"; },
+            toMySQL: function () { return "ALTER TABLE `".concat(_this.table, "` DROP PRIMARY KEY;"); },
+            toMSSQL: function () { return "\n                BEGIN TRANSACTION;\n                DECLARE @pkName NVARCHAR(128);\n                DECLARE @sql NVARCHAR(MAX);\n\n                SELECT @pkName = kc.name\n                FROM sys.key_constraints kc\n                WHERE kc.parent_object_id = OBJECT_ID('dbo.".concat(_this.table, "')\n                AND kc.type = 'PK';\n\n                IF @pkName IS NOT NULL\n                BEGIN\n                    SET @sql = N'ALTER TABLE dbo.").concat(_this.table, " DROP CONSTRAINT '\n                            + QUOTENAME(@pkName);\n\n                    EXEC sp_executesql @sql;\n                END;\n                COMMIT TRANSACTION;\n            "); },
+            toPostgreSQL: function () { return "\n                BEGIN;\n                DO $$\n                DECLARE\n                    pk_name TEXT;\n                BEGIN\n                    SELECT conname\n                    INTO pk_name\n                    FROM pg_constraint\n                    WHERE conrelid = '".concat(_this.table, "'::regclass\n                    AND contype = 'p';\n\n                    IF pk_name IS NOT NULL THEN\n                        EXECUTE format(\n                            'ALTER TABLE ").concat(_this.table, " DROP CONSTRAINT %I',\n                            pk_name\n                        );\n                    END IF;\n                END $$;\n                COMMIT;\n            "); }
+        };
+    };
     return SQLAlterCommand;
 }());
 exports.SQLAlterCommand = SQLAlterCommand;

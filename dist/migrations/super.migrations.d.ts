@@ -5,8 +5,8 @@ type SuperMigrationsSQLParam = string | ISQLCommandAdapter | SQLCommandData | (s
 export declare class SuperMigrations {
     private static _migrations;
     static get migrationTableName(): string;
-    static addRawMigration(dbtype: DatabaseOptions['type'] | 'all', entity: EntitySchema, date: Date | string, sql: SuperMigrationsSQLParam): void;
-    static addMigration(entity: EntitySchema, date: Date | string, sql: ISQLCommandAdapter | ISQLCommandAdapter[]): void;
+    static addRawMigration(dbtype: DatabaseOptions['type'] | 'all', entity: EntitySchema | string, date: Date | string, sql: SuperMigrationsSQLParam): void;
+    static addMigration(entity: EntitySchema | string, date: Date | string, sql: ISQLCommandAdapter | ISQLCommandAdapter[]): void;
     private static runMigrationForTable;
     static runMigrations(dataSource: DataSource): Promise<void>;
 }

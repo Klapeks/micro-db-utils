@@ -103,4 +103,54 @@ export class SQLAlterCommand {
             },
         }
     }
+
+
+    dropPrimaryKey(): ISQLCommandAdapter & {
+        toPostgreSQL(): string | Promise<string>;
+    } {
+        return {
+            toSQLite: () => "SELECT 1;",
+            toMySQL: () => `ALTER TABLE \`${this.table}\` DROP PRIMARY KEY;`,
+            toMSSQL: () => `
+                BEGIN TRANSACTION;
+                DECLARE @pkName NVARCHAR(128);
+                DECLARE @sql NVARCHAR(MAX);
+
+                SELECT @pkName = kc.name
+                FROM sys.key_constraints kc
+                WHERE kc.parent_object_id = OBJECT_ID('dbo.${this.table}')
+                AND kc.type = 'PK';
+
+                IF @pkName IS NOT NULL
+                BEGIN
+                    SET @sql = N'ALTER TABLE dbo.${this.table} DROP CONSTRAINT '
+                            + QUOTENAME(@pkName);
+
+                    EXEC sp_executesql @sql;
+                END;
+                COMMIT TRANSACTION;
+            `,
+            toPostgreSQL: () => `
+                BEGIN;
+                DO $$
+                DECLARE
+                    pk_name TEXT;
+                BEGIN
+                    SELECT conname
+                    INTO pk_name
+                    FROM pg_constraint
+                    WHERE conrelid = '${this.table}'::regclass
+                    AND contype = 'p';
+
+                    IF pk_name IS NOT NULL THEN
+                        EXECUTE format(
+                            'ALTER TABLE ${this.table} DROP CONSTRAINT %I',
+                            pk_name
+                        );
+                    END IF;
+                END $$;
+                COMMIT;
+            `
+        }
+    }
 }

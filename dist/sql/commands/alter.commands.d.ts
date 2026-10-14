@@ -7,4 +7,7 @@ export declare class SQLAlterCommand {
     renameColumn(old_name: string, new_name: string): ISQLCommandAdapter;
     addColumn(column: string, type: MicroColumnTypeObject): ISQLCommandAdapter;
     changeColumnType(column: string, type: MicroColumnTypeObject): ISQLCommandAdapter;
+    dropPrimaryKey(): ISQLCommandAdapter & {
+        toPostgreSQL(): string | Promise<string>;
+    };
 }
