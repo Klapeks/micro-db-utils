@@ -81,7 +81,7 @@ export abstract class AbstractSQLConnection {
     }
     protected debugQuery(query: string, params: any) {
         if (!this.isDebugLoggerEnabled) return;
-        logger.log("Running SQL command for " + this.rawOptions.type + ":", 
+        logger.log(terminalColors.cyan + "Running SQL command for " + this.rawOptions.type + ":", 
             terminalColors.magenta + query, terminalColors.reset,
             params ? ('\n| with params:') : '', params || ''
         );

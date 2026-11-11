@@ -1,6 +1,6 @@
 import { type SelectOptions } from "@klapeks/api-creation-tools";
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from "./abstract.select.handler";
-import { DatabaseOptions } from "@klapeks/utils";
+import { DatabaseOptions, logger } from "@klapeks/utils";
 import { MySQLConnection } from "../sql";
 
 
@@ -8,7 +8,9 @@ export type MySQLSelectEntityHandlerOptions<
     T extends object, K extends string
 > = SelectEntityHandlerOptions<T, K> & {
     schemaTableName: string,
-    mysql: MySQLConnection
+    mysql: MySQLConnection,
+    beforeGetMany?: (options: SelectOptions<T>) => Promise<void> | void,
+    debugLogs?: boolean,
 }
 
 
@@ -37,17 +39,12 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
     }
     
     async rawSelect(options: SelectOptions<T>): Promise<{ objects: T[], total: number }> {
-        let where = [] as [string, any][];
+        if (this.options.beforeGetMany) {
+            await this.options.beforeGetMany(options);
+        }
+
         let orderBy = '';
         let limit = '';
-
-        // if (options.where) {
-        //     const W = options.where as any;
-        //     for (let key of Object.keys(W)) {
-        //         if (typeof W[key] == 'undefined' || W[key] === null) continue;
-        //         where.push([key, W[key]]);
-        //     }
-        // }
         if (this.options.orderBy) {
             orderBy = 'ORDER BY ';
             
@@ -77,17 +74,57 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
             }
         }
 
-        const whereCondition = where?.length ? ('WHERE ' + where.map(w => w[0] + ' = ?').join(' AND ')) : ''; // TODO
+        let _whereConditions = '';
+        let _whereArgs = [] as any[];
+        if (options.where) {
+            const multipleOrWheres = Array.isArray(options.where) ? options.where : [options.where];
+            for (let i = 0; i < multipleOrWheres.length; i++) {
+                let conditionPart = [] as string[];
+                const where = multipleOrWheres[i] as any;
+                let j = 0;
+
+                for (let key of Object.keys(where)) {
+                    if (typeof where[key] === 'undefined') continue;
+                    if (where[key] == null) {
+                        conditionPart.push(key + ' IS NULL');
+                        continue;
+                    }
+                    if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
+                        const strVal = (where[key] as string).substring(7).toLowerCase();
+                        conditionPart.push('LOWER('  + key + ') LIKE ?');
+                        _whereArgs.push(strVal);
+                        continue;
+                    }
+                    conditionPart.push(key + ' = ?');
+                    _whereArgs.push(where[key]);
+                }
+
+                if (!conditionPart?.length) continue;
+                if (i) _whereConditions += ' OR ';
+                _whereConditions += '(' + conditionPart.join(" AND ") + ')'; 
+            }
+        }
+        if (_whereConditions) {
+            if (this.options.mysql.isDebugLoggerEnabled || this.options.debugLogs) {
+                logger.log('RawMysql Where Query:', _whereConditions, '\n|\t Args:', JSON.stringify(_whereArgs));
+            }
+            _whereConditions = 'WHERE ' + _whereConditions;
+        }
+
+
+        // let where = [] as [string, any][];
+        // const whereCondition = where?.length ? ('WHERE ' + where.map(w => w[0] + ' = ?').join(' AND ')) : ''; // TODO
+       
         let result = await this.runSQL(`
             SELECT * FROM ${this.getTableName()}
-            ${whereCondition} ${orderBy} ${limit}
-        `, where.map(d => d[1]));
+            ${_whereConditions} ${orderBy} ${limit}
+        `, _whereArgs);
 
         const totalCount = await this.runSQL(`
             SELECT count(1) as 'count' 
             FROM ${this.getTableName()}
-            ${whereCondition}
-        `, where.map(d => d[1]));
+            ${_whereConditions}
+        `, _whereArgs);
 
         if (this.options.afterSelect) {
             result = await this.options.afterSelect(result, options);

@@ -5,6 +5,8 @@ import { MySQLConnection } from "../sql";
 export type MySQLSelectEntityHandlerOptions<T extends object, K extends string> = SelectEntityHandlerOptions<T, K> & {
     schemaTableName: string;
     mysql: MySQLConnection;
+    beforeGetMany?: (options: SelectOptions<T>) => Promise<void> | void;
+    debugLogs?: boolean;
 };
 export declare class MySQLSelectEntityHandler<T extends object, K extends string> extends AbstractSelectHandler<T, K, MySQLSelectEntityHandlerOptions<T, K>> {
     constructor(options: MySQLSelectEntityHandlerOptions<T, K>);

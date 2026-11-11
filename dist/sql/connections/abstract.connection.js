@@ -132,7 +132,7 @@ var AbstractSQLConnection = /** @class */ (function () {
     AbstractSQLConnection.prototype.debugQuery = function (query, params) {
         if (!this.isDebugLoggerEnabled)
             return;
-        utils_1.logger.log("Running SQL command for " + this.rawOptions.type + ":", utils_1.terminalColors.magenta + query, utils_1.terminalColors.reset, params ? ('\n| with params:') : '', params || '');
+        utils_1.logger.log(utils_1.terminalColors.cyan + "Running SQL command for " + this.rawOptions.type + ":", utils_1.terminalColors.magenta + query, utils_1.terminalColors.reset, params ? ('\n| with params:') : '', params || '');
     };
     return AbstractSQLConnection;
 }());

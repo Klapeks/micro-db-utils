@@ -53,6 +53,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MySQLSelectEntityHandler = void 0;
 var abstract_select_handler_1 = require("./abstract.select.handler");
+var utils_1 = require("@klapeks/utils");
 var MySQLSelectEntityHandler = /** @class */ (function (_super) {
     __extends(MySQLSelectEntityHandler, _super);
     function MySQLSelectEntityHandler(options) {
@@ -85,21 +86,19 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
     MySQLSelectEntityHandler.prototype.rawSelect = function (options) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var where, orderBy, limit, addOrderBy, i, whereCondition, result, totalCount;
+            var orderBy, limit, addOrderBy, i, _whereConditions, _whereArgs, multipleOrWheres, i, conditionPart, where, j, _i, _b, key, strVal, result, totalCount;
             var _this = this;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
-                        where = [];
+                        if (!this.options.beforeGetMany) return [3 /*break*/, 2];
+                        return [4 /*yield*/, this.options.beforeGetMany(options)];
+                    case 1:
+                        _c.sent();
+                        _c.label = 2;
+                    case 2:
                         orderBy = '';
                         limit = '';
-                        // if (options.where) {
-                        //     const W = options.where as any;
-                        //     for (let key of Object.keys(W)) {
-                        //         if (typeof W[key] == 'undefined' || W[key] === null) continue;
-                        //         where.push([key, W[key]]);
-                        //     }
-                        // }
                         if (this.options.orderBy) {
                             orderBy = 'ORDER BY ';
                             addOrderBy = function (field, _index) {
@@ -130,19 +129,56 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                                 limit += ' OFFSET ' + options.offset;
                             }
                         }
-                        whereCondition = (where === null || where === void 0 ? void 0 : where.length) ? ('WHERE ' + where.map(function (w) { return w[0] + ' = ?'; }).join(' AND ')) : '';
-                        return [4 /*yield*/, this.runSQL("\n            SELECT * FROM ".concat(this.getTableName(), "\n            ").concat(whereCondition, " ").concat(orderBy, " ").concat(limit, "\n        "), where.map(function (d) { return d[1]; }))];
-                    case 1:
-                        result = _b.sent();
-                        return [4 /*yield*/, this.runSQL("\n            SELECT count(1) as 'count' \n            FROM ".concat(this.getTableName(), "\n            ").concat(whereCondition, "\n        "), where.map(function (d) { return d[1]; }))];
-                    case 2:
-                        totalCount = _b.sent();
-                        if (!this.options.afterSelect) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.options.afterSelect(result, options)];
+                        _whereConditions = '';
+                        _whereArgs = [];
+                        if (options.where) {
+                            multipleOrWheres = Array.isArray(options.where) ? options.where : [options.where];
+                            for (i = 0; i < multipleOrWheres.length; i++) {
+                                conditionPart = [];
+                                where = multipleOrWheres[i];
+                                j = 0;
+                                for (_i = 0, _b = Object.keys(where); _i < _b.length; _i++) {
+                                    key = _b[_i];
+                                    if (typeof where[key] === 'undefined')
+                                        continue;
+                                    if (where[key] == null) {
+                                        conditionPart.push(key + ' IS NULL');
+                                        continue;
+                                    }
+                                    if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
+                                        strVal = where[key].substring(7).toLowerCase();
+                                        conditionPart.push('LOWER(' + key + ') LIKE ?');
+                                        _whereArgs.push(strVal);
+                                        continue;
+                                    }
+                                    conditionPart.push(key + ' = ?');
+                                    _whereArgs.push(where[key]);
+                                }
+                                if (!(conditionPart === null || conditionPart === void 0 ? void 0 : conditionPart.length))
+                                    continue;
+                                if (i)
+                                    _whereConditions += ' OR ';
+                                _whereConditions += '(' + conditionPart.join(" AND ") + ')';
+                            }
+                        }
+                        if (_whereConditions) {
+                            if (this.options.mysql.isDebugLoggerEnabled || this.options.debugLogs) {
+                                utils_1.logger.log('RawMysql Where Query:', _whereConditions, '\n|\t Args:', JSON.stringify(_whereArgs));
+                            }
+                            _whereConditions = 'WHERE ' + _whereConditions;
+                        }
+                        return [4 /*yield*/, this.runSQL("\n            SELECT * FROM ".concat(this.getTableName(), "\n            ").concat(_whereConditions, " ").concat(orderBy, " ").concat(limit, "\n        "), _whereArgs)];
                     case 3:
-                        result = _b.sent();
-                        _b.label = 4;
-                    case 4: return [2 /*return*/, { objects: result, total: ((_a = totalCount === null || totalCount === void 0 ? void 0 : totalCount[0]) === null || _a === void 0 ? void 0 : _a.count) || NaN }];
+                        result = _c.sent();
+                        return [4 /*yield*/, this.runSQL("\n            SELECT count(1) as 'count' \n            FROM ".concat(this.getTableName(), "\n            ").concat(_whereConditions, "\n        "), _whereArgs)];
+                    case 4:
+                        totalCount = _c.sent();
+                        if (!this.options.afterSelect) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.options.afterSelect(result, options)];
+                    case 5:
+                        result = _c.sent();
+                        _c.label = 6;
+                    case 6: return [2 /*return*/, { objects: result, total: ((_a = totalCount === null || totalCount === void 0 ? void 0 : totalCount[0]) === null || _a === void 0 ? void 0 : _a.count) || NaN }];
                 }
             });
         });
