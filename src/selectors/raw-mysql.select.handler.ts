@@ -9,6 +9,7 @@ export type MySQLSelectEntityHandlerOptions<
 > = SelectEntityHandlerOptions<T, K> & {
     schemaTableName: string,
     mysql: MySQLConnection,
+    leftJoin?: string | string[],
     beforeGetMany?: (options: SelectOptions<T>) => Promise<void> | void,
     debugLogs?: boolean,
 }
@@ -41,6 +42,16 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
     async rawSelect(options: SelectOptions<T>): Promise<{ objects: T[], total: number }> {
         if (this.options.beforeGetMany) {
             await this.options.beforeGetMany(options);
+        }
+
+        let leftJoinQuery = '';
+        if (this.options.leftJoin?.length) {
+            if (!Array.isArray(this.options.leftJoin)) {
+                this.options.leftJoin = [this.options.leftJoin];
+            }
+            for (let j of this.options.leftJoin) {
+                leftJoinQuery += ' LEFT JOIN ' + j;
+            }
         }
 
         let orderBy = '';
@@ -117,7 +128,8 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
        
         let result = await this.runSQL(`
             SELECT * FROM ${this.getTableName()}
-            ${_whereConditions} ${orderBy} ${limit}
+            ${leftJoinQuery} ${_whereConditions}
+            ${orderBy} ${limit}
         `, _whereArgs);
 
         const totalCount = await this.runSQL(`

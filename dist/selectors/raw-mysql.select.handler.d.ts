@@ -5,6 +5,7 @@ import { MySQLConnection } from "../sql";
 export type MySQLSelectEntityHandlerOptions<T extends object, K extends string> = SelectEntityHandlerOptions<T, K> & {
     schemaTableName: string;
     mysql: MySQLConnection;
+    leftJoin?: string | string[];
     beforeGetMany?: (options: SelectOptions<T>) => Promise<void> | void;
     debugLogs?: boolean;
 };

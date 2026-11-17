@@ -84,19 +84,29 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
         });
     };
     MySQLSelectEntityHandler.prototype.rawSelect = function (options) {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
-            var orderBy, limit, addOrderBy, i, _whereConditions, _whereArgs, multipleOrWheres, i, conditionPart, where, j, _i, _b, key, strVal, result, totalCount;
+            var leftJoinQuery, _i, _c, j, orderBy, limit, addOrderBy, i, _whereConditions, _whereArgs, multipleOrWheres, i, conditionPart, where, j, _d, _e, key, strVal, result, totalCount;
             var _this = this;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            return __generator(this, function (_f) {
+                switch (_f.label) {
                     case 0:
                         if (!this.options.beforeGetMany) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.options.beforeGetMany(options)];
                     case 1:
-                        _c.sent();
-                        _c.label = 2;
+                        _f.sent();
+                        _f.label = 2;
                     case 2:
+                        leftJoinQuery = '';
+                        if ((_a = this.options.leftJoin) === null || _a === void 0 ? void 0 : _a.length) {
+                            if (!Array.isArray(this.options.leftJoin)) {
+                                this.options.leftJoin = [this.options.leftJoin];
+                            }
+                            for (_i = 0, _c = this.options.leftJoin; _i < _c.length; _i++) {
+                                j = _c[_i];
+                                leftJoinQuery += ' LEFT JOIN ' + j;
+                            }
+                        }
                         orderBy = '';
                         limit = '';
                         if (this.options.orderBy) {
@@ -137,8 +147,8 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                                 conditionPart = [];
                                 where = multipleOrWheres[i];
                                 j = 0;
-                                for (_i = 0, _b = Object.keys(where); _i < _b.length; _i++) {
-                                    key = _b[_i];
+                                for (_d = 0, _e = Object.keys(where); _d < _e.length; _d++) {
+                                    key = _e[_d];
                                     if (typeof where[key] === 'undefined')
                                         continue;
                                     if (where[key] == null) {
@@ -167,18 +177,18 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                             }
                             _whereConditions = 'WHERE ' + _whereConditions;
                         }
-                        return [4 /*yield*/, this.runSQL("\n            SELECT * FROM ".concat(this.getTableName(), "\n            ").concat(_whereConditions, " ").concat(orderBy, " ").concat(limit, "\n        "), _whereArgs)];
+                        return [4 /*yield*/, this.runSQL("\n            SELECT * FROM ".concat(this.getTableName(), "\n            ").concat(leftJoinQuery, " ").concat(_whereConditions, "\n            ").concat(orderBy, " ").concat(limit, "\n        "), _whereArgs)];
                     case 3:
-                        result = _c.sent();
+                        result = _f.sent();
                         return [4 /*yield*/, this.runSQL("\n            SELECT count(1) as 'count' \n            FROM ".concat(this.getTableName(), "\n            ").concat(_whereConditions, "\n        "), _whereArgs)];
                     case 4:
-                        totalCount = _c.sent();
+                        totalCount = _f.sent();
                         if (!this.options.afterSelect) return [3 /*break*/, 6];
                         return [4 /*yield*/, this.options.afterSelect(result, options)];
                     case 5:
-                        result = _c.sent();
-                        _c.label = 6;
-                    case 6: return [2 /*return*/, { objects: result, total: ((_a = totalCount === null || totalCount === void 0 ? void 0 : totalCount[0]) === null || _a === void 0 ? void 0 : _a.count) || NaN }];
+                        result = _f.sent();
+                        _f.label = 6;
+                    case 6: return [2 /*return*/, { objects: result, total: ((_b = totalCount === null || totalCount === void 0 ? void 0 : totalCount[0]) === null || _b === void 0 ? void 0 : _b.count) || NaN }];
                 }
             });
         });
