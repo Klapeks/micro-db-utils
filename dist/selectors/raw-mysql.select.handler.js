@@ -84,33 +84,28 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
         });
     };
     MySQLSelectEntityHandler.prototype.rawSelect = function (options) {
-        var _a, _b;
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var leftJoinQuery, _i, _c, j, orderBy, limit, addOrderBy, i, _whereConditions, _whereArgs, multipleOrWheres, i, conditionPart, where, j, _d, _e, key, strVal, result, totalCount;
+            var queryBuilder, addOrderBy, i, multipleOrWheres, i, conditionPart, where, j, _i, _b, key, strVal, limitQuery, result, totalCount;
             var _this = this;
-            return __generator(this, function (_f) {
-                switch (_f.label) {
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
+                        queryBuilder = {
+                            select: "*",
+                            leftJoin: "",
+                            whereCondition: "",
+                            whereArgs: [],
+                            orderBy: "",
+                        };
                         if (!this.options.beforeGetMany) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.options.beforeGetMany(options)];
+                        return [4 /*yield*/, this.options.beforeGetMany(queryBuilder, options)];
                     case 1:
-                        _f.sent();
-                        _f.label = 2;
+                        _c.sent();
+                        _c.label = 2;
                     case 2:
-                        leftJoinQuery = '';
-                        if ((_a = this.options.leftJoin) === null || _a === void 0 ? void 0 : _a.length) {
-                            if (!Array.isArray(this.options.leftJoin)) {
-                                this.options.leftJoin = [this.options.leftJoin];
-                            }
-                            for (_i = 0, _c = this.options.leftJoin; _i < _c.length; _i++) {
-                                j = _c[_i];
-                                leftJoinQuery += ' LEFT JOIN ' + j;
-                            }
-                        }
-                        orderBy = '';
-                        limit = '';
+                        // orderBy
                         if (this.options.orderBy) {
-                            orderBy = 'ORDER BY ';
                             addOrderBy = function (field, _index) {
                                 if (_index === void 0) { _index = 0; }
                                 var orderType = 'ASC';
@@ -120,12 +115,14 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                                 else {
                                     orderType = _this.options.orderType || 'ASC';
                                 }
-                                orderBy += field + ' ' + orderType.toUpperCase();
+                                if (!queryBuilder.orderBy)
+                                    queryBuilder.orderBy = '';
+                                queryBuilder.orderBy += field + ' ' + orderType.toUpperCase();
                             };
                             if (Array.isArray(this.options.orderBy)) {
                                 for (i = 0; i < this.options.orderBy.length; i++) {
-                                    if (i)
-                                        orderBy += ', ';
+                                    if (queryBuilder.orderBy)
+                                        queryBuilder.orderBy += ', ';
                                     addOrderBy(this.options.orderBy[i], i);
                                 }
                             }
@@ -133,22 +130,23 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                                 addOrderBy(this.options.orderBy, 0);
                             }
                         }
-                        if (options.limit) {
-                            limit = 'LIMIT ' + options.limit;
-                            if (options.offset) {
-                                limit += ' OFFSET ' + options.offset;
-                            }
-                        }
-                        _whereConditions = '';
-                        _whereArgs = [];
+                        // where
                         if (options.where) {
+                            if (!queryBuilder.whereArgs)
+                                queryBuilder.whereArgs = [];
                             multipleOrWheres = Array.isArray(options.where) ? options.where : [options.where];
+                            if (queryBuilder.whereCondition) {
+                                if (queryBuilder.whereCondition.toLowerCase().startsWith('where ')) {
+                                    queryBuilder.whereCondition = queryBuilder.whereCondition.substring(6);
+                                }
+                                queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
+                            }
                             for (i = 0; i < multipleOrWheres.length; i++) {
                                 conditionPart = [];
                                 where = multipleOrWheres[i];
                                 j = 0;
-                                for (_d = 0, _e = Object.keys(where); _d < _e.length; _d++) {
-                                    key = _e[_d];
+                                for (_i = 0, _b = Object.keys(where); _i < _b.length; _i++) {
+                                    key = _b[_i];
                                     if (typeof where[key] === 'undefined')
                                         continue;
                                     if (where[key] == null) {
@@ -158,37 +156,64 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                                     if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
                                         strVal = where[key].substring(7).toLowerCase();
                                         conditionPart.push('LOWER(' + key + ') LIKE ?');
-                                        _whereArgs.push(strVal);
+                                        queryBuilder.whereArgs.push(strVal);
                                         continue;
                                     }
                                     conditionPart.push(key + ' = ?');
-                                    _whereArgs.push(where[key]);
+                                    queryBuilder.whereArgs.push(where[key]);
                                 }
                                 if (!(conditionPart === null || conditionPart === void 0 ? void 0 : conditionPart.length))
                                     continue;
-                                if (i)
-                                    _whereConditions += ' OR ';
-                                _whereConditions += '(' + conditionPart.join(" AND ") + ')';
+                                if (!queryBuilder.whereCondition)
+                                    queryBuilder.whereCondition = '';
+                                else
+                                    queryBuilder.whereCondition += ' OR ';
+                                queryBuilder.whereCondition += '(' + conditionPart.join(" AND ") + ')';
+                            }
+                            if (queryBuilder.whereCondition) {
+                                queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
                             }
                         }
-                        if (_whereConditions) {
+                        // fixes
+                        if (queryBuilder.whereCondition) {
+                            if (!queryBuilder.whereCondition.toLowerCase().startsWith('where ')) {
+                                queryBuilder.whereCondition = 'WHERE ' + queryBuilder.whereCondition;
+                            }
                             if (this.options.mysql.isDebugLoggerEnabled || this.options.debugLogs) {
-                                utils_1.logger.log('RawMysql Where Query:', _whereConditions, '\n|\t Args:', JSON.stringify(_whereArgs));
+                                utils_1.logger.log('RawMysql Where Query:', queryBuilder.whereCondition, '\n|\t Args:', JSON.stringify(queryBuilder.whereArgs));
                             }
-                            _whereConditions = 'WHERE ' + _whereConditions;
                         }
-                        return [4 /*yield*/, this.runSQL("\n            SELECT * FROM ".concat(this.getTableName(), "\n            ").concat(leftJoinQuery, " ").concat(_whereConditions, "\n            ").concat(orderBy, " ").concat(limit, "\n        "), _whereArgs)];
+                        if (queryBuilder.leftJoin) {
+                            if (!queryBuilder.leftJoin.toLowerCase().startsWith('left join ')) {
+                                queryBuilder.leftJoin = 'LEFT JOIN ' + queryBuilder.leftJoin;
+                            }
+                        }
+                        limitQuery = '';
+                        if (options.limit) {
+                            limitQuery = 'LIMIT ' + options.limit;
+                            if (options.offset) {
+                                limitQuery += ' OFFSET ' + options.offset;
+                            }
+                        }
+                        return [4 /*yield*/, this.runSQL([
+                                'SELECT ' + (queryBuilder.select || '*'),
+                                'FROM ' + this.getTableName(),
+                                queryBuilder.leftJoin,
+                                queryBuilder.whereCondition,
+                                queryBuilder.orderBy,
+                                limitQuery
+                            ].filter(Boolean).join('\n'), queryBuilder.whereArgs)];
                     case 3:
-                        result = _f.sent();
-                        return [4 /*yield*/, this.runSQL("\n            SELECT count(1) as 'count' \n            FROM ".concat(this.getTableName(), "\n            ").concat(_whereConditions, "\n        "), _whereArgs)];
+                        result = _c.sent();
+                        return [4 /*yield*/, this.runSQL("\n            SELECT count(1) as 'count' \n            FROM ".concat(this.getTableName(), "\n            ").concat(queryBuilder.whereCondition, "\n        "), queryBuilder.whereArgs)];
                     case 4:
-                        totalCount = _f.sent();
+                        totalCount = _c.sent();
                         if (!this.options.afterSelect) return [3 /*break*/, 6];
                         return [4 /*yield*/, this.options.afterSelect(result, options)];
                     case 5:
-                        result = _f.sent();
-                        _f.label = 6;
-                    case 6: return [2 /*return*/, { objects: result, total: ((_b = totalCount === null || totalCount === void 0 ? void 0 : totalCount[0]) === null || _b === void 0 ? void 0 : _b.count) || NaN }];
+                        result = _c.sent();
+                        _c.label = 6;
+                    case 6: return [2 /*return*/, { objects: result, total: ((_a = totalCount === null || totalCount === void 0 ? void 0 : totalCount[0]) === null || _a === void 0 ? void 0 : _a.count) || NaN }];
                 }
             });
         });

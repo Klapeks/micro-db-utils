@@ -5,10 +5,16 @@ import { MySQLConnection } from "../sql";
 export type MySQLSelectEntityHandlerOptions<T extends object, K extends string> = SelectEntityHandlerOptions<T, K> & {
     schemaTableName: string;
     mysql: MySQLConnection;
-    leftJoin?: string | string[];
-    beforeGetMany?: (options: SelectOptions<T>) => Promise<void> | void;
+    beforeGetMany?: (builder: MySQLSelectEntityQueryBuilder, options: SelectOptions<T>) => Promise<void> | void;
     debugLogs?: boolean;
 };
+export interface MySQLSelectEntityQueryBuilder {
+    select?: string;
+    leftJoin?: string;
+    whereCondition?: string;
+    whereArgs?: any[];
+    orderBy?: string;
+}
 export declare class MySQLSelectEntityHandler<T extends object, K extends string> extends AbstractSelectHandler<T, K, MySQLSelectEntityHandlerOptions<T, K>> {
     constructor(options: MySQLSelectEntityHandlerOptions<T, K>);
     getDatabaseType(): DatabaseOptions['type'];

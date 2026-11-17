@@ -9,9 +9,19 @@ export type MySQLSelectEntityHandlerOptions<
 > = SelectEntityHandlerOptions<T, K> & {
     schemaTableName: string,
     mysql: MySQLConnection,
-    leftJoin?: string | string[],
-    beforeGetMany?: (options: SelectOptions<T>) => Promise<void> | void,
+    beforeGetMany?: (
+        builder: MySQLSelectEntityQueryBuilder, 
+        options: SelectOptions<T>
+    ) => Promise<void> | void,
     debugLogs?: boolean,
+}
+
+export interface MySQLSelectEntityQueryBuilder {
+    select?: string,
+    leftJoin?: string,
+    whereCondition?: string,
+    whereArgs?: any[],
+    orderBy?: string,
 }
 
 
@@ -40,26 +50,22 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
     }
     
     async rawSelect(options: SelectOptions<T>): Promise<{ objects: T[], total: number }> {
+        const queryBuilder: MySQLSelectEntityQueryBuilder = {
+            select: "*",
+            leftJoin: "",
+            whereCondition: "",
+            whereArgs: [],
+            orderBy: "",
+        };
+
+        // before get many
         if (this.options.beforeGetMany) {
-            await this.options.beforeGetMany(options);
+            await this.options.beforeGetMany(queryBuilder, options);
         }
 
-        let leftJoinQuery = '';
-        if (this.options.leftJoin?.length) {
-            if (!Array.isArray(this.options.leftJoin)) {
-                this.options.leftJoin = [this.options.leftJoin];
-            }
-            for (let j of this.options.leftJoin) {
-                leftJoinQuery += ' LEFT JOIN ' + j;
-            }
-        }
-
-        let orderBy = '';
-        let limit = '';
+        // orderBy
         if (this.options.orderBy) {
-            orderBy = 'ORDER BY ';
-            
-            // multiple order // TODO TEST SOMEHOW
+            // multiple order
             const addOrderBy = (field: string, _index = 0) => {
                 let orderType = 'ASC';
                 if (Array.isArray(this.options.orderType)) {
@@ -67,28 +73,29 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
                 } else {
                     orderType = this.options.orderType || 'ASC';
                 }
-                orderBy += field + ' ' + orderType.toUpperCase();
+                if (!queryBuilder.orderBy) queryBuilder.orderBy = '';
+                queryBuilder.orderBy += field + ' ' + orderType.toUpperCase();
             }
             if (Array.isArray(this.options.orderBy)) {
                 for (let i = 0; i < this.options.orderBy.length; i++) {
-                    if (i) orderBy += ', ';
+                    if (queryBuilder.orderBy) queryBuilder.orderBy += ', ';
                     addOrderBy(this.options.orderBy[i] as any, i);
                 }
             } else {
                 addOrderBy(this.options.orderBy as any, 0);
             }
         }
-        if (options.limit) {
-            limit = 'LIMIT '  + options.limit;
-            if (options.offset) {
-                limit += ' OFFSET ' + options.offset;
-            }
-        }
 
-        let _whereConditions = '';
-        let _whereArgs = [] as any[];
+        // where
         if (options.where) {
+            if (!queryBuilder.whereArgs) queryBuilder.whereArgs = [];
             const multipleOrWheres = Array.isArray(options.where) ? options.where : [options.where];
+            if (queryBuilder.whereCondition) {
+                if (queryBuilder.whereCondition.toLowerCase().startsWith('where ')) {
+                    queryBuilder.whereCondition = queryBuilder.whereCondition.substring(6);
+                }
+                queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
+            }
             for (let i = 0; i < multipleOrWheres.length; i++) {
                 let conditionPart = [] as string[];
                 const where = multipleOrWheres[i] as any;
@@ -103,40 +110,64 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
                     if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
                         const strVal = (where[key] as string).substring(7).toLowerCase();
                         conditionPart.push('LOWER('  + key + ') LIKE ?');
-                        _whereArgs.push(strVal);
+                        queryBuilder.whereArgs.push(strVal);
                         continue;
                     }
                     conditionPart.push(key + ' = ?');
-                    _whereArgs.push(where[key]);
+                    queryBuilder.whereArgs.push(where[key]);
                 }
 
                 if (!conditionPart?.length) continue;
-                if (i) _whereConditions += ' OR ';
-                _whereConditions += '(' + conditionPart.join(" AND ") + ')'; 
+                if (!queryBuilder.whereCondition) queryBuilder.whereCondition = '';
+                else queryBuilder.whereCondition += ' OR ';
+                queryBuilder.whereCondition += '(' + conditionPart.join(" AND ") + ')'; 
+            }
+            if (queryBuilder.whereCondition) {
+                queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
             }
         }
-        if (_whereConditions) {
+
+        // fixes
+        if (queryBuilder.whereCondition) {
+            if (!queryBuilder.whereCondition.toLowerCase().startsWith('where ')) {
+                queryBuilder.whereCondition = 'WHERE ' + queryBuilder.whereCondition;
+            }
             if (this.options.mysql.isDebugLoggerEnabled || this.options.debugLogs) {
-                logger.log('RawMysql Where Query:', _whereConditions, '\n|\t Args:', JSON.stringify(_whereArgs));
+                logger.log('RawMysql Where Query:', queryBuilder.whereCondition, 
+                    '\n|\t Args:', JSON.stringify(queryBuilder.whereArgs));
             }
-            _whereConditions = 'WHERE ' + _whereConditions;
+        }
+        if (queryBuilder.leftJoin) {
+            if (!queryBuilder.leftJoin.toLowerCase().startsWith('left join ')) {
+                queryBuilder.leftJoin = 'LEFT JOIN ' + queryBuilder.leftJoin;
+            }
         }
 
-
-        // let where = [] as [string, any][];
-        // const whereCondition = where?.length ? ('WHERE ' + where.map(w => w[0] + ' = ?').join(' AND ')) : ''; // TODO
-       
-        let result = await this.runSQL(`
-            SELECT * FROM ${this.getTableName()}
-            ${leftJoinQuery} ${_whereConditions}
-            ${orderBy} ${limit}
-        `, _whereArgs);
+        // limit
+        let limitQuery = '';
+        if (options.limit) {
+            limitQuery = 'LIMIT '  + options.limit;
+            if (options.offset) {
+                limitQuery += ' OFFSET ' + options.offset;
+            }
+        }
+        
+        let result = await this.runSQL([
+            'SELECT ' + (queryBuilder.select || '*'),
+            'FROM ' + this.getTableName(),
+            queryBuilder.leftJoin,
+            queryBuilder.whereCondition,
+            queryBuilder.orderBy, 
+            limitQuery
+        ].filter(Boolean).join('\n'), 
+            queryBuilder.whereArgs
+        );
 
         const totalCount = await this.runSQL(`
             SELECT count(1) as 'count' 
             FROM ${this.getTableName()}
-            ${_whereConditions}
-        `, _whereArgs);
+            ${queryBuilder.whereCondition}
+        `, queryBuilder.whereArgs);
 
         if (this.options.afterSelect) {
             result = await this.options.afterSelect(result, options);
