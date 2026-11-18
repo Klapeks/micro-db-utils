@@ -205,7 +205,13 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                             ].filter(Boolean).join('\n'), queryBuilder.whereArgs)];
                     case 3:
                         result = _c.sent();
-                        return [4 /*yield*/, this.runSQL("\n            SELECT count(1) as 'count' \n            FROM ".concat(this.getTableName(), "\n            ").concat(queryBuilder.whereCondition, "\n        "), queryBuilder.whereArgs)];
+                        return [4 /*yield*/, this.runSQL([
+                                "SELECT count(1) as 'count'",
+                                'FROM ' + this.getTableName(),
+                                queryBuilder.leftJoinInCountToo
+                                    ? queryBuilder.leftJoin : '',
+                                queryBuilder.whereCondition,
+                            ].filter(Boolean).join('\n'), queryBuilder.whereArgs)];
                     case 4:
                         totalCount = _c.sent();
                         if (!this.options.afterSelect) return [3 /*break*/, 6];

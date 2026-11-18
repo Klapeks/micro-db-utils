@@ -19,6 +19,7 @@ export type MySQLSelectEntityHandlerOptions<
 export interface MySQLSelectEntityQueryBuilder {
     select?: string,
     leftJoin?: string,
+    leftJoinInCountToo?: boolean,
     whereCondition?: string,
     whereArgs?: any[],
     orderBy?: string,
@@ -163,11 +164,15 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
             queryBuilder.whereArgs
         );
 
-        const totalCount = await this.runSQL(`
-            SELECT count(1) as 'count' 
-            FROM ${this.getTableName()}
-            ${queryBuilder.whereCondition}
-        `, queryBuilder.whereArgs);
+        const totalCount = await this.runSQL([
+            `SELECT count(1) as 'count'`,
+            'FROM ' + this.getTableName(),
+            queryBuilder.leftJoinInCountToo 
+                ? queryBuilder.leftJoin : '',
+            queryBuilder.whereCondition,
+        ].filter(Boolean).join('\n'), 
+            queryBuilder.whereArgs
+        );
 
         if (this.options.afterSelect) {
             result = await this.options.afterSelect(result, options);

@@ -11,6 +11,7 @@ export type MySQLSelectEntityHandlerOptions<T extends object, K extends string> 
 export interface MySQLSelectEntityQueryBuilder {
     select?: string;
     leftJoin?: string;
+    leftJoinInCountToo?: boolean;
     whereCondition?: string;
     whereArgs?: any[];
     orderBy?: string;
