@@ -1,4 +1,4 @@
-import { type SelectOptions } from "@klapeks/api-creation-tools";
+import { SelectOptionsWhere, type SelectOptions } from "@klapeks/api-creation-tools";
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from "./abstract.select.handler";
 import { DatabaseOptions, logger } from "@klapeks/utils";
 import { MySQLConnection } from "../sql";
@@ -23,6 +23,66 @@ export interface MySQLSelectEntityQueryBuilder {
     whereCondition?: string,
     whereArgs?: any[],
     orderBy?: string,
+}
+
+
+const parseWhereOnWhereBuilder = (
+    // whereString: string,
+    multipleOrWheres: SelectOptionsWhere<any>[],
+    globalWhereArgs: any[],
+): string => {
+    if (!multipleOrWheres) return '0';
+    if (!Array.isArray(multipleOrWheres)) throw "multipleOrWheres arg is not array";
+
+    let whereString = '';
+
+    // if (!queryBuilder.whereCondition) queryBuilder.whereCondition = '';
+    // if (!queryBuilder.whereArgs) queryBuilder.whereArgs = [];
+
+    // const multipleOrWheres = Array.isArray(options.where) ? options.where : [options.where];
+    
+    for (let i = 0; i < multipleOrWheres.length; i++) {
+        const where = multipleOrWheres[i] as any;
+
+        // and inside (...and...)
+        // let conditionPart = [] as string[];
+        if (whereString) whereString += ' OR ';
+        whereString += '(';
+
+        for (let key of Object.keys(where)) {
+            if (typeof where[key] === 'undefined') continue;
+            if (key === '$and') {
+                whereString += ' AND ' + parseWhereOnWhereBuilder(
+                    where[key] as any, globalWhereArgs);
+                continue;
+            }
+            if (key === '$or') {
+                whereString += ' OR ' + parseWhereOnWhereBuilder(
+                    where[key] as any, globalWhereArgs);
+                continue;
+            }
+            if (where[key] == null) {
+                whereString += key + ' IS NULL';
+                // conditionPart.push(key + ' IS NULL');
+                continue;
+            }
+            if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
+                const strVal = (where[key] as string).substring(7).toLowerCase();
+                whereString += 'LOWER('  + key + ') LIKE ?';
+                // conditionPart.push('LOWER('  + key + ') LIKE ?');
+                globalWhereArgs.push(strVal);
+                continue;
+            }
+            whereString += key + ' = ?';
+            // conditionPart.push(key + ' = ?');
+            globalWhereArgs.push(where[key]);
+        }
+        if (whereString.startsWith('(')) {
+            whereString += '0';
+        }
+        whereString += ')';
+    }
+    return '(' + whereString + ')';
 }
 
 
@@ -89,43 +149,19 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
 
         // where
         if (options.where) {
-            if (!queryBuilder.whereArgs) queryBuilder.whereArgs = [];
-            const multipleOrWheres = Array.isArray(options.where) ? options.where : [options.where];
+            const multipleWheres = Array.isArray(options.where) ? options.where : [options.where];
             if (queryBuilder.whereCondition) {
                 if (queryBuilder.whereCondition.toLowerCase().startsWith('where ')) {
                     queryBuilder.whereCondition = queryBuilder.whereCondition.substring(6);
                 }
                 queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
             }
-            for (let i = 0; i < multipleOrWheres.length; i++) {
-                let conditionPart = [] as string[];
-                const where = multipleOrWheres[i] as any;
-                let j = 0;
-
-                for (let key of Object.keys(where)) {
-                    if (typeof where[key] === 'undefined') continue;
-                    if (where[key] == null) {
-                        conditionPart.push(key + ' IS NULL');
-                        continue;
-                    }
-                    if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
-                        const strVal = (where[key] as string).substring(7).toLowerCase();
-                        conditionPart.push('LOWER('  + key + ') LIKE ?');
-                        queryBuilder.whereArgs.push(strVal);
-                        continue;
-                    }
-                    conditionPart.push(key + ' = ?');
-                    queryBuilder.whereArgs.push(where[key]);
-                }
-
-                if (!conditionPart?.length) continue;
-                if (!queryBuilder.whereCondition) queryBuilder.whereCondition = '';
-                else queryBuilder.whereCondition += ' OR ';
-                queryBuilder.whereCondition += '(' + conditionPart.join(" AND ") + ')'; 
-            }
             if (queryBuilder.whereCondition) {
-                queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
+                queryBuilder.whereCondition += ' OR ';
             }
+            if (!queryBuilder.whereArgs) queryBuilder.whereArgs = [];
+            queryBuilder.whereCondition += parseWhereOnWhereBuilder(
+                    multipleWheres, queryBuilder.whereArgs);
         }
 
         // fixes

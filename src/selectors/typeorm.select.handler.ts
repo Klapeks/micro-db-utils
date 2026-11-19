@@ -1,6 +1,6 @@
-import { Brackets, DataSource, EntitySchema, ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import { Brackets, DataSource, EntitySchema, ObjectLiteral, SelectQueryBuilder, WhereExpressionBuilder } from 'typeorm';
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from './abstract.select.handler';
-import { type SelectOptions } from '@klapeks/api-creation-tools';
+import { SelectOptionsWhere, type SelectOptions } from '@klapeks/api-creation-tools';
 import { DatabaseOptions } from '@klapeks/utils';
 
 
@@ -11,6 +11,53 @@ export type TypeormSelectEntityHandlerOptions<
     dataSource: DataSource,
     typeormHydrateValue?: boolean,
     beforeGetMany?: (builder: SelectQueryBuilder<T>, options: SelectOptions<T>) => Promise<void> | void
+}
+
+
+const parseWhereOnWhereBuilder = (
+    qbOr1: WhereExpressionBuilder, 
+    multipleWheres: SelectOptionsWhere<any>[]
+) => {
+    if (!multipleWheres) return;
+    if (!Array.isArray(multipleWheres)) throw "multipleWheres arg is not array";
+    for (let i = 0; i < multipleWheres.length; i++) {
+        const where = multipleWheres[i];
+        qbOr1 = qbOr1.orWhere(new Brackets(qbAnd2 => {
+            for (let key of Object.keys(where)) {
+                if (typeof where[key] === 'undefined') continue;
+                if (key === '$and') {
+                    qbAnd2.andWhere(new Brackets(qbOr3 => {
+                        parseWhereOnWhereBuilder(qbOr3, where[key] as any);
+                    }));
+                    continue;
+                }
+                if (key === '$or') {
+                    qbAnd2.orWhere(new Brackets(qbOr3 => {
+                        parseWhereOnWhereBuilder(qbOr3, where[key] as any);
+                    }));
+                    continue;
+                }
+                if (where[key] == null) {
+                    qbAnd2 = qbAnd2.andWhere(key + ' IS NULL');
+                    continue;
+                }
+                
+                const placeholderKey = key + "_" + i;
+                if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
+                    const strVal = (where[key] as string).substring(7).toLowerCase();
+                    qbAnd2 = qbAnd2.andWhere(
+                        'LOWER('  + key + ') LIKE :' + placeholderKey, 
+                        { [placeholderKey]: strVal }
+                    );
+                    continue;
+                }
+                qbAnd2 = qbAnd2.andWhere(
+                    key + ' = :' + placeholderKey, 
+                    { [placeholderKey]: where[key] }
+                );
+            }
+        }))
+    }
 }
 
 export class SelectEntityHandler<T extends ObjectLiteral, K extends string> 
@@ -63,26 +110,7 @@ export class SelectEntityHandler<T extends ObjectLiteral, K extends string>
         if (options.where) {
             const multipleWheres = Array.isArray(options.where) ? options.where : [options.where];
             builder.andWhere(new Brackets((qb1) => {
-                // qb1 = qb1.where('0 = 1');
-                for (let i = 0; i < multipleWheres.length; i++) {
-                    const where = multipleWheres[i];
-                    qb1 = qb1.orWhere(new Brackets(qb2 => {
-                        for (let key of Object.keys(where)) {
-                            const placeholderKey = key + "_" + i;
-                            if (typeof where[key] === 'undefined') continue;
-                            if (where[key] == null) {
-                                qb2 = qb2.andWhere(key + ' IS NULL');
-                                continue;
-                            }
-                            if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
-                                const strVal = (where[key] as string).substring(7).toLowerCase();
-                                qb2 = qb2.andWhere('LOWER('  + key + ') LIKE :' + placeholderKey, { [placeholderKey]: strVal });
-                                continue;
-                            }
-                            qb2 = qb2.andWhere(key + ' = :' + placeholderKey, { [placeholderKey]: where[key] });
-                        }
-                    }))
-                }
+                parseWhereOnWhereBuilder(qb1, multipleWheres);
             }));
         }
 
