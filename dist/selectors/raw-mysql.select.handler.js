@@ -86,7 +86,7 @@ multipleOrWheres, globalWhereArgs, type) {
                 var resultQuery = parseWhereOnWhereBuilder(where[key], globalWhereArgs, "or");
                 if (!resultQuery)
                     continue;
-                if (!whereString.startsWith('('))
+                if (!whereString.endsWith('('))
                     whereString += ' OR ';
                 whereString += resultQuery;
                 continue;
@@ -95,12 +95,12 @@ multipleOrWheres, globalWhereArgs, type) {
                 var resultQuery = parseWhereOnWhereBuilder(where[key], globalWhereArgs, "and");
                 if (!resultQuery)
                     continue;
-                if (!whereString.startsWith('('))
+                if (!whereString.endsWith('('))
                     whereString += ' AND ';
                 whereString += resultQuery;
                 continue;
             }
-            if (!whereString.startsWith('('))
+            if (!whereString.endsWith('('))
                 whereString += ' AND ';
             if (where[key] === null) {
                 whereString += key + ' IS NULL';
@@ -129,7 +129,7 @@ multipleOrWheres, globalWhereArgs, type) {
             // conditionPart.push(key + ' = ?');
             globalWhereArgs.push(where[key]);
         }
-        if (whereString.startsWith('(')) {
+        if (whereString.endsWith('(')) {
             if (whereString.length === 1) {
                 whereString = '';
                 continue;

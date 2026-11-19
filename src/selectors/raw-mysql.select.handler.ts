@@ -60,7 +60,7 @@ const parseWhereOnWhereBuilder = (
                 const resultQuery = parseWhereOnWhereBuilder(
                     where[key] as any, globalWhereArgs, "or");
                 if (!resultQuery) continue;
-                if (!whereString.startsWith('(')) whereString += ' OR ';
+                if (!whereString.endsWith('(')) whereString += ' OR ';
                 whereString += resultQuery;
                 continue;
             }
@@ -68,11 +68,11 @@ const parseWhereOnWhereBuilder = (
                 const resultQuery = parseWhereOnWhereBuilder(
                     where[key] as any, globalWhereArgs, "and");
                 if (!resultQuery) continue;
-                if (!whereString.startsWith('(')) whereString += ' AND ';
+                if (!whereString.endsWith('(')) whereString += ' AND ';
                 whereString += resultQuery;
                 continue;
             }
-            if (!whereString.startsWith('(')) whereString += ' AND ';
+            if (!whereString.endsWith('(')) whereString += ' AND ';
             if (where[key] === null) {
                 whereString += key + ' IS NULL';
                 continue;
@@ -100,7 +100,7 @@ const parseWhereOnWhereBuilder = (
             // conditionPart.push(key + ' = ?');
             globalWhereArgs.push(where[key]);
         }
-        if (whereString.startsWith('(')) {
+        if (whereString.endsWith('(')) {
             if (whereString.length === 1) {
                 whereString = '';
                 continue;
