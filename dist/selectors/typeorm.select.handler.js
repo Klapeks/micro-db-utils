@@ -54,6 +54,52 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SelectEntityHandler = void 0;
 var typeorm_1 = require("typeorm");
 var abstract_select_handler_1 = require("./abstract.select.handler");
+var parseWhereOnWhereBuilder = function (qbOr1, multipleWheres) {
+    if (!multipleWheres)
+        return;
+    if (!Array.isArray(multipleWheres))
+        throw "multipleWheres arg is not array";
+    var _loop_1 = function (i) {
+        var where = multipleWheres[i];
+        qbOr1 = qbOr1.orWhere(new typeorm_1.Brackets(function (qbAnd2) {
+            var _loop_2 = function (key) {
+                var _b, _c;
+                if (typeof where[key] === 'undefined')
+                    return "continue";
+                if (key === '$and') {
+                    qbAnd2.andWhere(new typeorm_1.Brackets(function (qbOr3) {
+                        parseWhereOnWhereBuilder(qbOr3, where[key]);
+                    }));
+                    return "continue";
+                }
+                if (key === '$or') {
+                    qbAnd2.orWhere(new typeorm_1.Brackets(function (qbOr3) {
+                        parseWhereOnWhereBuilder(qbOr3, where[key]);
+                    }));
+                    return "continue";
+                }
+                if (where[key] == null) {
+                    qbAnd2 = qbAnd2.andWhere(key + ' IS NULL');
+                    return "continue";
+                }
+                var placeholderKey = key + "_" + i;
+                if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
+                    var strVal = where[key].substring(7).toLowerCase();
+                    qbAnd2 = qbAnd2.andWhere('LOWER(' + key + ') LIKE :' + placeholderKey, (_b = {}, _b[placeholderKey] = strVal, _b));
+                    return "continue";
+                }
+                qbAnd2 = qbAnd2.andWhere(key + ' = :' + placeholderKey, (_c = {}, _c[placeholderKey] = where[key], _c));
+            };
+            for (var _i = 0, _a = Object.keys(where); _i < _a.length; _i++) {
+                var key = _a[_i];
+                _loop_2(key);
+            }
+        }));
+    };
+    for (var i = 0; i < multipleWheres.length; i++) {
+        _loop_1(i);
+    }
+};
 var SelectEntityHandler = /** @class */ (function (_super) {
     __extends(SelectEntityHandler, _super);
     function SelectEntityHandler(options) {
@@ -133,32 +179,7 @@ var SelectEntityHandler = /** @class */ (function (_super) {
                         if (options.where) {
                             multipleWheres_1 = Array.isArray(options.where) ? options.where : [options.where];
                             builder.andWhere(new typeorm_1.Brackets(function (qb1) {
-                                var _loop_1 = function (i) {
-                                    var where = multipleWheres_1[i];
-                                    qb1 = qb1.orWhere(new typeorm_1.Brackets(function (qb2) {
-                                        var _a, _b;
-                                        for (var _i = 0, _c = Object.keys(where); _i < _c.length; _i++) {
-                                            var key = _c[_i];
-                                            var placeholderKey = key + "_" + i;
-                                            if (typeof where[key] === 'undefined')
-                                                continue;
-                                            if (where[key] == null) {
-                                                qb2 = qb2.andWhere(key + ' IS NULL');
-                                                continue;
-                                            }
-                                            if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
-                                                var strVal = where[key].substring(7).toLowerCase();
-                                                qb2 = qb2.andWhere('LOWER(' + key + ') LIKE :' + placeholderKey, (_a = {}, _a[placeholderKey] = strVal, _a));
-                                                continue;
-                                            }
-                                            qb2 = qb2.andWhere(key + ' = :' + placeholderKey, (_b = {}, _b[placeholderKey] = where[key], _b));
-                                        }
-                                    }));
-                                };
-                                // qb1 = qb1.where('0 = 1');
-                                for (var i = 0; i < multipleWheres_1.length; i++) {
-                                    _loop_1(i);
-                                }
+                                parseWhereOnWhereBuilder(qb1, multipleWheres_1);
                             }));
                         }
                         if (!this.options.beforeGetMany) return [3 /*break*/, 2];

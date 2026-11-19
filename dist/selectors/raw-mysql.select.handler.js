@@ -54,6 +54,59 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MySQLSelectEntityHandler = void 0;
 var abstract_select_handler_1 = require("./abstract.select.handler");
 var utils_1 = require("@klapeks/utils");
+var parseWhereOnWhereBuilder = function (
+// whereString: string,
+multipleOrWheres, globalWhereArgs) {
+    if (!multipleOrWheres)
+        return '0';
+    if (!Array.isArray(multipleOrWheres))
+        throw "multipleOrWheres arg is not array";
+    var whereString = '';
+    // if (!queryBuilder.whereCondition) queryBuilder.whereCondition = '';
+    // if (!queryBuilder.whereArgs) queryBuilder.whereArgs = [];
+    // const multipleOrWheres = Array.isArray(options.where) ? options.where : [options.where];
+    for (var i = 0; i < multipleOrWheres.length; i++) {
+        var where = multipleOrWheres[i];
+        // and inside (...and...)
+        // let conditionPart = [] as string[];
+        if (whereString)
+            whereString += ' OR ';
+        whereString += '(';
+        for (var _i = 0, _a = Object.keys(where); _i < _a.length; _i++) {
+            var key = _a[_i];
+            if (typeof where[key] === 'undefined')
+                continue;
+            if (key === '$and') {
+                whereString += ' AND ' + parseWhereOnWhereBuilder(where[key], globalWhereArgs);
+                continue;
+            }
+            if (key === '$or') {
+                whereString += ' OR ' + parseWhereOnWhereBuilder(where[key], globalWhereArgs);
+                continue;
+            }
+            if (where[key] == null) {
+                whereString += key + ' IS NULL';
+                // conditionPart.push(key + ' IS NULL');
+                continue;
+            }
+            if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
+                var strVal = where[key].substring(7).toLowerCase();
+                whereString += 'LOWER(' + key + ') LIKE ?';
+                // conditionPart.push('LOWER('  + key + ') LIKE ?');
+                globalWhereArgs.push(strVal);
+                continue;
+            }
+            whereString += key + ' = ?';
+            // conditionPart.push(key + ' = ?');
+            globalWhereArgs.push(where[key]);
+        }
+        if (whereString.startsWith('(')) {
+            whereString += '0';
+        }
+        whereString += ')';
+    }
+    return '(' + whereString + ')';
+};
 var MySQLSelectEntityHandler = /** @class */ (function (_super) {
     __extends(MySQLSelectEntityHandler, _super);
     function MySQLSelectEntityHandler(options) {
@@ -86,10 +139,10 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
     MySQLSelectEntityHandler.prototype.rawSelect = function (options) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var queryBuilder, addOrderBy, i, multipleOrWheres, i, conditionPart, where, j, _i, _b, key, strVal, limitQuery, result, totalCount;
+            var queryBuilder, addOrderBy, i, multipleWheres, limitQuery, result, totalCount;
             var _this = this;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
                         queryBuilder = {
                             select: "*",
@@ -101,8 +154,8 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                         if (!this.options.beforeGetMany) return [3 /*break*/, 2];
                         return [4 /*yield*/, this.options.beforeGetMany(queryBuilder, options)];
                     case 1:
-                        _c.sent();
-                        _c.label = 2;
+                        _b.sent();
+                        _b.label = 2;
                     case 2:
                         // orderBy
                         if (this.options.orderBy) {
@@ -132,47 +185,19 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                         }
                         // where
                         if (options.where) {
-                            if (!queryBuilder.whereArgs)
-                                queryBuilder.whereArgs = [];
-                            multipleOrWheres = Array.isArray(options.where) ? options.where : [options.where];
+                            multipleWheres = Array.isArray(options.where) ? options.where : [options.where];
                             if (queryBuilder.whereCondition) {
                                 if (queryBuilder.whereCondition.toLowerCase().startsWith('where ')) {
                                     queryBuilder.whereCondition = queryBuilder.whereCondition.substring(6);
                                 }
                                 queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
                             }
-                            for (i = 0; i < multipleOrWheres.length; i++) {
-                                conditionPart = [];
-                                where = multipleOrWheres[i];
-                                j = 0;
-                                for (_i = 0, _b = Object.keys(where); _i < _b.length; _i++) {
-                                    key = _b[_i];
-                                    if (typeof where[key] === 'undefined')
-                                        continue;
-                                    if (where[key] == null) {
-                                        conditionPart.push(key + ' IS NULL');
-                                        continue;
-                                    }
-                                    if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
-                                        strVal = where[key].substring(7).toLowerCase();
-                                        conditionPart.push('LOWER(' + key + ') LIKE ?');
-                                        queryBuilder.whereArgs.push(strVal);
-                                        continue;
-                                    }
-                                    conditionPart.push(key + ' = ?');
-                                    queryBuilder.whereArgs.push(where[key]);
-                                }
-                                if (!(conditionPart === null || conditionPart === void 0 ? void 0 : conditionPart.length))
-                                    continue;
-                                if (!queryBuilder.whereCondition)
-                                    queryBuilder.whereCondition = '';
-                                else
-                                    queryBuilder.whereCondition += ' OR ';
-                                queryBuilder.whereCondition += '(' + conditionPart.join(" AND ") + ')';
-                            }
                             if (queryBuilder.whereCondition) {
-                                queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
+                                queryBuilder.whereCondition += ' OR ';
                             }
+                            if (!queryBuilder.whereArgs)
+                                queryBuilder.whereArgs = [];
+                            queryBuilder.whereCondition += parseWhereOnWhereBuilder(multipleWheres, queryBuilder.whereArgs);
                         }
                         // fixes
                         if (queryBuilder.whereCondition) {
@@ -204,7 +229,7 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                                 limitQuery
                             ].filter(Boolean).join('\n'), queryBuilder.whereArgs)];
                     case 3:
-                        result = _c.sent();
+                        result = _b.sent();
                         return [4 /*yield*/, this.runSQL([
                                 "SELECT count(1) as 'count'",
                                 'FROM ' + this.getTableName(),
@@ -213,12 +238,12 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                                 queryBuilder.whereCondition,
                             ].filter(Boolean).join('\n'), queryBuilder.whereArgs)];
                     case 4:
-                        totalCount = _c.sent();
+                        totalCount = _b.sent();
                         if (!this.options.afterSelect) return [3 /*break*/, 6];
                         return [4 /*yield*/, this.options.afterSelect(result, options)];
                     case 5:
-                        result = _c.sent();
-                        _c.label = 6;
+                        result = _b.sent();
+                        _b.label = 6;
                     case 6: return [2 /*return*/, { objects: result, total: ((_a = totalCount === null || totalCount === void 0 ? void 0 : totalCount[0]) === null || _a === void 0 ? void 0 : _a.count) || NaN }];
                 }
             });
