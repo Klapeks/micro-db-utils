@@ -58,9 +58,11 @@ var parseWhereOnWhereBuilder = function (
 // whereString: string,
 multipleOrWheres, globalWhereArgs, type) {
     if (!multipleOrWheres)
-        return '0';
+        return null;
     if (!Array.isArray(multipleOrWheres))
         throw "multipleOrWheres arg is not array";
+    if (!multipleOrWheres.length)
+        return null;
     var whereString = '';
     // if (!queryBuilder.whereCondition) queryBuilder.whereCondition = '';
     // if (!queryBuilder.whereArgs) queryBuilder.whereArgs = [];
@@ -81,17 +83,25 @@ multipleOrWheres, globalWhereArgs, type) {
             if (typeof where[key] === 'undefined')
                 continue;
             if (key === '$or') {
+                var resultQuery = parseWhereOnWhereBuilder(where[key], globalWhereArgs, "or");
+                if (!resultQuery)
+                    continue;
                 if (!whereString.startsWith('('))
                     whereString += ' OR ';
-                whereString += parseWhereOnWhereBuilder(where[key], globalWhereArgs, "or");
+                whereString += resultQuery;
+                continue;
+            }
+            if (key === '$and') {
+                var resultQuery = parseWhereOnWhereBuilder(where[key], globalWhereArgs, "and");
+                if (!resultQuery)
+                    continue;
+                if (!whereString.startsWith('('))
+                    whereString += ' AND ';
+                whereString += resultQuery;
                 continue;
             }
             if (!whereString.startsWith('('))
                 whereString += ' AND ';
-            if (key === '$and') {
-                whereString += parseWhereOnWhereBuilder(where[key], globalWhereArgs, "and");
-                continue;
-            }
             if (where[key] === null) {
                 whereString += key + ' IS NULL';
                 continue;
@@ -124,6 +134,8 @@ multipleOrWheres, globalWhereArgs, type) {
         }
         whereString += ')';
     }
+    if (!whereString)
+        return null;
     return '(' + whereString + ')';
 };
 var MySQLSelectEntityHandler = /** @class */ (function (_super) {
@@ -158,7 +170,7 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
     MySQLSelectEntityHandler.prototype.rawSelect = function (options) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var queryBuilder, addOrderBy, i, multipleWheres, limitQuery, result, totalCount;
+            var queryBuilder, addOrderBy, i, multipleWheres, resultQuery, limitQuery, result, totalCount;
             var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
@@ -211,12 +223,15 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                                 }
                                 queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
                             }
-                            if (queryBuilder.whereCondition) {
-                                queryBuilder.whereCondition += ' OR ';
-                            }
                             if (!queryBuilder.whereArgs)
                                 queryBuilder.whereArgs = [];
-                            queryBuilder.whereCondition += parseWhereOnWhereBuilder(multipleWheres, queryBuilder.whereArgs, 'or');
+                            resultQuery = parseWhereOnWhereBuilder(multipleWheres, queryBuilder.whereArgs, 'or');
+                            if (resultQuery) {
+                                if (queryBuilder.whereCondition) {
+                                    queryBuilder.whereCondition += ' OR ';
+                                }
+                                queryBuilder.whereCondition += resultQuery;
+                            }
                         }
                         // fixes
                         if (queryBuilder.whereCondition) {

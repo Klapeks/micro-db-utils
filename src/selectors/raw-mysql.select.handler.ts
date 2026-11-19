@@ -31,9 +31,10 @@ const parseWhereOnWhereBuilder = (
     multipleOrWheres: SelectOptions.Where<any>[],
     globalWhereArgs: any[],
     type: "or" | "and"
-): string => {
-    if (!multipleOrWheres) return '0';
+): string | null => {
+    if (!multipleOrWheres) return null;
     if (!Array.isArray(multipleOrWheres)) throw "multipleOrWheres arg is not array";
+    if (!multipleOrWheres.length) return null;
 
     let whereString = '';
 
@@ -56,17 +57,22 @@ const parseWhereOnWhereBuilder = (
         for (let key of Object.keys(where)) {
             if (typeof where[key] === 'undefined') continue;
             if (key === '$or') {
-                if (!whereString.startsWith('(')) whereString += ' OR ';
-                whereString += parseWhereOnWhereBuilder(
+                const resultQuery = parseWhereOnWhereBuilder(
                     where[key] as any, globalWhereArgs, "or");
+                if (!resultQuery) continue;
+                if (!whereString.startsWith('(')) whereString += ' OR ';
+                whereString += resultQuery;
+                continue;
+            }
+            if (key === '$and') {
+                const resultQuery = parseWhereOnWhereBuilder(
+                    where[key] as any, globalWhereArgs, "and");
+                if (!resultQuery) continue;
+                if (!whereString.startsWith('(')) whereString += ' AND ';
+                whereString += resultQuery;
                 continue;
             }
             if (!whereString.startsWith('(')) whereString += ' AND ';
-            if (key === '$and') {
-                whereString += parseWhereOnWhereBuilder(
-                    where[key] as any, globalWhereArgs, "and");
-                continue;
-            }
             if (where[key] === null) {
                 whereString += key + ' IS NULL';
                 continue;
@@ -99,6 +105,7 @@ const parseWhereOnWhereBuilder = (
         }
         whereString += ')';
     }
+    if (!whereString) return null;
     return '(' + whereString + ')';
 }
 
@@ -173,12 +180,15 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
                 }
                 queryBuilder.whereCondition = '(' + queryBuilder.whereCondition + ')';
             }
-            if (queryBuilder.whereCondition) {
-                queryBuilder.whereCondition += ' OR ';
-            }
             if (!queryBuilder.whereArgs) queryBuilder.whereArgs = [];
-            queryBuilder.whereCondition += parseWhereOnWhereBuilder(
+            const resultQuery = parseWhereOnWhereBuilder(
                     multipleWheres, queryBuilder.whereArgs, 'or');
+            if (resultQuery) {
+                if (queryBuilder.whereCondition) {
+                    queryBuilder.whereCondition += ' OR ';
+                }
+                queryBuilder.whereCondition += resultQuery;
+            }
         }
 
         // fixes
