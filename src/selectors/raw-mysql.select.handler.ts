@@ -1,4 +1,4 @@
-import { SelectOptionsWhere, type SelectOptions } from "@klapeks/api-creation-tools";
+import type { SelectOptions } from "@klapeks/api-creation-tools";
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from "./abstract.select.handler";
 import { DatabaseOptions, logger } from "@klapeks/utils";
 import { MySQLConnection } from "../sql";
@@ -28,8 +28,9 @@ export interface MySQLSelectEntityQueryBuilder {
 
 const parseWhereOnWhereBuilder = (
     // whereString: string,
-    multipleOrWheres: SelectOptionsWhere<any>[],
+    multipleOrWheres: SelectOptions.Where<any>[],
     globalWhereArgs: any[],
+    type: "or" | "and"
 ): string => {
     if (!multipleOrWheres) return '0';
     if (!Array.isArray(multipleOrWheres)) throw "multipleOrWheres arg is not array";
@@ -46,32 +47,48 @@ const parseWhereOnWhereBuilder = (
 
         // and inside (...and...)
         // let conditionPart = [] as string[];
-        if (whereString) whereString += ' OR ';
+        if (whereString) {
+            if (type === 'or') whereString += ' OR ';
+            if (type === 'and') whereString += ' AND ';
+        }
         whereString += '(';
 
         for (let key of Object.keys(where)) {
             if (typeof where[key] === 'undefined') continue;
-            if (key === '$and') {
-                whereString += ' AND ' + parseWhereOnWhereBuilder(
-                    where[key] as any, globalWhereArgs);
-                continue;
-            }
             if (key === '$or') {
-                whereString += ' OR ' + parseWhereOnWhereBuilder(
-                    where[key] as any, globalWhereArgs);
+                if (!whereString.startsWith('(')) whereString += ' OR ';
+                whereString += parseWhereOnWhereBuilder(
+                    where[key] as any, globalWhereArgs, "or");
                 continue;
             }
-            if (where[key] == null) {
+            if (!whereString.startsWith('(')) whereString += ' AND ';
+            if (key === '$and') {
+                whereString += parseWhereOnWhereBuilder(
+                    where[key] as any, globalWhereArgs, "and");
+                continue;
+            }
+            if (where[key] === null) {
                 whereString += key + ' IS NULL';
-                // conditionPart.push(key + ' IS NULL');
                 continue;
             }
-            if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
-                const strVal = (where[key] as string).substring(7).toLowerCase();
-                whereString += 'LOWER('  + key + ') LIKE ?';
-                // conditionPart.push('LOWER('  + key + ') LIKE ?');
-                globalWhereArgs.push(strVal);
+            if (where[key] === '{not}=null' || where[key] === '{not}=NULL') {
+                whereString += key + ' IS NOT NULL';
                 continue;
+            }
+            if (typeof where[key] === 'string') {
+                if ((where[key] as string).startsWith('{like}=')) {
+                    const strVal = (where[key] as string).substring(7).toLowerCase();
+                    whereString += 'LOWER('  + key + ') LIKE ?';
+                    // conditionPart.push('LOWER('  + key + ') LIKE ?');
+                    globalWhereArgs.push(strVal);
+                    continue;
+                }
+                if ((where[key] as string).startsWith('{not}=')) {
+                    const strVal = (where[key] as string).substring(6).toLowerCase();
+                    whereString += key + ' != ?';
+                    globalWhereArgs.push(strVal);
+                    continue;
+                }
             }
             whereString += key + ' = ?';
             // conditionPart.push(key + ' = ?');
@@ -161,7 +178,7 @@ export class MySQLSelectEntityHandler<T extends object, K extends string>
             }
             if (!queryBuilder.whereArgs) queryBuilder.whereArgs = [];
             queryBuilder.whereCondition += parseWhereOnWhereBuilder(
-                    multipleWheres, queryBuilder.whereArgs);
+                    multipleWheres, queryBuilder.whereArgs, 'or');
         }
 
         // fixes

@@ -54,41 +54,53 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SelectEntityHandler = void 0;
 var typeorm_1 = require("typeorm");
 var abstract_select_handler_1 = require("./abstract.select.handler");
-var parseWhereOnWhereBuilder = function (qbOr1, multipleWheres) {
+var parseWhereOnWhereBuilder = function (qbOr1, multipleWheres, type) {
     if (!multipleWheres)
         return;
     if (!Array.isArray(multipleWheres))
         throw "multipleWheres arg is not array";
     var _loop_1 = function (i) {
         var where = multipleWheres[i];
-        qbOr1 = qbOr1.orWhere(new typeorm_1.Brackets(function (qbAnd2) {
+        qbOr1 = (type == 'and' ? qbOr1.andWhere
+            : qbOr1.orWhere)(new typeorm_1.Brackets(function (qbAnd2) {
             var _loop_2 = function (key) {
-                var _b, _c;
+                var _b, _c, _d;
                 if (typeof where[key] === 'undefined')
                     return "continue";
                 if (key === '$and') {
                     qbAnd2.andWhere(new typeorm_1.Brackets(function (qbOr3) {
-                        parseWhereOnWhereBuilder(qbOr3, where[key]);
+                        parseWhereOnWhereBuilder(qbOr3, where[key], 'and');
                     }));
                     return "continue";
                 }
                 if (key === '$or') {
                     qbAnd2.orWhere(new typeorm_1.Brackets(function (qbOr3) {
-                        parseWhereOnWhereBuilder(qbOr3, where[key]);
+                        parseWhereOnWhereBuilder(qbOr3, where[key], 'or');
                     }));
                     return "continue";
                 }
-                if (where[key] == null) {
+                if (where[key] === null) {
                     qbAnd2 = qbAnd2.andWhere(key + ' IS NULL');
                     return "continue";
                 }
-                var placeholderKey = key + "_" + i;
-                if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
-                    var strVal = where[key].substring(7).toLowerCase();
-                    qbAnd2 = qbAnd2.andWhere('LOWER(' + key + ') LIKE :' + placeholderKey, (_b = {}, _b[placeholderKey] = strVal, _b));
+                if (where[key] === '{not}=null' || where[key] === '{not}=NULL') {
+                    qbAnd2 = qbAnd2.andWhere(key + ' IS NOT NULL');
                     return "continue";
                 }
-                qbAnd2 = qbAnd2.andWhere(key + ' = :' + placeholderKey, (_c = {}, _c[placeholderKey] = where[key], _c));
+                var placeholderKey = key + "_" + i;
+                if (typeof where[key] === 'string') {
+                    if (where[key].startsWith('{like}=')) {
+                        var strVal = where[key].substring(7).toLowerCase();
+                        qbAnd2 = qbAnd2.andWhere('LOWER(' + key + ') LIKE :' + placeholderKey, (_b = {}, _b[placeholderKey] = strVal, _b));
+                        return "continue";
+                    }
+                    if (where[key].startsWith('{not}=')) {
+                        var strVal = where[key].substring(6).toLowerCase();
+                        qbAnd2 = qbAnd2.andWhere(key + ' != :' + placeholderKey, (_c = {}, _c[placeholderKey] = strVal, _c));
+                        return "continue";
+                    }
+                }
+                qbAnd2 = qbAnd2.andWhere(key + ' = :' + placeholderKey, (_d = {}, _d[placeholderKey] = where[key], _d));
             };
             for (var _i = 0, _a = Object.keys(where); _i < _a.length; _i++) {
                 var key = _a[_i];
@@ -179,7 +191,7 @@ var SelectEntityHandler = /** @class */ (function (_super) {
                         if (options.where) {
                             multipleWheres_1 = Array.isArray(options.where) ? options.where : [options.where];
                             builder.andWhere(new typeorm_1.Brackets(function (qb1) {
-                                parseWhereOnWhereBuilder(qb1, multipleWheres_1);
+                                parseWhereOnWhereBuilder(qb1, multipleWheres_1, 'or');
                             }));
                         }
                         if (!this.options.beforeGetMany) return [3 /*break*/, 2];

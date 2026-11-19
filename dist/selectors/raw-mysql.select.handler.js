@@ -56,7 +56,7 @@ var abstract_select_handler_1 = require("./abstract.select.handler");
 var utils_1 = require("@klapeks/utils");
 var parseWhereOnWhereBuilder = function (
 // whereString: string,
-multipleOrWheres, globalWhereArgs) {
+multipleOrWheres, globalWhereArgs, type) {
     if (!multipleOrWheres)
         return '0';
     if (!Array.isArray(multipleOrWheres))
@@ -69,32 +69,51 @@ multipleOrWheres, globalWhereArgs) {
         var where = multipleOrWheres[i];
         // and inside (...and...)
         // let conditionPart = [] as string[];
-        if (whereString)
-            whereString += ' OR ';
+        if (whereString) {
+            if (type === 'or')
+                whereString += ' OR ';
+            if (type === 'and')
+                whereString += ' AND ';
+        }
         whereString += '(';
         for (var _i = 0, _a = Object.keys(where); _i < _a.length; _i++) {
             var key = _a[_i];
             if (typeof where[key] === 'undefined')
                 continue;
-            if (key === '$and') {
-                whereString += ' AND ' + parseWhereOnWhereBuilder(where[key], globalWhereArgs);
-                continue;
-            }
             if (key === '$or') {
-                whereString += ' OR ' + parseWhereOnWhereBuilder(where[key], globalWhereArgs);
+                if (!whereString.startsWith('('))
+                    whereString += ' OR ';
+                whereString += parseWhereOnWhereBuilder(where[key], globalWhereArgs, "or");
                 continue;
             }
-            if (where[key] == null) {
+            if (!whereString.startsWith('('))
+                whereString += ' AND ';
+            if (key === '$and') {
+                whereString += parseWhereOnWhereBuilder(where[key], globalWhereArgs, "and");
+                continue;
+            }
+            if (where[key] === null) {
                 whereString += key + ' IS NULL';
-                // conditionPart.push(key + ' IS NULL');
                 continue;
             }
-            if (typeof where[key] == 'string' && where[key].startsWith('{like}=')) {
-                var strVal = where[key].substring(7).toLowerCase();
-                whereString += 'LOWER(' + key + ') LIKE ?';
-                // conditionPart.push('LOWER('  + key + ') LIKE ?');
-                globalWhereArgs.push(strVal);
+            if (where[key] === '{not}=null' || where[key] === '{not}=NULL') {
+                whereString += key + ' IS NOT NULL';
                 continue;
+            }
+            if (typeof where[key] === 'string') {
+                if (where[key].startsWith('{like}=')) {
+                    var strVal = where[key].substring(7).toLowerCase();
+                    whereString += 'LOWER(' + key + ') LIKE ?';
+                    // conditionPart.push('LOWER('  + key + ') LIKE ?');
+                    globalWhereArgs.push(strVal);
+                    continue;
+                }
+                if (where[key].startsWith('{not}=')) {
+                    var strVal = where[key].substring(6).toLowerCase();
+                    whereString += key + ' != ?';
+                    globalWhereArgs.push(strVal);
+                    continue;
+                }
             }
             whereString += key + ' = ?';
             // conditionPart.push(key + ' = ?');
@@ -197,7 +216,7 @@ var MySQLSelectEntityHandler = /** @class */ (function (_super) {
                             }
                             if (!queryBuilder.whereArgs)
                                 queryBuilder.whereArgs = [];
-                            queryBuilder.whereCondition += parseWhereOnWhereBuilder(multipleWheres, queryBuilder.whereArgs);
+                            queryBuilder.whereCondition += parseWhereOnWhereBuilder(multipleWheres, queryBuilder.whereArgs, 'or');
                         }
                         // fixes
                         if (queryBuilder.whereCondition) {

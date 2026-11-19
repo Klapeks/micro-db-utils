@@ -1,4 +1,4 @@
-import { type SelectOptions } from "@klapeks/api-creation-tools";
+import type { SelectOptions } from "@klapeks/api-creation-tools";
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from "./abstract.select.handler";
 import { DatabaseOptions } from "@klapeks/utils";
 import { MySQLConnection } from "../sql";

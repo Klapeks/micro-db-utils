@@ -1,6 +1,6 @@
 import { Brackets, DataSource, EntitySchema, ObjectLiteral, SelectQueryBuilder, WhereExpressionBuilder } from 'typeorm';
 import { AbstractSelectHandler, SelectEntityHandlerOptions } from './abstract.select.handler';
-import { SelectOptionsWhere, type SelectOptions } from '@klapeks/api-creation-tools';
+import { type SelectOptions } from '@klapeks/api-creation-tools';
 import { DatabaseOptions } from '@klapeks/utils';
 
 
@@ -16,40 +16,56 @@ export type TypeormSelectEntityHandlerOptions<
 
 const parseWhereOnWhereBuilder = (
     qbOr1: WhereExpressionBuilder, 
-    multipleWheres: SelectOptionsWhere<any>[]
+    multipleWheres: SelectOptions.Where<any>[],
+    type: "or" | "and"
 ) => {
     if (!multipleWheres) return;
     if (!Array.isArray(multipleWheres)) throw "multipleWheres arg is not array";
     for (let i = 0; i < multipleWheres.length; i++) {
         const where = multipleWheres[i];
-        qbOr1 = qbOr1.orWhere(new Brackets(qbAnd2 => {
+        qbOr1 = (type == 'and' ? qbOr1.andWhere 
+        : qbOr1.orWhere)(new Brackets(qbAnd2 => {
             for (let key of Object.keys(where)) {
                 if (typeof where[key] === 'undefined') continue;
                 if (key === '$and') {
                     qbAnd2.andWhere(new Brackets(qbOr3 => {
-                        parseWhereOnWhereBuilder(qbOr3, where[key] as any);
+                        parseWhereOnWhereBuilder(qbOr3, where[key] as any, 'and');
                     }));
                     continue;
                 }
                 if (key === '$or') {
                     qbAnd2.orWhere(new Brackets(qbOr3 => {
-                        parseWhereOnWhereBuilder(qbOr3, where[key] as any);
+                        parseWhereOnWhereBuilder(qbOr3, where[key] as any, 'or');
                     }));
                     continue;
                 }
-                if (where[key] == null) {
+                if (where[key] === null) {
                     qbAnd2 = qbAnd2.andWhere(key + ' IS NULL');
+                    continue;
+                }
+                if (where[key] === '{not}=null' || where[key] === '{not}=NULL') {
+                    qbAnd2 = qbAnd2.andWhere(key + ' IS NOT NULL');
                     continue;
                 }
                 
                 const placeholderKey = key + "_" + i;
-                if (typeof where[key] == 'string' && (where[key] as string).startsWith('{like}=')) {
-                    const strVal = (where[key] as string).substring(7).toLowerCase();
-                    qbAnd2 = qbAnd2.andWhere(
-                        'LOWER('  + key + ') LIKE :' + placeholderKey, 
-                        { [placeholderKey]: strVal }
-                    );
-                    continue;
+                if (typeof where[key] === 'string') {
+                    if ((where[key] as string).startsWith('{like}=')) {
+                        const strVal = (where[key] as string).substring(7).toLowerCase();
+                        qbAnd2 = qbAnd2.andWhere(
+                            'LOWER('  + key + ') LIKE :' + placeholderKey, 
+                            { [placeholderKey]: strVal }
+                        );
+                        continue;
+                    }
+                    if ((where[key] as string).startsWith('{not}=')) {
+                        const strVal = (where[key] as string).substring(6).toLowerCase();
+                        qbAnd2 = qbAnd2.andWhere(
+                            key + ' != :' + placeholderKey,
+                            { [placeholderKey]: strVal }
+                        );
+                        continue;
+                    }
                 }
                 qbAnd2 = qbAnd2.andWhere(
                     key + ' = :' + placeholderKey, 
@@ -110,7 +126,7 @@ export class SelectEntityHandler<T extends ObjectLiteral, K extends string>
         if (options.where) {
             const multipleWheres = Array.isArray(options.where) ? options.where : [options.where];
             builder.andWhere(new Brackets((qb1) => {
-                parseWhereOnWhereBuilder(qb1, multipleWheres);
+                parseWhereOnWhereBuilder(qb1, multipleWheres, 'or');
             }));
         }
 
