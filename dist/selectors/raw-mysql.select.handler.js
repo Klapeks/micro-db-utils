@@ -130,7 +130,11 @@ multipleOrWheres, globalWhereArgs, type) {
             globalWhereArgs.push(where[key]);
         }
         if (whereString.startsWith('(')) {
-            whereString += '0';
+            if (whereString.length === 1) {
+                whereString = '';
+                continue;
+            }
+            whereString += type === 'and' ? '1' : '0';
         }
         whereString += ')';
     }
